@@ -9,6 +9,6 @@ print("\ncoordinates\n")
 print(coordinates)
 print("\nfaces\n")
 print(faces)
-print("\nedges\n")
-print(edges)
+print("\nedges with lengths\n")
+print(zip(edges, edge_length_vec))
 

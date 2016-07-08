@@ -133,6 +133,18 @@ def ply_to_input(fname_no_ply, min_len_nt):
 
     edges = get_edges_from_faces(faces)
 
-    [edge_length_vec, file_name, staple_name, singleXOs] = [None, None, None, None]
+
+    def get_edge_lengths(edges, coordinates):
+        edge_length_vec = []
+        for edge in edges:
+            beginning, end = edge
+            length = np.linalg.norm(np.array(coordinates[beginning]) - np.array(coordinates[end]))
+            edge_length_vec.append(length)
+        return edge_length_vec
+
+    edge_length_vec = get_edge_lengths(edges, coordinates)
+
+
+    [file_name, staple_name, singleXOs] = [None, None, None]
 
     return [coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs]
