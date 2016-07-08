@@ -86,6 +86,41 @@ def ply_to_input(fname_no_ply, min_len_nt):
 
     faces = extract_faces_from_file(fid, num_faces)
 
+    def remove_unused_vertices(coordinates, faces, number_of_vertices):
+        # Determine if you need to clean the vertex indices:
+        used_face_ids_as_list = []
+        for n, vertices in faces:
+            used_face_ids_as_list += vertices
+        unique_used_faces_as_set = set(used_face_ids_as_list)
+        unique_used_faces_as_list = sorted(list(unique_used_faces_as_set))  # sort to enforce consistency
+        cleaning_needed = len(unique_used_faces_as_set) < number_of_vertices
+
+        # Then clean if needed:
+        if cleaning_needed:
+            #TODO: raise warning if cleaning is needed / used?
+            # Remove unused row from coordinates data.
+            new_coordinates = []
+            for i, row in enumerate(coordinates):
+                if i in unique_used_faces_as_set:
+                    new_coordinates.append(row)
+            coordinates = new_coordinates
+
+            new_faces = []
+            for face in faces:
+                number_of_vertices = face[0]
+                current_vertices = face[1]
+                new_vertices = []
+                for vertex in current_vertices:
+                    new_vertex = unique_used_faces_as_list.index(vertex)
+                    new_vertices.append(new_vertex)
+                new_faces.append([number_of_vertices, new_vertices])
+            faces = new_faces
+
+        return coordinates, faces
+
+    coordinates, faces = remove_unused_vertices(coordinates, faces, num_vert)
+
+
     #`int`s:
     # edges
     # faces  # (he used cell structure)
