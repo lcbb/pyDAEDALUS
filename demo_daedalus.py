@@ -9,4 +9,6 @@ print("\ncoordinates\n")
 print(coordinates)
 print("\nfaces\n")
 print(faces)
+print("\nedges\n")
+print(edges)
 

@@ -121,10 +121,18 @@ def ply_to_input(fname_no_ply, min_len_nt):
     coordinates, faces = remove_unused_vertices(coordinates, faces, num_vert)
 
 
-    #`int`s:
-    # edges
-    # faces  # (he used cell structure)
+    def get_edges_from_faces(faces):
+        edges = []
+        for number_of_vertices, vertices in faces:
+            curr_face = vertices
+            curr_face += [curr_face[0]]
+            for i in range(len(curr_face)-1):
+                if curr_face[i + 1] > curr_face[i]:
+                    edges.append((curr_face[i + 1], curr_face[i]))
+        return edges
 
-    [edges, edge_length_vec, file_name, staple_name, singleXOs] = [None, None, None, None, None]
+    edges = get_edges_from_faces(faces)
+
+    [edge_length_vec, file_name, staple_name, singleXOs] = [None, None, None, None]
 
     return [coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs]
