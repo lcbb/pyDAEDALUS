@@ -167,8 +167,14 @@ def ply_to_input(fname_no_ply, min_len_nt=31):
     scale_edge_length_PLY = scale_edge_lengths(edge_length_PLY, min_len_nt)
     edge_length_vec = scale_edge_length_PLY
 
+    # Other parameters
+    staple_name = file_name  # set short name as file name by default
+
+    if min_len_nt < 42:
+        singleXOs = 0
+    else:
+        singleXOs = 1
 
 
-    [file_name, staple_name, singleXOs] = [None, None, None]
 
     return [coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs]
