@@ -38,28 +38,58 @@ def ply_to_input(fname_no_ply, min_len_nt):
     fid = open(fname)
 
     def extract_number_from_keyword_in_ply_file(filestream, keyword):
-        # TODO: make regular expression!!  And funcitonize it?
-        # TODO: verify this filestream doesn't restart
-        keyword_length = len(keyword)
-        temp = ''
-        while temp[:keyword_length] != keyword:
-            temp = fid.readline()
+        # TODO: make regular expression?
+        line = ''
+        while keyword not in line:
+            line = filestream.readline()
 
-        full_line_with_keyword = temp
-        number = int(full_line_with_keyword[keyword_length:])
-
+        number = int(line.strip().split()[-1]) # grab last whitespace-delimited bit from line and convert to int
         return number
 
-    num_vert = extract_number_from_keyword_in_ply_file(fid, 'element vertex ')
-    num_faces = extract_number_from_keyword_in_ply_file(fid, 'element face ')
+    num_vert = extract_number_from_keyword_in_ply_file(fid, 'element vertex')
+    num_faces = extract_number_from_keyword_in_ply_file(fid, 'element face')
 
+    def extract_coordinates_from_file(filestream, number_of_vertices):
+        # read lines up to and including the one containing 'end header':
+        temp = ''
+        while 'end_header' not in temp:  # not strict equality, because
+            temp = filestream.readline()
 
-    coordinates = np.zeros(dtype=np.float64, shape=(num_vert, 3))  #double
+        coordinates_as_list = []
+        for i in range(number_of_vertices):
+            line = filestream.readline()
+            line_as_list = line.split()
+            coords_on_this_line = map(float, line_as_list)
+            coordinates_as_list.append(coords_on_this_line)
+
+        #TODO: make this into an array?
+        # coordinates_as_array = np.array(coordinates_as_list, dtype=np.float64)
+        return coordinates_as_list
+
+    coordinates = extract_coordinates_from_file(fid, num_vert)
+
+    def extract_faces_from_file(filestream, number_of_faces):
+        # TODO: verify this filestream doesn't restart
+
+        faces_as_list = []
+        for face_id in range(number_of_faces):
+            line = filestream.readline()
+            line_as_list_of_ints = map(int, line.strip().split())
+            number_of_vertices = line_as_list_of_ints[0]
+            vertices = line_as_list_of_ints[1:]
+
+            assert number_of_vertices == len(vertices)
+            faces_as_list.append([number_of_vertices, vertices])
+
+        #TODO: make this into an array?
+        return faces_as_list
+
+    faces = extract_faces_from_file(fid, num_faces)
 
     #`int`s:
     # edges
     # faces  # (he used cell structure)
 
-    [edges, faces, edge_length_vec, file_name, staple_name, singleXOs] = [None, None, None, None, None, None]
+    [edges, edge_length_vec, file_name, staple_name, singleXOs] = [None, None, None, None, None]
 
     return [coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs]
