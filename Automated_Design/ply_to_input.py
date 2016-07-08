@@ -122,11 +122,10 @@ def ply_to_input(fname_no_ply, min_len_nt=31):
 
     coordinates, faces = remove_unused_vertices(coordinates, faces, num_vert)
 
-
     def get_edges_from_faces(faces):
         edges = []
         for number_of_vertices, vertices in faces:
-            curr_face = vertices
+            curr_face = list(vertices)  #force python to make copy rather than create reference
             curr_face += [curr_face[0]]
             for i in range(len(curr_face)-1):
                 if curr_face[i + 1] > curr_face[i]:
