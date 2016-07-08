@@ -202,7 +202,6 @@ def ply_to_input(fname_no_ply, min_len_nt=31):
         y32 = np.histogram(rounded_edge_length_PLY, bins=bins_for_hist)[0]
         bins_a = [x - 0.125 for x in bins_for_plotting]
         bins_b = [x + 0.38 for x in bins_for_plotting]
-        # plt.bar(left=[bins_a, bins_b], height=[y31, y32])
         plt.bar(bins_a, y31, width=0.25, color='b')
         plt.bar(bins_b, y32, width=0.25, color='r')
 
