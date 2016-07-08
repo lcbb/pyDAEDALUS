@@ -7,8 +7,15 @@ min_len_nt = 52 # minimum edge length. Input [] for default minimum 31.
 
 print("\ncoordinates\n")
 print(coordinates)
+
 print("\nfaces\n")
 print(faces)
-print("\nedges with lengths\n")
-print(zip(edges, edge_length_vec))
+
+print("\nedges\n")
+print(edges)
+
+print("\nedges lengths\n")
+print(edge_length_vec)
+
+
 

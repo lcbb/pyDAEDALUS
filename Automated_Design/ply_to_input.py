@@ -1,7 +1,7 @@
 from os import path
 import numpy as np
 
-def ply_to_input(fname_no_ply, min_len_nt):
+def ply_to_input(fname_no_ply, min_len_nt=31):
     """
     Converts PLY file into design variables for DX_cage_design input
     Inputs: fname_no_ply = string containing name of PLY file without '.ply'
@@ -142,7 +142,31 @@ def ply_to_input(fname_no_ply, min_len_nt):
             edge_length_vec.append(length)
         return edge_length_vec
 
-    edge_length_vec = get_edge_lengths(edges, coordinates)
+    edge_length_PLY = get_edge_lengths(edges, coordinates)
+
+
+    def scale_edge_lengths(edge_lengths, min_len_nt):
+        min_edge_PLY = min(edge_lengths)
+        scale = float(min_len_nt)/min_edge_PLY
+        scale_edge_length_PLY = np.rint(scale * np.array(edge_lengths))
+        rounded = np.rint(scale_edge_length_PLY / 10.5)
+
+        rounded_edge_length_PLY = []
+        for edge_ID in range(len(edge_lengths)):
+            rounded_times_ten_point_five = rounded[edge_ID]*10.5
+            remainder = rounded[edge_ID] % 2
+            if remainder == 0:
+                final_length = rounded_times_ten_point_five
+            elif scale_edge_length_PLY[edge_ID] > rounded_times_ten_point_five:
+                final_length = rounded_times_ten_point_five + 0.5
+            else:
+                final_length = rounded_times_ten_point_five - 0.5
+            rounded_edge_length_PLY.append(final_length)
+        return rounded_edge_length_PLY
+
+    scale_edge_length_PLY = scale_edge_lengths(edge_length_PLY, min_len_nt)
+    edge_length_vec = scale_edge_length_PLY
+
 
 
     [file_name, staple_name, singleXOs] = [None, None, None]
