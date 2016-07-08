@@ -1,5 +1,7 @@
 from os import path
 import numpy as np
+from matplotlib import pyplot as plt
+
 
 def ply_to_input(fname_no_ply, min_len_nt=31):
     """
@@ -145,7 +147,7 @@ def ply_to_input(fname_no_ply, min_len_nt=31):
     edge_length_PLY = get_edge_lengths(edges, coordinates)
 
 
-    def scale_edge_lengths(edge_lengths, min_len_nt):
+    def get_scaled_and_rounded_edge_lengths(edge_lengths, min_len_nt):
         min_edge_PLY = min(edge_lengths)
         scale = float(min_len_nt)/min_edge_PLY
         scale_edge_length_PLY = np.rint(scale * np.array(edge_lengths))
@@ -161,11 +163,11 @@ def ply_to_input(fname_no_ply, min_len_nt=31):
                 final_length = rounded_times_ten_point_five + 0.5
             else:
                 final_length = rounded_times_ten_point_five - 0.5
-            rounded_edge_length_PLY.append(final_length)
-        return rounded_edge_length_PLY
+            rounded_edge_length_PLY.append(int(final_length))
+        return scale_edge_length_PLY, rounded_edge_length_PLY
 
-    scale_edge_length_PLY = scale_edge_lengths(edge_length_PLY, min_len_nt)
-    edge_length_vec = scale_edge_length_PLY
+    scale_edge_length_PLY, rounded_edge_length_PLY = get_scaled_and_rounded_edge_lengths(edge_length_PLY, min_len_nt)
+    edge_length_vec = rounded_edge_length_PLY
 
     # Other parameters
     staple_name = file_name  # set short name as file name by default
@@ -174,6 +176,46 @@ def ply_to_input(fname_no_ply, min_len_nt=31):
         singleXOs = 0
     else:
         singleXOs = 1
+
+    #TODO: det default to print plots to file, unless explicitly stated to show on screen?
+
+    def plot_edge_length_distributions(scale_edge_length_PLY, rounded_edge_length_PLY):
+        min_len_nt = min(rounded_edge_length_PLY)  #TODO: This is right, right?  It's a little cleaner to not have to import it if the info is already in a variable we're passing in.
+        bins_for_hist = range(min_len_nt, max(rounded_edge_length_PLY) + 3, 1)
+        bins_for_plotting = [x - 0.25 for x in bins_for_hist[:-1]]
+
+
+        fig = plt.figure(31, figsize=(8, 6))
+        fig.clf()
+        y31 = np.histogram(scale_edge_length_PLY, bins=bins_for_hist)[0]
+        plt.bar(bins_for_plotting, y31, width=0.5)
+        plt.xlim((min_len_nt - 0.5, max(rounded_edge_length_PLY) + 1.5))
+        plt.ylim((0, max(y31)+1))
+        plt.title('Minimum edge length {} bp'.format(min_len_nt));
+        plt.xlabel('Edge length (bp)')
+        plt.ylabel('Number of edges')
+        plt.xticks(bins_for_hist)
+
+
+        fig = plt.figure(32, figsize=(8, 6))
+        fig.clf()
+        y32 = np.histogram(rounded_edge_length_PLY, bins=bins_for_hist)[0]
+        bins_a = [x - 0.125 for x in bins_for_plotting]
+        bins_b = [x + 0.38 for x in bins_for_plotting]
+        # plt.bar(left=[bins_a, bins_b], height=[y31, y32])
+        plt.bar(bins_a, y31, width=0.25, color='b')
+        plt.bar(bins_b, y32, width=0.25, color='r')
+
+        plt.xlim((min_len_nt - 0.5, max(rounded_edge_length_PLY) + 1.5))
+        plt.ylim((0, max(max(y31)+1, 1)))
+        plt.title('Edges rounded to nearest 10.5 bp')
+        plt.xlabel('Edge length (bp)')
+        plt.ylabel('Number of edges')
+        plt.xticks(bins_for_hist)
+
+        plt.show()
+
+    plot_edge_length_distributions(scale_edge_length_PLY, rounded_edge_length_PLY)
 
 
 
