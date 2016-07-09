@@ -1,6 +1,7 @@
 import numpy as np
 from gen_vert_to_face import gen_vert_to_face
 from designate_edge_type import designate_edge_type
+from gen_schlegel import gen_schlegel
 import networkx as nx
 
 def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs, scaf_seq, scaf_name):
@@ -109,6 +110,9 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
         i = edge[0]
         j = edge[1]
         print(i, j, edge_type_mat[i][j])
+
+    gen_schlegel(edges, coordinates, faces, edge_type_mat, 2)
+
 
 
     full_file_name = None
