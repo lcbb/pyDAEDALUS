@@ -1,5 +1,7 @@
 import numpy as np
 from gen_vert_to_face import gen_vert_to_face
+from designate_edge_type import designate_edge_type
+import networkx as nx
 
 def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs, scaf_seq, scaf_name):
     """
@@ -72,17 +74,42 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
 
     ### 1. Generate sparse matrix of connectivities and vertex-face indexing ###
     # Create sparse matrices of connectivities and edge lengths
-    # graph = sparse(edges(:, 1), edges(:, 2), ones(num_edges, 1), num_vert, num_vert)
-    # edge_length_mat = sparse(edges(:, 1), edges(:, 2), edge_length_vec, num_vert, num_vert)
+    def generate_graph(num_vert, edges, edge_length_vec):
+        G = nx.Graph()
+        for n in range(num_vert):
+            G.add_node(n)
+        for edge, length in zip(edges, edge_length_vec):
+            G.add_edge(edge[0], edge[1], weight=length)
 
-    # Convert lower triangle graphs to full symmetric graphs
-    # full_graph = graph + graph'
-    # edge_length_mat_full = edge_length_mat + edge_length_mat'
+
+        #TODO: here's the matlab code... ambiguous if the above is enough or not until I get further into the rest of the code
+        # graph = sparse(edges(:, 1), edges(:, 2), ones(num_edges, 1), num_vert, num_vert)
+        # edge_length_mat = sparse(edges(:, 1), edges(:, 2), edge_length_vec, num_vert, num_vert)
+
+        # Convert lower triangle graphs to full symmetric graphs
+        # full_graph = graph + graph'
+        # edge_length_mat_full = edge_length_mat + edge_length_mat'
+        full_graph = G
+        return full_graph
+    full_graph = generate_graph(num_vert, edges, edge_length_vec)
 
     # Identify presence of every vertex in every face
     vert_to_face = gen_vert_to_face(num_vert, faces)
-    print('\nvert_to_face\n')
-    print(vert_to_face)
+    # print('\nvert_to_face\n')
+    # print(vert_to_face)
+
+
+    ## 2. Generate spanning tree ##############################################
+    # # Designate edges as type 1 or 2:
+    # # Type 1: Non-spanning tree, i.e. 1 scaffold crossover in DX cage
+    # # Type 2: Spanning tree edges, i.e. 0 scaffold crossovers in DX cage
+    edge_type_mat = designate_edge_type(full_graph)
+    print("graph with spanning tree data:")
+    for edge in edge_type_mat.edges():
+        i = edge[0]
+        j = edge[1]
+        print(i, j, edge_type_mat[i][j])
+
 
     full_file_name = None
     return full_file_name
