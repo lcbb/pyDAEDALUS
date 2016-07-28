@@ -2,6 +2,7 @@ import networkx as nx
 import numpy as np
 
 from Automated_Design.constants import SCAF_SEQ
+from Automated_Design.util import generate_graph
 from designate_edge_type import designate_edge_type
 from gen_schlegel import gen_schlegel
 from gen_vert_to_face import gen_vert_to_face
@@ -15,9 +16,8 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
               V = number of vertices
             edges = Ex2 matrix where each row corresponds to one edge,
               denoting the vertices being connected. 1st column > 2nd column
-            faces = Fx2 cell matrix, where F is the number of faces.
-              The first column details how many vertices the face has
-              The second column details the vertex IDs of the face
+            faces = F cell matrix, where F is the number of faces.
+              The second column details the vertex IDs of the face                #TODO: polish up these 'faces' docs
             edge_length_vec = column vector of edge lengths
             file_name = string to name structure
             staple_name = string to name staples to order (can be same as
@@ -78,23 +78,6 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
 
     ### 1. Generate sparse matrix of connectivities and vertex-face indexing ###
     # Create sparse matrices of connectivities and edge lengths
-    def generate_graph(num_vert, edges, edge_length_vec):
-        G = nx.Graph()
-        for n in range(num_vert):
-            G.add_node(n)
-        for edge, length in zip(edges, edge_length_vec):
-            G.add_edge(edge[0], edge[1], weight=length)
-
-
-        #TODO: here's the matlab code... ambiguous if the above is enough or not until I get further into the rest of the code
-        # graph = sparse(edges(:, 1), edges(:, 2), ones(num_edges, 1), num_vert, num_vert)
-        # edge_length_mat = sparse(edges(:, 1), edges(:, 2), edge_length_vec, num_vert, num_vert)
-
-        # Convert lower triangle graphs to full symmetric graphs
-        # full_graph = graph + graph'
-        # edge_length_mat_full = edge_length_mat + edge_length_mat'
-        full_graph = G
-        return full_graph
     full_graph = generate_graph(num_vert, edges, edge_length_vec)
 
     # Identify presence of every vertex in every face

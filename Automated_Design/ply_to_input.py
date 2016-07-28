@@ -130,7 +130,7 @@ def ply_to_input(fname_no_ply, min_len_nt=31):
             for i in range(len(curr_face)-1):
                 if curr_face[i + 1] > curr_face[i]:
                     edges.append((curr_face[i + 1], curr_face[i]))
-        return edges
+        return np.array(edges)
 
     edges = get_edges_from_faces(faces)
 
