@@ -35,6 +35,7 @@ def gen_schlegel(edges, coordinates, faces, edge_type_mat=None, schlegel_filenam
     vermillion = tuple(np.array([213, 94, 0], dtype=np.float) / 255)
     redpurple = tuple(np.array([204, 121, 167], dtype=np.float) / 255)
     skyblue = tuple(np.array([86, 180, 233], dtype=np.float) / 255)
+    white = tuple(np.array([255, 255, 255], dtype=np.float) / 255)
 
     # Choose Biggest Face:
     big_face = max(faces, key=len)
@@ -92,7 +93,7 @@ def gen_schlegel(edges, coordinates, faces, edge_type_mat=None, schlegel_filenam
     plt.xlim((-1.2, 1.2))
     plt.ylim((-1.2, 1.2))
     #TODO: `axis equal` resolvede by figsize?
-    # plt.axis('off')
+    plt.axis('off')
 
     # TODO:  `for thickfirst = 1:2` needed?  Yes.  Plot blue lines then pink line.
     for edge in edges:
@@ -115,6 +116,16 @@ def gen_schlegel(edges, coordinates, faces, edge_type_mat=None, schlegel_filenam
             plt.plot(x_vec, y_vec, linestyle='-', color=redpurple, linewidth=8)
         else:  #if this is a non-tree edge:
             plt.plot(x_vec, y_vec, linestyle='-', color=skyblue, linewidth=5)
+
+    # Plot nodes:
+    plt.plot(xycoord[:, 0], xycoord[:, 1], 'o',
+             color=vermillion, markeredgecolor=vermillion, markersize=15)
+
+    # Plot node labels:
+    for i, node_xy in enumerate(xycoord):
+        x, y = node_xy
+        plt.text(x, y, str(i), color=white, fontname='Arial',
+        horizontalalignment='center', verticalalignment='center')
 
     if schlegel_filename:
         plt.savefig(schlegel_filename, bbox_inches='tight')

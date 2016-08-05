@@ -96,10 +96,5 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
         full_schlegel_filename = None
     gen_schlegel(edges, coordinates, faces, edge_type_mat=edge_type_mat, schlegel_filename=full_schlegel_filename)
 
-
-    #TODO: plot circles at each vertex
-
-    #TODO: label each vertex
-
     full_file_name = None
     return full_file_name

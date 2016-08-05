@@ -21,7 +21,7 @@ if __name__ == '__main__':
     out_directory = 'Drawings'
     ply_filenames = grab_all_ply_filenames_from_directory(ply_directory)
 
-    print ply_filenames[:10]
+    # ply_filenames = ply_filenames[:10]
 
     create_empty_directory(out_directory)
 
