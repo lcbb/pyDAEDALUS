@@ -1,5 +1,6 @@
 import networkx as nx
 import numpy as np
+from os import path
 
 from Automated_Design.constants import SCAF_SEQ
 from Automated_Design.util import generate_graph
@@ -8,7 +9,7 @@ from gen_schlegel import gen_schlegel
 from gen_vert_to_face import gen_vert_to_face
 
 
-def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs, scaf_seq, scaf_name):
+def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs, scaf_seq, scaf_name, results_foldername=None):
     """
     Creates scaffold routing and staple placement of a DX-based DNA origami
     nano cage.
@@ -69,8 +70,6 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
                 scaf_seq += chosen_letter
 
     scaf_name = 'randomscaf'  # scaffold name
-    print(scaf_name)  # display the scaffold name
-    print(len(scaf_seq))  # display the length of the scaffold
 
     # Count number of vertices and edges
     num_vert = len(coordinates)
@@ -82,8 +81,6 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
 
     # Identify presence of every vertex in every face
     vert_to_face = gen_vert_to_face(num_vert, faces)
-    # print('\nvert_to_face\n')
-    # print(vert_to_face)
 
 
     ## 2. Generate spanning tree ##############################################
@@ -91,13 +88,13 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
     # # Type 1: Non-spanning tree, i.e. 1 scaffold crossover in DX cage
     # # Type 2: Spanning tree edges, i.e. 0 scaffold crossovers in DX cage
     edge_type_mat = designate_edge_type(full_graph)
-    print("graph with spanning tree data:")
-    for edge in edge_type_mat.edges():
-        i = edge[0]
-        j = edge[1]
-        print(i, j, edge_type_mat[i][j])
-
-    gen_schlegel(edges, coordinates, faces, edge_type_mat, 2)
+    if results_foldername:
+        file_name_without_containing_folder = path.split(file_name)[1]
+        schlegel_filename = file_name_without_containing_folder + '_schlegel.png'
+        full_schlegel_filename = path.join(results_foldername, schlegel_filename)
+    else:
+        full_schlegel_filename = None
+    gen_schlegel(edges, coordinates, faces, edge_type_mat=edge_type_mat, schlegel_filename=full_schlegel_filename)
 
 
     #TODO: plot circles at each vertex

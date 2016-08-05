@@ -12,7 +12,6 @@ def designate_edge_type(full_graph):
 
     tree_edges = full_tree.edges()
     for edge in full_graph.edges():
-        print edge
         if edge in tree_edges:
             type = 2
         else:

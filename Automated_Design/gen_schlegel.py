@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from Automated_Design.util import generate_graph
 
 
-def gen_schlegel(edges, coordinates, faces, edge_type_mat=None, fig=None):
+def gen_schlegel(edges, coordinates, faces, edge_type_mat=None, schlegel_filename=None):
     """
     Plots vertices and edges in Schlegel diagram, tracing scaffold path in
     colored lines
@@ -18,9 +18,9 @@ def gen_schlegel(edges, coordinates, faces, edge_type_mat=None, fig=None):
             edge_type_mat = sparse matrix where
       1 is non-spanning tree edge: DX edge with 1 scaffold crossover
       2 is spanning tree edge: DX edge with 0 scaffold crossovers
-            fig = figure number for display
     Output: figure of vertices and edges in Schlegel diagram and coordinates
-    of projected vertices (xycoord, Vx2 matrix)
+    of projected vertices (xycoord, Vx2 matrix).  Saved into folder
+    `results_filename` if defined, else it's shown on screen
     ##########################################################################
     by Sakul Ratanalert, MIT, Bathe Lab, 2016
 
@@ -87,13 +87,14 @@ def gen_schlegel(edges, coordinates, faces, edge_type_mat=None, fig=None):
                 # # Store as new xycoord for vert_ID
                 xycoord[vert_ID, :] = midpt
 
-    f = plt.figure(fig, figsize=(8, 8)) #TODO: Why preserver the fig number?
+    f = plt.figure(0, figsize=(8, 8)) #TODO: Why preserver the fig number?
+    f.clf()
     plt.xlim((-1.2, 1.2))
     plt.ylim((-1.2, 1.2))
     #TODO: `axis equal` resolvede by figsize?
     # plt.axis('off')
 
-    # TODO:  `for thickfirst = 1:2` needed?
+    # TODO:  `for thickfirst = 1:2` needed?  Yes.  Plot blue lines then pink line.
     for edge in edges:
         # Get end vertices
         edge_bgn, edge_fin = edge
@@ -115,6 +116,10 @@ def gen_schlegel(edges, coordinates, faces, edge_type_mat=None, fig=None):
         else:  #if this is a non-tree edge:
             plt.plot(x_vec, y_vec, linestyle='-', color=skyblue, linewidth=5)
 
-    plt.savefig('thing.png', bbox_inches='tight')  #TODO: make sensible name
+    if schlegel_filename:
+        plt.savefig(schlegel_filename, bbox_inches='tight')
+    else:
+        #Should I make showing an option?  Either way, should I also save the earlier distribution plots?
+        plt.show()
 
     return xycoord
