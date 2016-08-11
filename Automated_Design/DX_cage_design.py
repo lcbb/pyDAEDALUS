@@ -4,6 +4,7 @@ from os import path
 
 from Automated_Design.constants import SCAF_SEQ
 from Automated_Design.split_edge import split_edge
+from Automated_Design.split_vert import split_vert
 from Automated_Design.util import generate_graph
 from designate_edge_type import designate_edge_type
 from gen_schlegel import gen_schlegel
@@ -97,7 +98,7 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
     else:
         full_schlegel_filename = None
     gen_schlegel(edges, coordinates, faces, edge_type_mat=edge_type_mat, schlegel_filename=full_schlegel_filename)
-    edge_type_mat = edge_type_mat.to_directed()  # MST in networkx requires an undirected graph?  Later code requires directed.
+    edge_type_mat = edge_type_mat.to_directed()  # MST in networkx requires an undirected graph?  Later code requires directed?
 
     ## 3. Add nodes to edges ##################################################
     # Add two nodes to each nontree edge to implement scaffold crossovers
@@ -105,8 +106,14 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
     graph_with_edges_split = edge_type_mat_wHalfs  #TODO: this rename
 
 
-    import ipdb; ipdb.set_trace()
+    ## 4. Add nodes to vertices ###############################################
+    # # Split each vertex into N nodes, where N is degree of vertex
+    edge_type_mat_allNodes, pseudo_vert = split_vert(edge_type_mat_wHalfs, pseudo_vert, num_vert, vert_to_face)
 
+    print('--------')
+    print(len(edge_type_mat_allNodes.nodes()))
+    print(len(edge_type_mat_allNodes.edges()))
+    import ipdb; ipdb.set_trace()
 
     full_file_name = None
     return full_file_name
