@@ -1,4 +1,4 @@
-from networkx.algorithms.mst import prim_mst
+from networkx.algorithms.mst import prim_mst, kruskal_mst
 
 def designate_edge_type(full_graph):
     """
