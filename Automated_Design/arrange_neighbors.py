@@ -74,18 +74,16 @@ def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors, v
                 shared_neighbor = set(v2f_vert_ID).intersection(set(v2f_n1)).intersection(set(v2f_n2))
                 #TODO: there has to be a way to clean up at least the for-for-if above...
 
-                print('  ',(vert_ID,neighbor_1,neighbor_2), '->', (vert_ID,pseudo_vert[neighbor_1],pseudo_vert[neighbor_2]))
-                print('  ', v2f_vert_ID, v2f_n1, v2f_n2)
+                # print(', ',(vert_ID,neighbor_1,neighbor_2), '->', (vert_ID,pseudo_vert[neighbor_1],pseudo_vert[neighbor_2]))
+                # print('. ', v2f_vert_ID, v2f_n1, v2f_n2)
 
                 if shared_neighbor:
                     print('n', shared_neighbor)
 
                     # # Record the face this new node belongs to
-                    if len(shared_neighbor) > 1:
-                        import ipdb; ipdb.set_trace()
 
-                    assert len(shared_neighbor) <= 1 , "is multiple neighbors possible?"
-                    face_3 = shared_neighbor.pop()
+                    # assert len(shared_neighbor) <= 1 , "is multiple neighbors possible?"
+                    face_3 = list(shared_neighbor)
 
 
                     # # Check if connecting to another pseudo node if faces
