@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def ply_to_input(fname_no_ply, min_len_nt=31):
+def ply_as_filename_to_input(fname_no_ply, min_len_nt=31):
     """
     Converts PLY file into design variables for DX_cage_design input
     Inputs: fname_no_ply = string containing name of PLY file without '.ply'
@@ -31,13 +31,15 @@ def ply_to_input(fname_no_ply, min_len_nt=31):
     this license is available at https://opensource.org/licenses/GPL-2.0
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     """
-
-
-    file_name = fname_no_ply + '_' + str(min_len_nt)  #TODO: rename to disambiguate from fname?
-
     fname = fname_no_ply + '.ply'
     assert path.isfile(fname)
-    fid = open(fname)
+    f = open(fname)
+    return ply_to_input(fname_no_ply, f, min_len_nt)
+
+#TODO: clean up the almost-redundant `fname_no_ply` and `f` being passed in here.
+def ply_to_input(fname_no_ply, f, min_len_nt):
+
+    file_name = fname_no_ply + '_' + str(min_len_nt)
 
     def extract_number_from_keyword_in_ply_file(filestream, keyword):
         # TODO: make regular expression?
@@ -48,8 +50,8 @@ def ply_to_input(fname_no_ply, min_len_nt=31):
         number = int(line.strip().split()[-1]) # grab last whitespace-delimited bit from line and convert to int
         return number
 
-    num_vert = extract_number_from_keyword_in_ply_file(fid, 'element vertex')
-    num_faces = extract_number_from_keyword_in_ply_file(fid, 'element face')
+    num_vert = extract_number_from_keyword_in_ply_file(f, 'element vertex')
+    num_faces = extract_number_from_keyword_in_ply_file(f, 'element face')
 
     def extract_coordinates_from_file(filestream, number_of_vertices):
         # read lines up to and including the one containing 'end header':
@@ -68,7 +70,7 @@ def ply_to_input(fname_no_ply, min_len_nt=31):
         # coordinates_as_array = np.array(coordinates_as_list, dtype=np.float64)
         return coordinates_as_list
 
-    coordinates = extract_coordinates_from_file(fid, num_vert)
+    coordinates = extract_coordinates_from_file(f, num_vert)
 
     def extract_faces_from_file(filestream, number_of_faces):
         # TODO: verify this filestream doesn't restart
@@ -86,7 +88,7 @@ def ply_to_input(fname_no_ply, min_len_nt=31):
         #TODO: make this into an array?
         return faces_as_list
 
-    faces = extract_faces_from_file(fid, num_faces)
+    faces = extract_faces_from_file(f, num_faces)
 
     def remove_unused_vertices(coordinates, faces, number_of_vertices):
         # Determine if you need to clean the vertex indices:

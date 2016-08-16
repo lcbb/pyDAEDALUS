@@ -4,5 +4,5 @@ from unittest import main
 from tests.test_dx_cage_design import *
 
 
-if __name__ == '__int__':
+if __name__ == '__main__':
     main()
