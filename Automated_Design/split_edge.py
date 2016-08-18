@@ -39,7 +39,7 @@ def split_edge(edge_type_mat, num_vert):
         index_of_new_vert = len(pseudo_vert)
         properties['type'] = -1
 
-        pseudo_vert.append(i)  # vert_list[new_node_id] = original_node_id
+        pseudo_vert.append(j)  # vert_list[new_node_id] = original_node_id
         edge_type_mat_wHalfs.remove_edge(i, j)
 
         edge_type_mat_wHalfs.add_node(index_of_new_vert)
