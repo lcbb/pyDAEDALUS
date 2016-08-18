@@ -79,7 +79,11 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
 
     ### 1. Generate sparse matrix of connectivities and vertex-face indexing ###
     # Create sparse matrices of connectivities and edge lengths
+    file_name_without_containing_folder = path.split(file_name)[1]
     full_graph = generate_graph(num_vert, edges, edge_length_vec)
+    full_graph.name = file_name_without_containing_folder
+    nx.write_gml(full_graph,
+                 'tests/sample_files/' + full_graph.name + '_initial_graph.gml')
 
     # Identify presence of every vertex in every face
     vert_to_face = gen_vert_to_face(num_vert, faces)
@@ -92,7 +96,6 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
     edge_type_mat = designate_edge_type(full_graph)
     graph_with_spanning_tree_marked = edge_type_mat   #TODO: this rename
     if results_foldername:
-        file_name_without_containing_folder = path.split(file_name)[1]
         schlegel_filename = file_name_without_containing_folder + '_schlegel.png'
         full_schlegel_filename = path.join(results_foldername, schlegel_filename)
     else:
