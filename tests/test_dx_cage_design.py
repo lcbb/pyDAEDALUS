@@ -62,9 +62,14 @@ def load_vert_to_face_from_mat(filename):
     return formatted_vert_to_face
 
 
-class TestRouting(TestCase):
+class TestIntegrationsUsing01Tetrahedron(TestCase):
+    """
+        Walk through whole chain of processing using the 01_tetrahedron as the
+    example comparing to what the actual output from the matlab version were.
+    """
     # maxDiff = None
 
+    #TODO: move all these test files into an `01_tetrahedron
     target_1_vert_to_face = load_vert_to_face_from_mat('1_vert_to_face.mat')
 
     target_2_edge_type_mat = load_graph_from_mat('2_edge_type_mat.mat')
@@ -73,6 +78,11 @@ class TestRouting(TestCase):
     target_4_edge_type_mat_allNodes = load_graph_from_mat('4_edge_type_mat_allNodes.mat')
     target_4_pseudo_vert = load_pseudonodes_from_mat('4_pseudo_vert.mat')
 
+    # 2
+    def test_generate_spanning_tree(self):
+        self.fail()
+
+    # 3
     def test_split_edge(self):
         edge_type_mat = self.target_2_edge_type_mat
         num_vert = edge_type_mat.size()
@@ -87,6 +97,7 @@ class TestRouting(TestCase):
         self.assertEqual(actual_edge_type_mat_wHalfs.edges(),
                          target_edge_type_mat_wHalfs.edges())
 
+    # 4
     def test_split_vert(self):
         edge_type_mat_wHalfs = self.target_3_edge_type_mat_wHalfs
         pseudo_vert = self.target_3_pseudo_vert
@@ -102,4 +113,30 @@ class TestRouting(TestCase):
         self.assertEqual(actual_edge_type_mat_allNodes.edges(),
                          target_edge_type_allNodes.edges())
 
+    # 5
+    def test_set_routing_direction(self):
+        self.fail()
 
+    # 6
+    def test_enum_scaf_bases_DX(self):
+        self.fail()
+
+    # 7
+    def test_assign_scaf_to_edge(self):
+        self.fail()
+
+    # 8
+    def test_adj_scaf_nick_pos(self):
+        self.fail()
+
+    # 9
+    def test_assign_staples_wChoices(self):
+        self.fail()
+
+    # 10
+    def test_gen_stap_seq(self):
+        self.fail()
+
+    # 11
+    def test_toCanDo(self):
+        self.fail()
