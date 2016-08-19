@@ -9,6 +9,7 @@ from Automated_Design.adj_scaf_nick_pos import adj_scaf_nick_pos
 from Automated_Design.adj_scaf_nick_pos import get_scaf_nick_pos
 from Automated_Design.assign_scaf_to_edge import assign_scaf_to_edge
 from Automated_Design.assign_staples_wChoices import assign_staples_wChoices
+from Automated_Design.designate_edge_type import designate_edge_type
 from Automated_Design.enum_scaf_bases_DX import enum_scaf_bases_DX
 from Automated_Design.set_routing_direction import set_routing_direction
 from Automated_Design.gen_stap_seq import gen_stap_seq
@@ -46,12 +47,16 @@ def load_mat_file(filename):
     return data
     #TODO: declare all these files currently used as 1_tetra...
 
-def load_graph_from_mat(filename):
+def load_graph_from_mat(filename, edge_attribute='type', graph_type=nx.DiGraph()):
     graph_as_sparse_matrix = load_mat_file(filename)
     graph = nx.from_scipy_sparse_matrix(graph_as_sparse_matrix,
-                                        create_using=nx.DiGraph(),
-                                        edge_attribute='type')
-    return graph
+                                        create_using=graph_type,
+                                        edge_attribute=edge_attribute)
+    #intify 'type' if that's the property used (defaults to float)
+    if edge_attribute == 'type':
+        for i, j, attribute in graph.edges(data=True):
+            graph[i][j]['type'] = int(attribute['type'])
+    return graph.copy()
 
 
 def load_pseudonodes_from_mat(filename):
@@ -86,8 +91,15 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
 
     #TODO: move all these test files into an `01_tetrahedron
     target_1_vert_to_face = load_vert_to_face_from_mat('1_vert_to_face.mat')
+    target_1_edge_length_mat_full = load_graph_from_mat(
+        '1_edge_length_mat_full.mat',
+        edge_attribute='length',
+        graph_type=nx.Graph())
+    target_1_full_graph = load_graph_from_mat(
+        '1_full_graph.mat', graph_type=nx.Graph())
 
-    target_2_edge_type_mat = load_graph_from_mat('2_edge_type_mat.mat')
+    target_2_edge_type_mat = load_graph_from_mat('2_edge_type_mat.mat',
+                                                 graph_type=nx.Graph())
 
     target_3_edge_type_mat_wHalfs = load_graph_from_mat('3_edge_type_mat_wHalfs.mat')
     target_3_pseudo_vert = load_pseudonodes_from_mat('3_pseudo_vert.mat')
@@ -98,8 +110,6 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     #TODO: All the following `load`s probably need further parsing out of raw state
     target_0_edges = load_mat_file('0_edges.mat')
     target_0_singleXOs = load_mat_file('0_singleXOs.mat')
-
-    target_1_edge_length_mat_full = load_mat_file('1_edge_length_mat_full.mat')
 
     target_5_route_real = load_mat_file('5_route_real.mat')
     target_5_route_vals = load_mat_file('5_route_vals.mat')
@@ -115,15 +125,29 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
 
     target_9_staples = load_mat_file('9_staples.mat')
 
+    # 1:  I'm using a networkx.Graph rather than sparse matrix.  No direct
+    # assertion possible, though we still could do assertions on the
+    # properties.
 
     # 2
     def test_generate_spanning_tree(self):
-        self.fail("Write me.")
+        full_graph = self.target_1_full_graph
+
+        actual_edge_type_mat = designate_edge_type(full_graph)
+
+        target_edge_type_mat = self.target_2_edge_type_mat
+        self.assertEqual(actual_edge_type_mat.nodes(),
+                         target_edge_type_mat.nodes())
+        self.assertEqual(len(actual_edge_type_mat.edges()),
+                         len(target_edge_type_mat.edges()))
+        self.assertEqual(actual_edge_type_mat.edges(data=True),
+                         target_edge_type_mat.edges(data=True))
+        #TODO: assert graphs are isomorphic instead of directly equal?
 
     # 3
     def test_split_edge(self):
-        edge_type_mat = self.target_2_edge_type_mat
-        num_vert = edge_type_mat.size()
+        edge_type_mat = self.target_2_edge_type_mat.to_directed()  #TODO:  Figure out where this transition needs to happen, and move it out of this test!!!
+        num_vert = len(edge_type_mat.nodes())
 
         actual_edge_type_mat_wHalfs, actual_pseudo_vert = split_edge(edge_type_mat, num_vert)
 
@@ -224,10 +248,10 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         singleXOs = self.target_0_singleXOs
         edges = self.target_0_edges
         num_edges = len(edges)
-        edge_type_mat = self.target_2_edge_type_mat
+        edge_type_mat = self.target_2_edge_type_mat.to_directed()  #TODO:  Same as other time I call `.to_directed`!
         scaf_to_edge = self.target_8_scaf_to_edge
         num_bases = len(self.target_6_edge_type_vec)
-        num_vert = edge_type_mat.size()
+        num_vert = len(edge_type_mat.nodes())
 
         staples = assign_staples_wChoices(
             edges, num_edges, edge_type_mat, scaf_to_edge,

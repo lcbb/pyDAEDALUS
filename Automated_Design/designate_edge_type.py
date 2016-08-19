@@ -20,5 +20,4 @@ def designate_edge_type(full_graph):
         j = edge[1]
         full_graph[i][j]['type'] = type
 
-
     return full_graph
