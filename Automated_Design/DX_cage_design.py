@@ -71,7 +71,7 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
                     chosen_letter = 'c'
                 scaf_seq += chosen_letter
 
-    scaf_name = 'randomscaf'  # scaffold name
+            scaf_name = 'randomscaf'  # scaffold name
 
     # Count number of vertices and edges
     num_vert = len(coordinates)
