@@ -2,7 +2,13 @@ import networkx as nx
 import numpy as np
 from os import path
 
+from Automated_Design.adj_scaf_nick_pos import adj_scaf_nick_pos, \
+    get_scaf_nick_pos
+from Automated_Design.assign_scaf_to_edge import assign_scaf_to_edge
+from Automated_Design.assign_staples_wChoices import assign_staples_wChoices
 from Automated_Design.constants import SCAF_SEQ
+from Automated_Design.enum_scaf_bases_DX import enum_scaf_bases_DX
+from Automated_Design.set_routing_direction import set_routing_direction
 from Automated_Design.split_edge import split_edge
 from Automated_Design.split_vert import split_vert
 from Automated_Design.util import generate_graph
@@ -111,12 +117,36 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
 
     ## 4. Add nodes to vertices ###############################################
     # # Split each vertex into N nodes, where N is degree of vertex
-    edge_type_mat_allNodes, pseudo_vert = split_vert(edge_type_mat_wHalfs, pseudo_vert, num_vert, vert_to_face)
+    edge_type_mat_allNodes, pseudo_vert = split_vert(
+        edge_type_mat_wHalfs, pseudo_vert, num_vert, vert_to_face)
 
-    print('--------')
-    print(len(edge_type_mat_allNodes.nodes()))
-    print(len(edge_type_mat_allNodes.edges()))
-    import ipdb; ipdb.set_trace()
+
+    ## 5. Set direction of routing ############################################
+    [route_real, route_vals] = set_routing_direction(
+        edge_type_mat_allNodes, num_vert, pseudo_vert, faces, vert_to_face)
+
+    ## 6. Enumerate scaffold bases ############################################
+    edge_length_mat_full = full_graph  #TODO: Did I save the ege lengths onto this one, too?  If not, need to propogate edge lengths to this point
+    [edge_bgn_vec, edge_fin_vec, edge_type_vec] = enum_scaf_bases_DX(
+        route_real, route_vals, edge_length_mat_full)
+
+    num_bases = len(edge_type_vec)
+
+    ## 7. Assign enumerated scaffold bases to edges ###########################
+    scaf_to_edge = assign_scaf_to_edge(edges, num_edges, edge_type_mat,
+                                       edge_bgn_vec, edge_fin_vec,
+                                       edge_type_vec)
+
+    ## 8. Adjust scaffold nick position #######################################
+    scaf_nick_pos = get_scaf_nick_pos(edges, route_real)
+    scaf_to_edge_adj = adj_scaf_nick_pos(scaf_to_edge, scaf_nick_pos,
+                                         num_bases)
+    scaf_to_edge = scaf_to_edge_adj
+
+    ## 9. Add staples #########################################################
+    staples = assign_staples_wChoices(edges, num_edges, edge_type_mat,
+                                      scaf_to_edge, num_bases, num_vert,
+                                      singleXOs)
 
     full_file_name = None
     return full_file_name
