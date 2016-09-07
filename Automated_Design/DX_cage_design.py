@@ -114,12 +114,10 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
     edge_type_mat_wHalfs, pseudo_vert = split_edge(edge_type_mat, num_vert)
     graph_with_edges_split = edge_type_mat_wHalfs  #TODO: this rename
 
-
     ## 4. Add nodes to vertices ###############################################
     # # Split each vertex into N nodes, where N is degree of vertex
     edge_type_mat_allNodes, pseudo_vert = split_vert(
         edge_type_mat_wHalfs, pseudo_vert, num_vert, vert_to_face)
-
 
     ## 5. Set direction of routing ############################################
     [route_real, route_vals] = set_routing_direction(

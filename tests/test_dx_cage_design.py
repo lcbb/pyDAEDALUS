@@ -65,6 +65,11 @@ def load_pseudonodes_from_mat(filename):
     return list(pseudonodes.flatten())  #convert shape(N,1) to shape(N)
 
 
+def load_1d_list_from_mat(filename):
+    data = load_mat_file(filename)
+    return list(data.flatten())
+
+
 def load_vert_to_face_from_mat(filename):
     """
         The raw read starts of as a, (N,1)-size length array of each face where
@@ -107,16 +112,16 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     target_4_edge_type_mat_allNodes = load_graph_from_mat('4_edge_type_mat_allNodes.mat')
     target_4_pseudo_vert = load_pseudonodes_from_mat('4_pseudo_vert.mat')
 
+    target_5_route_real = load_1d_list_from_mat('5_route_real.mat')
+    target_5_route_vals = load_1d_list_from_mat('5_route_vals.mat')
+
     #TODO: All the following `load`s probably need further parsing out of raw state
     target_0_edges = load_mat_file('0_edges.mat')
     target_0_singleXOs = load_mat_file('0_singleXOs.mat')
 
-    target_5_route_real = load_mat_file('5_route_real.mat')
-    target_5_route_vals = load_mat_file('5_route_vals.mat')
-
-    target_6_edge_bgn_vec = load_mat_file('6_edge_bgn_vec.mat')
-    target_6_edge_fin_vec = load_mat_file('6_edge_fin_vec.mat')
-    target_6_edge_type_vec = load_mat_file('6_edge_type_vec.mat')
+    target_6_edge_bgn_vec = list(load_mat_file('6_edge_bgn_vec.mat').flatten()-1)
+    target_6_edge_fin_vec = list(load_mat_file('6_edge_fin_vec.mat').flatten()-1)
+    target_6_edge_type_vec = list(load_mat_file('6_edge_type_vec.mat').flatten())
 
     target_7_scaf_to_edge = load_mat_file('7_scaf_to_edge.mat')
 
@@ -195,7 +200,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     # 6
     def test_enum_scaf_bases_DX(self):
         edge_length_mat_full = self.target_1_edge_length_mat_full
-        route_real = self.target_5_route_real
+        route_real = [x-1 for x in self.target_5_route_real]
         route_vals = self.target_5_route_vals
 
         actual_edge_bgn_vec, actual_edge_fin_vec, actual_edge_type_vec = \
@@ -204,7 +209,9 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         target_edge_bgn_vec = self.target_6_edge_bgn_vec
         target_edge_fin_vec = self.target_6_edge_fin_vec
         target_edge_type_vec = self.target_6_edge_type_vec
-        self.fail("Write these assertions...")
+        self.assertEqual(actual_edge_bgn_vec, target_edge_bgn_vec)
+        self.assertEqual(actual_edge_fin_vec, target_edge_fin_vec)
+        self.assertEqual(actual_edge_type_vec, target_edge_type_vec)
 
     # 7
     def test_assign_scaf_to_edge(self):
