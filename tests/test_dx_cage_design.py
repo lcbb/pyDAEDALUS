@@ -70,6 +70,15 @@ def load_1d_list_from_mat(filename):
     return list(data.flatten())
 
 
+def load_edges_from_mat(filename):
+    data = load_mat_file(filename)
+    edges = []
+    for row in data:
+        zero_indexed_row = [x-1 for x in row]
+        edges.append(zero_indexed_row)
+    return edges
+
+
 def load_vert_to_face_from_mat(filename):
     """
         The raw read starts of as a, (N,1)-size length array of each face where
@@ -79,6 +88,25 @@ def load_vert_to_face_from_mat(filename):
     vert_to_face = load_mat_file(filename) - 1
     formatted_vert_to_face = [list(face[0].flatten()) for face in vert_to_face]
     return formatted_vert_to_face
+
+def load_scaf_to_edge_from_mat(filename):
+    """
+    target structure:
+    final_data = [
+                   [ [0,1,2,...], [56, 57, 58, ...] ],
+                   [ ..., ... ]
+                   ...
+                 ]
+    """
+    data = load_mat_file(filename)
+    data = data - 1  # convert to 0 index
+
+    final_data = []
+    for a, b in data:
+        a = a.flatten()  # each cell is shape=(N,1).  Needs to be shape=(N)
+        b = b.flatten()
+        final_data.append([list(a), list(b)])
+    return final_data
 
 
 class TestIntegrationsUsing01Tetrahedron(TestCase):
@@ -95,6 +123,8 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     # maxDiff = None
 
     #TODO: move all these test files into an `01_tetrahedron
+    target_0_edges = load_edges_from_mat('0_edges.mat')
+
     target_1_vert_to_face = load_vert_to_face_from_mat('1_vert_to_face.mat')
     target_1_edge_length_mat_full = load_graph_from_mat(
         '1_edge_length_mat_full.mat',
@@ -115,15 +145,14 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     target_5_route_real = load_1d_list_from_mat('5_route_real.mat')
     target_5_route_vals = load_1d_list_from_mat('5_route_vals.mat')
 
+    target_7_scaf_to_edge = load_scaf_to_edge_from_mat('7_scaf_to_edge.mat')
+
     #TODO: All the following `load`s probably need further parsing out of raw state
-    target_0_edges = load_mat_file('0_edges.mat')
     target_0_singleXOs = load_mat_file('0_singleXOs.mat')
 
     target_6_edge_bgn_vec = list(load_mat_file('6_edge_bgn_vec.mat').flatten()-1)
     target_6_edge_fin_vec = list(load_mat_file('6_edge_fin_vec.mat').flatten()-1)
     target_6_edge_type_vec = list(load_mat_file('6_edge_type_vec.mat').flatten())
-
-    target_7_scaf_to_edge = load_mat_file('7_scaf_to_edge.mat')
 
     target_8_scaf_nick_pos = load_mat_file('8_scaf_nick_pos.mat')
     target_8_scaf_to_edge = load_mat_file('8_scaf_to_edge.mat')
@@ -217,18 +246,17 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     def test_assign_scaf_to_edge(self):
         edges = self.target_0_edges
         num_edges = len(edges)
-        edge_length_mat_full = self.target_1_edge_length_mat_full
+        edge_type_mat = self.target_2_edge_type_mat
         edge_bgn_vec = self.target_6_edge_bgn_vec
         edge_fin_vec = self.target_6_edge_fin_vec
         edge_type_vec = self.target_6_edge_type_vec
 
         actual_scaf_to_edge = assign_scaf_to_edge(
-            edges, num_edges, edge_length_mat_full,
+            edges, num_edges, edge_type_mat,
             edge_bgn_vec, edge_fin_vec, edge_type_vec)
 
-        target_edge_type_vec = self.target_6_edge_type_vec
         target_scaf_to_edge = self.target_7_scaf_to_edge
-        self.fail("Write these assertions...")
+        self.assertEqual(actual_scaf_to_edge, target_scaf_to_edge)
 
     # 8
     def test_get_scaf_nick_pos(self):
