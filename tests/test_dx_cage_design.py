@@ -78,6 +78,15 @@ def load_edges_from_mat(filename):
         edges.append(zero_indexed_row)
     return edges
 
+def load_faces_from_mat(filename):
+    data = load_mat_file(filename)
+    data = data - 1
+    faces = []
+    for row in data:
+        n, node_data = row
+        faces.append(list(node_data.flatten()))
+    return faces
+
 
 def load_vert_to_face_from_mat(filename):
     """
@@ -124,6 +133,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
 
     #TODO: move all these test files into an `01_tetrahedron
     target_0_edges = load_edges_from_mat('0_edges.mat')
+    target_0_faces = load_faces_from_mat('0_faces.mat')
 
     target_1_vert_to_face = load_vert_to_face_from_mat('1_vert_to_face.mat')
     target_1_edge_length_mat_full = load_graph_from_mat(
@@ -212,7 +222,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
 
     # 5
     def test_set_routing_direction(self):
-        faces = None  #TODO:  import this `0_faces.mat`
+        faces = self.target_0_faces
         vert_to_face = self.target_1_vert_to_face
         edge_type_mat_allNodes = self.target_4_edge_type_mat_allNodes
         pseudo_vert = self.target_4_pseudo_vert
@@ -222,9 +232,10 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
             edge_type_mat_allNodes, num_vert, pseudo_vert, faces, vert_to_face
         )
 
-        target_route_real = self.target_5_route_real
+        target_route_real = [n-1 for n in self.target_5_route_real]  #'cuase 0 indexing instead of 1  #TODO: Move comprehension out of these tests.
         target_route_vals = self.target_5_route_vals
-        self.fail("Write these assertions...")
+        self.assertEqual(actual_route_real, target_route_real)
+        self.assertEqual(actual_route_vals, target_route_vals)
 
     # 6
     def test_enum_scaf_bases_DX(self):
