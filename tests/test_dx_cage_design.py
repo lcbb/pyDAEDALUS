@@ -236,7 +236,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
             edge_type_mat_allNodes, num_vert, pseudo_vert, faces, vert_to_face
         )
 
-        target_route_real = [n-1 for n in self.target_5_route_real]  #'cuase 0 indexing instead of 1  #TODO: Move comprehension out of these tests.
+        target_route_real = self.target_5_route_real
         target_route_vals = self.target_5_route_vals
         self.assertEqual(actual_route_real, target_route_real)
         self.assertEqual(actual_route_vals, target_route_vals)
@@ -244,7 +244,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     # 6
     def test_enum_scaf_bases_DX(self):
         edge_length_mat_full = self.target_1_edge_length_mat_full
-        route_real = [x-1 for x in self.target_5_route_real]
+        route_real = self.target_5_route_real
         route_vals = self.target_5_route_vals
 
         actual_edge_bgn_vec, actual_edge_fin_vec, actual_edge_type_vec = \
