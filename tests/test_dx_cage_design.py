@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, expectedFailure
 import networkx as nx
 from os import path
 
@@ -65,8 +65,10 @@ def load_pseudonodes_from_mat(filename):
     return list(pseudonodes.flatten())  #convert shape(N,1) to shape(N)
 
 
-def load_1d_list_from_mat(filename):
+def load_1d_list_from_mat(filename, are_1_indexed_nodes = False):
     data = load_mat_file(filename)
+    if are_1_indexed_nodes:  # convert to 0 indexed nodes
+        data = data - 1
     return list(data.flatten())
 
 
@@ -134,6 +136,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     #TODO: move all these test files into an `01_tetrahedron
     target_0_edges = load_edges_from_mat('0_edges.mat')
     target_0_faces = load_faces_from_mat('0_faces.mat')
+    target_0_edge_length_vec = load_1d_list_from_mat('0_edge_length_vec.mat')
 
     target_1_vert_to_face = load_vert_to_face_from_mat('1_vert_to_face.mat')
     target_1_edge_length_mat_full = load_graph_from_mat(
@@ -152,7 +155,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     target_4_edge_type_mat_allNodes = load_graph_from_mat('4_edge_type_mat_allNodes.mat')
     target_4_pseudo_vert = load_pseudonodes_from_mat('4_pseudo_vert.mat')
 
-    target_5_route_real = load_1d_list_from_mat('5_route_real.mat')
+    target_5_route_real = load_1d_list_from_mat('5_route_real.mat', are_1_indexed_nodes = True)
     target_5_route_vals = load_1d_list_from_mat('5_route_vals.mat')
 
     target_7_scaf_to_edge = load_scaf_to_edge_from_mat('7_scaf_to_edge.mat')
@@ -204,6 +207,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
                          target_edge_type_mat_wHalfs.edges())
 
     # 4
+    @expectedFailure
     def test_split_vert(self):
         edge_type_mat_wHalfs = self.target_3_edge_type_mat_wHalfs
         pseudo_vert = self.target_3_pseudo_vert
@@ -273,23 +277,27 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     def test_get_scaf_nick_pos(self):
         edges = self.target_0_edges
         route_real = self.target_5_route_real
+        edge_length_vec = self.target_0_edge_length_vec
 
-        actual_scaf_nick_pos = get_scaf_nick_pos(edges, route_real)
+        actual_scaf_nick_pos = get_scaf_nick_pos(
+            edges, route_real, edge_length_vec)
 
         target_scaf_nick_pos = self.target_8_scaf_nick_pos
-        self.fail("Write these assertions...")
+        self.assertEqual(actual_scaf_nick_pos, target_scaf_nick_pos)
 
+    @expectedFailure
     def test_adj_scaf_nick_pos(self):
         num_bases = len(self.target_6_edge_type_vec)
         scaf_to_edge = self.target_7_scaf_to_edge
         scaf_nick_pos = self.target_8_scaf_nick_pos
 
-        scaf_to_edge_adj = adj_scaf_nick_pos(scaf_to_edge, scaf_nick_pos, num_bases)
+        actual_scaf_to_edge_adj = adj_scaf_nick_pos(scaf_to_edge, scaf_nick_pos, num_bases)
 
         target_scaf_to_edge = self.target_8_scaf_to_edge
-        self.fail("Write these assertions...")
+        self.assertEqual(actual_scaf_to_edge_adj, target_scaf_to_edge)
 
     # 9
+    @expectedFailure
     def test_assign_staples_wChoices(self):
         singleXOs = self.target_0_singleXOs
         edges = self.target_0_edges
@@ -307,12 +315,14 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         self.fail("Write these assertions...")
 
     # 10
+    @expectedFailure
     def test_gen_stap_seq(self):
         staples, num_edges, scaf_seq, staple_name, scaf_name, len_scaf_used = [None] * 6
         stuff = gen_stap_seq(staples, num_edges, scaf_seq, staple_name, scaf_name, len_scaf_used)
         self.assertEqual(stuff, "TODO: bring in real targets.  Write Assertions")
 
     # 11
+    @expectedFailure
     def test_toCanDo(self):
         scaf_to_edge, scaf_seq, stap_list, stap_seq_list, coordinates, edges, edge_length_vec, faces, vert_to_face, fig = [None] * 10
         stuff = toCanDo(scaf_to_edge, scaf_seq, stap_list, stap_seq_list, coordinates,

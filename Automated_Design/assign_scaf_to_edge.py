@@ -1,8 +1,5 @@
-def find(iterable, val):
-    return [i for i in range(len(iterable)) if iterable[i] == val]
+from Automated_Design.util import intersect_lists, find
 
-def intersect(a, b):
-    return sorted(list(set(a).intersection(set(b))))
 
 def assign_scaf_to_edge(edges, num_edges, edge_type_mat, edge_bgn_vec,
                         edge_fin_vec, edge_type_vec):
@@ -50,13 +47,13 @@ def assign_scaf_to_edge(edges, num_edges, edge_type_mat, edge_bgn_vec,
 
             edge_type = edge_type_mat[edge_bgn][edge_fin]['type']
             if edge_type == 2:  # tree edge  #TODO: extract into constant
-                bases = intersect(find(edge_bgn_vec, edge_bgn),
-                                  find(edge_fin_vec, edge_fin))
+                bases = intersect_lists(find(edge_bgn_vec, edge_bgn),
+                                        find(edge_fin_vec, edge_fin))
             else:  # non-tree edge
-                bases_all = intersect(find(edge_bgn_vec, edge_bgn),
-                                      find(edge_fin_vec, edge_fin))
-                bases_5 = intersect(bases_all, find(edge_type_vec, -5))
-                bases_3 = intersect(bases_all, find(edge_type_vec, -3))
+                bases_all = intersect_lists(find(edge_bgn_vec, edge_bgn),
+                                            find(edge_fin_vec, edge_fin))
+                bases_5 = intersect_lists(bases_all, find(edge_type_vec, -5))
+                bases_3 = intersect_lists(bases_all, find(edge_type_vec, -3))
 
                 bases = bases_5 + bases_3
 

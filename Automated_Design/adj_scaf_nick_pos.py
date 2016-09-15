@@ -1,18 +1,25 @@
+import numpy as np
 
-def get_scaf_nick_pos(edges, route_real):
-    """
-    first_edge = intersect(find(edges(:, 1) == max(route_real(1:2)) ), find(
-        edges(:, 2) == min(route_real(1:2)) ) )
-    if edge_length_vec(first_edge) < 42  # == 31
+from Automated_Design.util import intersect_lists
+
+
+def get_scaf_nick_pos(edges, route_real, edge_length_vec):
+    first_node_in_route = route_real[0]
+    second_node_in_route = route_real[1]
+    min_node = min(first_node_in_route, second_node_in_route)
+    max_node = max(first_node_in_route, second_node_in_route)
+
+    edges = np.array(edges)
+    from_nodes = np.where(edges[:, 0] == max_node)[0]
+    to_nodes = np.where(edges[:, 1] == min_node)[0]
+
+    first_edge = intersect_lists(from_nodes, to_nodes)[0]  #TODO: assured to always have 1 result?
+
+    first_edge_length = edge_length_vec[first_edge]
+    if first_edge_length < 42:  # == 31
         scaf_nick_pos = 16
-    else
+    else:
         scaf_nick_pos = 19
-    end
-    """
-
-
-
-    scaf_nick_pos = None
 
     return scaf_nick_pos
 
