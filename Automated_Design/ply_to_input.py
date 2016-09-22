@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def ply_as_filename_to_input(fname_no_ply, min_len_nt=31):
+def ply_as_filename_to_input(fname_no_ply, min_len_nt=31, results_foldername=None):
     """
     Converts PLY file into design variables for DX_cage_design input
     Inputs: fname_no_ply = string containing name of PLY file without '.ply'
@@ -34,10 +34,10 @@ def ply_as_filename_to_input(fname_no_ply, min_len_nt=31):
     fname = fname_no_ply + '.ply'
     assert path.isfile(fname)
     f = open(fname)
-    return ply_to_input(fname_no_ply, f, min_len_nt)
+    return ply_to_input(fname_no_ply, f, min_len_nt, results_foldername)
 
 #TODO: clean up the almost-redundant `fname_no_ply` and `f` being passed in here.
-def ply_to_input(fname_no_ply, f, min_len_nt):
+def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername):
 
     file_name = fname_no_ply + '_' + str(min_len_nt)
 
@@ -180,14 +180,14 @@ def ply_to_input(fname_no_ply, f, min_len_nt):
 
     #TODO: det default to print plots to file, unless explicitly stated to show on screen?
 
-    def plot_edge_length_distributions(scale_edge_length_PLY, rounded_edge_length_PLY):
+    def plot_edge_length_distributions(scale_edge_length_PLY, rounded_edge_length_PLY, results_foldername):
         min_len_nt = min(rounded_edge_length_PLY)  #TODO: This is right, right?  It's a little cleaner to not have to import it if the info is already in a variable we're passing in.
         bins_for_hist = range(min_len_nt, max(rounded_edge_length_PLY) + 3, 1)
         bins_for_plotting = [x - 0.25 for x in bins_for_hist[:-1]]
 
 
-        fig = plt.figure(31, figsize=(8, 6))
-        fig.clf()
+        fig_31 = plt.figure(31, figsize=(8, 6))
+        fig_31.clf()
         y31 = np.histogram(scale_edge_length_PLY, bins=bins_for_hist)[0]
         plt.bar(bins_for_plotting, y31, width=0.5)
         plt.xlim((min_len_nt - 0.5, max(rounded_edge_length_PLY) + 1.5))
@@ -198,8 +198,8 @@ def ply_to_input(fname_no_ply, f, min_len_nt):
         plt.xticks(bins_for_hist)
 
 
-        fig = plt.figure(32, figsize=(8, 6))
-        fig.clf()
+        fig_32 = plt.figure(32, figsize=(8, 6))
+        fig_32.clf()
         y32 = np.histogram(rounded_edge_length_PLY, bins=bins_for_hist)[0]
         bins_a = [x - 0.125 for x in bins_for_plotting]
         bins_b = [x + 0.38 for x in bins_for_plotting]
@@ -213,9 +213,15 @@ def ply_to_input(fname_no_ply, f, min_len_nt):
         plt.ylabel('Number of edges')
         plt.xticks(bins_for_hist)
 
-        plt.show()
+        if results_foldername:
+            shape_name = path.basename(path.normpath(fname_no_ply))
+            base_filename = path.join(results_foldername,shape_name)
+            fig_31.savefig(base_filename+'_min_edge_length_dist.png', bbox_inches='tight')
+            fig_32.savefig(base_filename+'edges_rounded_to_10_5.png', bbox_inches='tight')
+        else:
+            plt.show()
 
-    plot_edge_length_distributions(scale_edge_length_PLY, rounded_edge_length_PLY)
+    plot_edge_length_distributions(scale_edge_length_PLY, rounded_edge_length_PLY, results_foldername)
 
 
 

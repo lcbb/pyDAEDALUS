@@ -136,7 +136,7 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
                                        edge_type_vec)
 
     ## 8. Adjust scaffold nick position #######################################
-    scaf_nick_pos = get_scaf_nick_pos(edges, route_real)
+    scaf_nick_pos = get_scaf_nick_pos(edges, route_real, edge_length_vec)
     scaf_to_edge_adj = adj_scaf_nick_pos(scaf_to_edge, scaf_nick_pos,
                                          num_bases)
     scaf_to_edge = scaf_to_edge_adj
