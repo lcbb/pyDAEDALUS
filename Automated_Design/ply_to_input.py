@@ -215,8 +215,9 @@ def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername):
 
         if results_foldername:
             shape_name = path.basename(path.normpath(fname_no_ply))
-            base_filename = path.join(results_foldername,shape_name)
-            fig_31.savefig(base_filename+'_min_edge_length_dist.png', bbox_inches='tight')
+            shape_name_with_len = shape_name + '_{}_'.format(min_len_nt)
+            base_filename = path.join(results_foldername, shape_name_with_len)
+            fig_31.savefig(base_filename+'min_edge_length_dist.png', bbox_inches='tight')
             fig_32.savefig(base_filename+'edges_rounded_to_10_5.png', bbox_inches='tight')
         else:
             plt.show()

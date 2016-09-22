@@ -4,3 +4,4 @@ networkx>=1.11
 tqdm>=4.8.3
 ipdb>=0.10.1
 scipy>=0.18.0
+click>=6.6
