@@ -5,9 +5,11 @@ import click
 from Automated_Design.ply_to_input import ply_as_filename_to_input
 from Automated_Design.DX_cage_design import DX_cage_design
 
+
 default_fname_no_ply = path.join('PLY_Files',
                          '05_icosahedron')  # No '.ply' extension required
 default_fname_no_ply = path.join('PLY_Files', '01_tetrahedron')
+
 
 @click.command()
 @click.option('--fname_no_ply', default=default_fname_no_ply,
@@ -30,7 +32,6 @@ def run_demo(fname_no_ply, min_len_nt, results_foldername):
     scaf_seq = [] # Using default scaffold sequence
     scaf_name = [] # Using default scaffold name
     full_file_name = DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs, scaf_seq, scaf_name, results_foldername=results_foldername)
-
 
 
 if __name__ == '__main__':
