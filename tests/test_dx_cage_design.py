@@ -71,6 +71,10 @@ def load_1d_list_from_mat(filename, are_1_indexed_nodes = False):
         data = data - 1
     return list(data.flatten())
 
+def load_single_value(filename):
+    data = load_mat_file(filename)
+    val = data[0][0]
+    return val
 
 def load_edges_from_mat(filename):
     data = load_mat_file(filename)
@@ -160,6 +164,9 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
 
     target_7_scaf_to_edge = load_scaf_to_edge_from_mat('7_scaf_to_edge.mat')
 
+    target_8_scaf_to_edge = load_scaf_to_edge_from_mat('8_scaf_to_edge.mat')
+    target_8_scaf_nick_pos = load_single_value('8_scaf_nick_pos.mat')
+
     #TODO: All the following `load`s probably need further parsing out of raw state
     target_0_singleXOs = load_mat_file('0_singleXOs.mat')
 
@@ -167,8 +174,6 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     target_6_edge_fin_vec = list(load_mat_file('6_edge_fin_vec.mat').flatten()-1)
     target_6_edge_type_vec = list(load_mat_file('6_edge_type_vec.mat').flatten())
 
-    target_8_scaf_nick_pos = load_mat_file('8_scaf_nick_pos.mat')
-    target_8_scaf_to_edge = load_mat_file('8_scaf_to_edge.mat')
 
     target_9_staples = load_mat_file('9_staples.mat')
 
@@ -285,7 +290,6 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         target_scaf_nick_pos = self.target_8_scaf_nick_pos
         self.assertEqual(actual_scaf_nick_pos, target_scaf_nick_pos)
 
-    @expectedFailure
     def test_adj_scaf_nick_pos(self):
         num_bases = len(self.target_6_edge_type_vec)
         scaf_to_edge = self.target_7_scaf_to_edge
