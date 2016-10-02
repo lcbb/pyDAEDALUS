@@ -88,7 +88,8 @@ def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors, v
 
                     # # Check if connecting to another pseudo node if faces
                     # # match, otherwise don't add node
-                    # TODO: ?? I don't get this conditional.
+
+                    #  if face_1 == face_2 == face_3, but allowing for empty face_1 or face_2
                     if (face_1 == 0 or face_1 == face_3) and (face_2 == 0 or face_2 == face_3):
 
                         # # Create a new node and store in pseudo_vert
