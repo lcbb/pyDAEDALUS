@@ -1,5 +1,5 @@
 import numpy as np
-
+from copy import deepcopy
 from Automated_Design.util import intersect_lists
 
 
@@ -44,18 +44,18 @@ def adj_scaf_nick_pos(scaf_to_edge, scaf_nick_pos, num_bases):
     ###########################################################################
 
     # # Initialize output vector
-    scaf_to_edge_adj = scaf_to_edge   # row vec
+    scaf_to_edge_adj = deepcopy(scaf_to_edge)   # row vec
 
     # # Adjust scaf_to_edge
     import numpy as np
-    num_edges, num_sides, dontcare = np.array(scaf_to_edge).shape # num_sides should be 2
+    num_edges, num_sides, dontcare = np.array(scaf_to_edge_adj).shape # num_sides should be 2
 
     for edge_ID in range(num_edges):
         for sides_ID in range(num_sides):
             scaf_to_edge_adj[edge_ID][sides_ID] = adjust(scaf_to_edge[edge_ID][sides_ID], scaf_nick_pos, num_bases)
 
-
     return scaf_to_edge_adj
+
 
 def adjust(old_num_vec, scaf_nick_pos, num_bases):
     # Adjusts numbered vector by shifting by scaf_nick_pos bases, with
@@ -66,13 +66,13 @@ def adjust(old_num_vec, scaf_nick_pos, num_bases):
     # Output: new_num_vec = adjusted numbered vector
 
     # Initialize
-    new_num_vec = old_num_vec
+    new_num_vec = deepcopy(old_num_vec)
 
-    old_num_vec_len = len(old_num_vec)
-    for i in range(old_num_vec_len):
+    for i in range(len(old_num_vec)):
         new_num = (int(old_num_vec[i]) - int(scaf_nick_pos)) % int(num_bases)
 
-        if new_num == num_bases: # if is now last base
+        #TODO: Doesn't this always return `new_num`?
+        if new_num == num_bases:  # if is now last base
             new_num_vec[i] = num_bases  # set to last base
         else:
             new_num_vec[i] = new_num

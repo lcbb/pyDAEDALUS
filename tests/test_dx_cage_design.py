@@ -152,9 +152,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
             - Import target state.
             - Make assertions comparing target to actual.
     """
-    # maxDiff = None
 
-    #TODO: move all these test files into an `01_tetrahedron
     target_0_edges = load_edges_from_mat('0_edges.mat')
     target_0_faces = load_faces_from_mat('0_faces.mat')
     target_0_singleXOs = load_single_value('0_singleXOs.mat')
