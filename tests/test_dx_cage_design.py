@@ -123,6 +123,23 @@ def load_scaf_to_edge_from_mat(filename):
         final_data.append([list(a), list(b)])
     return final_data
 
+# python test.py TestIntegrationsUsing01Tetrahedron.test_assign_staples_wChoices
+def load_staples_from_mat(filename):
+    data = load_mat_file(filename)
+    data = np.delete(data, 4, axis=1)
+    data = np.delete(data, 1, axis=1)
+
+    listized_data = []
+    for row in data:
+        cleaned_row = []
+        for subrow in row:
+            if subrow.size > 0:
+                ids = [x-1 for x in subrow[0]]
+                cleaned_row.append(ids)
+            else:
+                cleaned_row.append([])
+        listized_data.append(cleaned_row)
+    return listized_data
 
 class TestIntegrationsUsing01Tetrahedron(TestCase):
     """
@@ -140,6 +157,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     #TODO: move all these test files into an `01_tetrahedron
     target_0_edges = load_edges_from_mat('0_edges.mat')
     target_0_faces = load_faces_from_mat('0_faces.mat')
+    target_0_singleXOs = load_single_value('0_singleXOs.mat')
     target_0_edge_length_vec = load_1d_list_from_mat('0_edge_length_vec.mat')
 
     target_1_vert_to_face = load_vert_to_face_from_mat('1_vert_to_face.mat')
@@ -152,7 +170,6 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
 
     target_2_edge_type_mat = load_graph_from_mat('2_edge_type_mat.mat',
                                                  graph_type=nx.Graph())
-
     target_3_edge_type_mat_wHalfs = load_graph_from_mat('3_edge_type_mat_wHalfs.mat')
     target_3_pseudo_vert = load_pseudonodes_from_mat('3_pseudo_vert.mat')
 
@@ -167,15 +184,15 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     target_8_scaf_to_edge = load_scaf_to_edge_from_mat('8_scaf_to_edge.mat')
     target_8_scaf_nick_pos = load_single_value('8_scaf_nick_pos.mat')
 
+    target_9_staples = load_staples_from_mat('9_staples.mat')
+
     #TODO: All the following `load`s probably need further parsing out of raw state
-    target_0_singleXOs = load_mat_file('0_singleXOs.mat')
 
     target_6_edge_bgn_vec = list(load_mat_file('6_edge_bgn_vec.mat').flatten()-1)
     target_6_edge_fin_vec = list(load_mat_file('6_edge_fin_vec.mat').flatten()-1)
     target_6_edge_type_vec = list(load_mat_file('6_edge_type_vec.mat').flatten())
 
 
-    target_9_staples = load_mat_file('9_staples.mat')
 
     # 1:  I'm using a networkx.Graph rather than sparse matrix.  No direct
     # assertion possible, though we still could do assertions on the
@@ -301,7 +318,6 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         self.assertEqual(actual_scaf_to_edge_adj, target_scaf_to_edge)
 
     # 9
-    @expectedFailure
     def test_assign_staples_wChoices(self):
         singleXOs = self.target_0_singleXOs
         edges = self.target_0_edges
@@ -311,12 +327,12 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         num_bases = len(self.target_6_edge_type_vec)
         num_vert = len(edge_type_mat.nodes())
 
-        staples = assign_staples_wChoices(
+        actual_staples = assign_staples_wChoices(
             edges, num_edges, edge_type_mat, scaf_to_edge,
             num_bases, num_vert, singleXOs)
 
         target_staples = self.target_9_staples
-        self.fail("Write these assertions...")
+        self.assertEqual(actual_staples, target_staples)
 
     # 10
     @expectedFailure
