@@ -27,8 +27,8 @@ def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors, v
     # this license is available at https://opensource.org/licenses/GPL-2.0
     ###########################################################################
 
-    print
-    print(' -- start -- ', vert_ID)
+    # print
+    # print(' -- start -- ', vert_ID)
 
     ########   find what neighbors are:
     # # Access edge_type_mat_allNodes, outputs are column vectors
@@ -44,7 +44,7 @@ def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors, v
 
     # # Identify neighboring pairs and add a new node between each pair
     list_a = range(degree - 1)
-    print('a', list_a)
+    # print('a', list_a)
     for row_ID1 in list_a:
 
         # # Find neighbor 1 info
@@ -53,7 +53,7 @@ def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors, v
         face_1 = face_assign[neighbor_1]  # designated face, if assigned
 
         list_b = range(row_ID1 + 1, degree)
-        print('b', list_b)
+        # print('b', list_b)
         for row_ID2 in list_b:
 
             # # Find neighbor info
@@ -78,7 +78,7 @@ def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors, v
                 # print('. ', v2f_vert_ID, v2f_n1, v2f_n2)
 
                 if shared_neighbor:
-                    print('n', shared_neighbor)
+                    # print('n', shared_neighbor)
 
                     # # Record the face this new node belongs to
 

@@ -39,5 +39,5 @@ def split_vert(edge_type_mat_wHalfs, pseudo_vert, num_vert, vert_to_face):
         # # vertex vert_ID accordingly
         edge_type_mat_allNodes, pseudo_vert, face_assign = arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID,
                                                                                neighbors, vert_to_face, face_assign)
-        print(face_assign)
+        # print(face_assign)
     return edge_type_mat_allNodes, pseudo_vert
