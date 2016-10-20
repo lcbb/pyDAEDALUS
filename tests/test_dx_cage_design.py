@@ -104,6 +104,7 @@ def load_vert_to_face_from_mat(filename):
     formatted_vert_to_face = [list(face[0].flatten()) for face in vert_to_face]
     return formatted_vert_to_face
 
+
 def load_scaf_to_edge_from_mat(filename):
     """
     target structure:
@@ -123,7 +124,7 @@ def load_scaf_to_edge_from_mat(filename):
         final_data.append([list(a), list(b)])
     return final_data
 
-# python test.py TestIntegrationsUsing01Tetrahedron.test_assign_staples_wChoices
+
 def load_staples_from_mat(filename):
     data = load_mat_file(filename)
     data = np.delete(data, 4, axis=1)
@@ -141,6 +142,61 @@ def load_staples_from_mat(filename):
         listized_data.append(cleaned_row)
     return listized_data
 
+
+def load_stap_seq_file(filename):
+    data = load_mat_file(filename)
+    stap_seq = []
+    for row in data:
+        cleaned_row = []
+        for cell in row:
+            if cell.size > 0:
+                cleaned_row.append(cell[0])
+            else:
+                cleaned_row.append(None)
+        stap_seq.append(cleaned_row)
+    return stap_seq
+
+
+def load_stap_seq_list_file(filename):
+    data = load_mat_file(filename)
+    stap_seq_list = []
+    for row in data:
+        cell = row[0]
+        if cell.size > 0:
+            stap_seq_list.append(cell[0])
+        else:
+            stap_seq_list.append(None)
+    return stap_seq_list
+
+
+def load_stap_list_file(filename):
+    data = load_mat_file(filename)
+    data = data - 1
+    stap_list = []
+    for row in data:
+        cell = row[0]
+        if cell.size > 0:
+            stap_list.append(list(cell[0]))
+        else:
+            stap_list.append(None)
+    return stap_list
+
+
+def load_named_stap_seq_list_file(filename):
+    # TODO: same as `load_stap_seq_file`
+    data = load_mat_file(filename)
+    named_stap_seq_list = []
+    for row in data:
+        cleaned_row = []
+        for cell in row:
+            if cell.size > 0:
+                cleaned_row.append(cell[0])
+            else:
+                cleaned_row.append(None)
+        named_stap_seq_list.append(cleaned_row)
+    return named_stap_seq_list
+
+
 class TestIntegrationsUsing01Tetrahedron(TestCase):
     """
         Walk through whole chain of processing using the 01_tetrahedron as the
@@ -157,6 +213,9 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     target_0_faces = load_faces_from_mat('0_faces.mat')
     target_0_singleXOs = load_single_value('0_singleXOs.mat')
     target_0_edge_length_vec = load_1d_list_from_mat('0_edge_length_vec.mat')
+    target_0_scaf_seq = load_mat_file("0_scaf_seq.mat")[0]
+    target_0_staple_name = load_mat_file("0_staple_name.mat")[0]
+    target_0_scaf_name = load_mat_file("0_scaf_name.mat")[0]
 
     target_1_vert_to_face = load_vert_to_face_from_mat('1_vert_to_face.mat')
     target_1_edge_length_mat_full = load_graph_from_mat(
@@ -177,6 +236,10 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     target_5_route_real = load_1d_list_from_mat('5_route_real.mat', are_1_indexed_nodes = True)
     target_5_route_vals = load_1d_list_from_mat('5_route_vals.mat')
 
+    target_6_edge_bgn_vec = list(load_mat_file('6_edge_bgn_vec.mat').flatten()-1)
+    target_6_edge_fin_vec = list(load_mat_file('6_edge_fin_vec.mat').flatten()-1)
+    target_6_edge_type_vec = list(load_mat_file('6_edge_type_vec.mat').flatten())
+
     target_7_scaf_to_edge = load_scaf_to_edge_from_mat('7_scaf_to_edge.mat')
 
     target_8_scaf_to_edge = load_scaf_to_edge_from_mat('8_scaf_to_edge.mat')
@@ -184,12 +247,10 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
 
     target_9_staples = load_staples_from_mat('9_staples.mat')
 
-    #TODO: All the following `load`s probably need further parsing out of raw state
-
-    target_6_edge_bgn_vec = list(load_mat_file('6_edge_bgn_vec.mat').flatten()-1)
-    target_6_edge_fin_vec = list(load_mat_file('6_edge_fin_vec.mat').flatten()-1)
-    target_6_edge_type_vec = list(load_mat_file('6_edge_type_vec.mat').flatten())
-
+    target_10_stap_seq = load_stap_seq_file("10_stap_seq.mat")
+    target_10_stap_seq_list = load_stap_seq_list_file("10_stap_seq_list.mat")
+    target_10_stap_list = load_stap_list_file("10_stap_list.mat")
+    target_10_named_stap_seq_list = load_named_stap_seq_list_file("10_named_stap_seq_list.mat")
 
 
     # 1:  I'm using a networkx.Graph rather than sparse matrix.  No direct
@@ -333,11 +394,27 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         self.assertEqual(actual_staples, target_staples)
 
     # 10
-    @expectedFailure
     def test_gen_stap_seq(self):
-        staples, num_edges, scaf_seq, staple_name, scaf_name, len_scaf_used = [None] * 6
-        stuff = gen_stap_seq(staples, num_edges, scaf_seq, staple_name, scaf_name, len_scaf_used)
-        self.assertEqual(stuff, "TODO: bring in real targets.  Write Assertions")
+        staples = self.target_9_staples
+        num_edges = len(self.target_0_edges)
+        len_scaf_used = 2*sum(self.target_0_edge_length_vec)  # TODO: it seems like this variable will be undefined if random scaf seq is used!
+        scaf_seq = self.target_0_scaf_seq
+        staple_name = self.target_0_staple_name
+        scaf_name = self.target_0_scaf_name
+        actual_stap_seq, actual_stap_seq_list, \
+        actual_stap_list, actual_named_stap_seq_list \
+            = gen_stap_seq(staples, num_edges, scaf_seq,
+                           staple_name, scaf_name, len_scaf_used)
+
+        target_stap_seq = self.target_10_stap_seq
+        target_stap_seq_list = self.target_10_stap_seq_list
+        target_stap_list = self.target_10_stap_list
+        target_named_stap_seq_list = self.target_10_named_stap_seq_list
+
+        self.assertEqual(actual_stap_seq, target_stap_seq)
+        self.assertEqual(actual_stap_seq_list, target_stap_seq_list)
+        self.assertEqual(actual_stap_list, target_stap_list)
+        self.assertEqual(actual_named_stap_seq_list, target_named_stap_seq_list)
 
     # 11
     @expectedFailure
