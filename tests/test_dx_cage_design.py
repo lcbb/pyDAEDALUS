@@ -135,7 +135,7 @@ def load_staples_from_mat(filename):
         cleaned_row = []
         for subrow in row:
             if subrow.size > 0:
-                ids = [x-1 for x in subrow[0]]
+                ids = [x-1 if x > 0 else None for x in subrow[0]]
                 cleaned_row.append(ids)
             else:
                 cleaned_row.append([])
@@ -145,6 +145,9 @@ def load_staples_from_mat(filename):
 
 def load_stap_seq_file(filename):
     data = load_mat_file(filename)
+    data = np.delete(data, 4, axis=1)
+    data = np.delete(data, 1, axis=1)
+
     stap_seq = []
     for row in data:
         cleaned_row = []
@@ -152,7 +155,7 @@ def load_stap_seq_file(filename):
             if cell.size > 0:
                 cleaned_row.append(cell[0])
             else:
-                cleaned_row.append(None)
+                cleaned_row.append(u'')
         stap_seq.append(cleaned_row)
     return stap_seq
 
@@ -171,19 +174,36 @@ def load_stap_seq_list_file(filename):
 
 def load_stap_list_file(filename):
     data = load_mat_file(filename)
-    data = data - 1
     stap_list = []
     for row in data:
-        cell = row[0]
-        if cell.size > 0:
-            stap_list.append(list(cell[0]))
+        subrow = row[0]
+        if subrow.size > 0:
+            # TODO: how to de-dupe work from load_staples_from_mat
+            ids = [x - 1 if x > 0 else None for x in subrow[0]]
+            stap_list.append(ids)
         else:
             stap_list.append(None)
     return stap_list
 
 
 def load_named_stap_seq_list_file(filename):
-    # TODO: same as `load_stap_seq_file`
+
+    # These next two function could be so much cleaner with regex...
+    def de_1_index_name_a(name):
+        parts = name.split('-', 2)
+        parts = parts[0].rsplit('_', 1) + parts[1:]
+        decrimented_name = '{}_{}-{}-{}'.format(
+            parts[0], str(int(parts[1])-1), str(int(parts[2])-1), parts[3])
+        return decrimented_name
+
+    def de_1_index_name_b(name):
+        parts = name.split('(')
+        parts = [parts[0] ] + parts[1].split('-')
+        parts = parts[:2] + parts[2].split(')')
+        decrimented_name = '{}({}-{}){}'.format(
+            parts[0], str(int(parts[1])-1), str(int(parts[2])-1), parts[3])
+        return decrimented_name
+
     data = load_mat_file(filename)
     named_stap_seq_list = []
     for row in data:
@@ -194,6 +214,15 @@ def load_named_stap_seq_list_file(filename):
             else:
                 cleaned_row.append(None)
         named_stap_seq_list.append(cleaned_row)
+
+    #take 1 indexing in names down to 0 indexing
+    splitter = named_stap_seq_list.index([None, None])
+    for row in named_stap_seq_list[:splitter]:
+        row[0] = de_1_index_name_a(row[0])
+
+    for row in named_stap_seq_list[splitter+1:]:
+        row[0] = de_1_index_name_b(row[0])
+
     return named_stap_seq_list
 
 
