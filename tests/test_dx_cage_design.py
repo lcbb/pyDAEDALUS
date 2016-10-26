@@ -1,9 +1,7 @@
 from unittest import TestCase, expectedFailure
-import networkx as nx
-from os import path
 
+import networkx as nx
 import numpy as np
-import scipy.io as sio
 
 from Automated_Design.adj_scaf_nick_pos import adj_scaf_nick_pos
 from Automated_Design.adj_scaf_nick_pos import get_scaf_nick_pos
@@ -11,13 +9,19 @@ from Automated_Design.assign_scaf_to_edge import assign_scaf_to_edge
 from Automated_Design.assign_staples_wChoices import assign_staples_wChoices
 from Automated_Design.designate_edge_type import designate_edge_type
 from Automated_Design.enum_scaf_bases_DX import enum_scaf_bases_DX
-from Automated_Design.set_routing_direction import set_routing_direction
 from Automated_Design.gen_stap_seq import gen_stap_seq
 from Automated_Design.ply_to_input import ply_to_input
-from Automated_Design.split_vert import split_vert
+from Automated_Design.set_routing_direction import set_routing_direction
 from Automated_Design.split_edge import split_edge
+from Automated_Design.split_vert import split_vert
 from Automated_Design.toCanDo import toCanDo
 from tests.sample_data import ply_file_01_tetrahedron, ply_file_05_icosahedron
+from tests.target_parsers import load_mat_file, load_graph_from_mat, \
+    load_pseudonodes_from_mat, load_1d_list_from_mat, load_single_value, \
+    load_edges_from_mat, load_faces_from_mat, load_vert_to_face_from_mat, \
+    load_scaf_to_edge_from_mat, load_staples_from_mat, load_stap_seq_file, \
+    load_stap_seq_list_file, load_stap_list_file, \
+    load_named_stap_seq_list_file, load_dna_info
 from tests.utils import open_string_as_file
 
 
@@ -35,195 +39,6 @@ class TestPlyImport(TestCase):
         self.assertEqual(len(coordinates), 12)
         self.assertEqual(len(faces), 20)
         # TODO: improve these assertions
-
-
-def load_mat_file(filename):
-    full_data = sio.loadmat(path.join('tests', 'targets', filename))
-    # full_data.keys()
-    # >>> ['thing', '__version__', '__header__', '__globals__']
-    # where `thing` is whatever var was originally saved.
-    key = (key for key in full_data.keys() if key[0] is not '_').next()
-    data = full_data[key]
-    return data
-    #TODO: declare all these files currently used as 1_tetra...
-
-def load_graph_from_mat(filename, edge_attribute='type', graph_type=nx.DiGraph()):
-    graph_as_sparse_matrix = load_mat_file(filename)
-    graph = nx.from_scipy_sparse_matrix(graph_as_sparse_matrix,
-                                        create_using=graph_type,
-                                        edge_attribute=edge_attribute)
-    #intify 'type' if that's the property used (defaults to float)
-    if edge_attribute == 'type':
-        for i, j, attribute in graph.edges(data=True):
-            graph[i][j]['type'] = int(attribute['type'])
-    return graph.copy()
-
-
-def load_pseudonodes_from_mat(filename):
-    pseudonodes = load_mat_file(filename)
-    pseudonodes = pseudonodes - 1
-    return list(pseudonodes.flatten())  #convert shape(N,1) to shape(N)
-
-
-def load_1d_list_from_mat(filename, are_1_indexed_nodes = False):
-    data = load_mat_file(filename)
-    if are_1_indexed_nodes:  # convert to 0 indexed nodes
-        data = data - 1
-    return list(data.flatten())
-
-def load_single_value(filename):
-    data = load_mat_file(filename)
-    val = data[0][0]
-    return val
-
-def load_edges_from_mat(filename):
-    data = load_mat_file(filename)
-    edges = []
-    for row in data:
-        zero_indexed_row = [x-1 for x in row]
-        edges.append(zero_indexed_row)
-    return edges
-
-def load_faces_from_mat(filename):
-    data = load_mat_file(filename)
-    data = data - 1
-    faces = []
-    for row in data:
-        n, node_data = row
-        faces.append(list(node_data.flatten()))
-    return faces
-
-
-def load_vert_to_face_from_mat(filename):
-    """
-        The raw read starts of as a, (N,1)-size length array of each face where
-    a given face is a (1,m)-size array inside of a (1,)-shape array.
-        I have it return as a list of lists.
-    """
-    vert_to_face = load_mat_file(filename) - 1
-    formatted_vert_to_face = [list(face[0].flatten()) for face in vert_to_face]
-    return formatted_vert_to_face
-
-
-def load_scaf_to_edge_from_mat(filename):
-    """
-    target structure:
-    final_data = [
-                   [ [0,1,2,...], [56, 57, 58, ...] ],
-                   [ ..., ... ]
-                   ...
-                 ]
-    """
-    data = load_mat_file(filename)
-    data = data - 1  # convert to 0 index
-
-    final_data = []
-    for a, b in data:
-        a = a.flatten()  # each cell is shape=(N,1).  Needs to be shape=(N)
-        b = b.flatten()
-        final_data.append([list(a), list(b)])
-    return final_data
-
-
-def load_staples_from_mat(filename):
-    data = load_mat_file(filename)
-    data = np.delete(data, 4, axis=1)
-    data = np.delete(data, 1, axis=1)
-
-    listized_data = []
-    for row in data:
-        cleaned_row = []
-        for subrow in row:
-            if subrow.size > 0:
-                ids = [x-1 if x > 0 else None for x in subrow[0]]
-                cleaned_row.append(ids)
-            else:
-                cleaned_row.append([])
-        listized_data.append(cleaned_row)
-    return listized_data
-
-
-def load_stap_seq_file(filename):
-    data = load_mat_file(filename)
-    data = np.delete(data, 4, axis=1)
-    data = np.delete(data, 1, axis=1)
-
-    stap_seq = []
-    for row in data:
-        cleaned_row = []
-        for cell in row:
-            if cell.size > 0:
-                cleaned_row.append(cell[0])
-            else:
-                cleaned_row.append(u'')
-        stap_seq.append(cleaned_row)
-    return stap_seq
-
-
-def load_stap_seq_list_file(filename):
-    data = load_mat_file(filename)
-    stap_seq_list = []
-    for row in data:
-        cell = row[0]
-        if cell.size > 0:
-            stap_seq_list.append(cell[0])
-        else:
-            stap_seq_list.append(None)
-    return stap_seq_list
-
-
-def load_stap_list_file(filename):
-    data = load_mat_file(filename)
-    stap_list = []
-    for row in data:
-        subrow = row[0]
-        if subrow.size > 0:
-            # TODO: how to de-dupe work from load_staples_from_mat
-            ids = [x - 1 if x > 0 else None for x in subrow[0]]
-            stap_list.append(ids)
-        else:
-            stap_list.append(None)
-    return stap_list
-
-
-def load_named_stap_seq_list_file(filename):
-
-    # These next two function could be so much cleaner with regex...
-    def de_1_index_name_a(name):
-        parts = name.split('-', 2)
-        parts = parts[0].rsplit('_', 1) + parts[1:]
-        decrimented_name = '{}_{}-{}-{}'.format(
-            parts[0], str(int(parts[1])-1), str(int(parts[2])-1), parts[3])
-        return decrimented_name
-
-    def de_1_index_name_b(name):
-        parts = name.split('(')
-        parts = [parts[0] ] + parts[1].split('-')
-        parts = parts[:2] + parts[2].split(')')
-        decrimented_name = '{}({}-{}){}'.format(
-            parts[0], str(int(parts[1])-1), str(int(parts[2])-1), parts[3])
-        return decrimented_name
-
-    data = load_mat_file(filename)
-    named_stap_seq_list = []
-    for row in data:
-        cleaned_row = []
-        for cell in row:
-            if cell.size > 0:
-                cleaned_row.append(cell[0])
-            else:
-                cleaned_row.append(None)
-        named_stap_seq_list.append(cleaned_row)
-
-    #take 1 indexing in names down to 0 indexing
-    splitter = named_stap_seq_list.index([None, None])
-    for row in named_stap_seq_list[:splitter]:
-        row[0] = de_1_index_name_a(row[0])
-
-    for row in named_stap_seq_list[splitter+1:]:
-        row[0] = de_1_index_name_b(row[0])
-
-    return named_stap_seq_list
 
 
 class TestIntegrationsUsing01Tetrahedron(TestCase):
@@ -265,9 +80,12 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     target_5_route_real = load_1d_list_from_mat('5_route_real.mat', are_1_indexed_nodes = True)
     target_5_route_vals = load_1d_list_from_mat('5_route_vals.mat')
 
-    target_6_edge_bgn_vec = list(load_mat_file('6_edge_bgn_vec.mat').flatten()-1)
-    target_6_edge_fin_vec = list(load_mat_file('6_edge_fin_vec.mat').flatten()-1)
-    target_6_edge_type_vec = list(load_mat_file('6_edge_type_vec.mat').flatten())
+    target_6_edge_bgn_vec = list(
+        load_mat_file('6_edge_bgn_vec.mat').flatten() - 1)
+    target_6_edge_fin_vec = list(
+        load_mat_file('6_edge_fin_vec.mat').flatten() - 1)
+    target_6_edge_type_vec = list(
+        load_mat_file('6_edge_type_vec.mat').flatten())
 
     target_7_scaf_to_edge = load_scaf_to_edge_from_mat('7_scaf_to_edge.mat')
 
@@ -280,6 +98,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     target_10_stap_seq_list = load_stap_seq_list_file("10_stap_seq_list.mat")
     target_10_stap_list = load_stap_list_file("10_stap_list.mat")
     target_10_named_stap_seq_list = load_named_stap_seq_list_file("10_named_stap_seq_list.mat")
+    target_11_dna_info = load_dna_info("11_dna_info.mat")
 
 
     # 1:  I'm using a networkx.Graph rather than sparse matrix.  No direct
@@ -449,7 +268,11 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     @expectedFailure
     def test_toCanDo(self):
         scaf_to_edge, scaf_seq, stap_list, stap_seq_list, coordinates, edges, edge_length_vec, faces, vert_to_face, fig = [None] * 10
-        stuff = toCanDo(scaf_to_edge, scaf_seq, stap_list, stap_seq_list, coordinates,
-                        edges, edge_length_vec, faces, vert_to_face, fig)
+        actual_dnaInfo = toCanDo(scaf_to_edge, scaf_seq, stap_list,
+                                 stap_seq_list, coordinates, edges,
+                                 edge_length_vec, faces, vert_to_face, fig)
 
-        self.assertEqual(stuff, "TODO: Bring in real targets.  How to properly test this function?")
+        target_dnaInfo = self.target_11_dna_info
+
+        self.maxDiff = 10
+        self.assertEqual(actual_dnaInfo, target_dnaInfo)
