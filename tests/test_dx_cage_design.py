@@ -14,7 +14,7 @@ from Automated_Design.ply_to_input import ply_to_input
 from Automated_Design.set_routing_direction import set_routing_direction
 from Automated_Design.split_edge import split_edge
 from Automated_Design.split_vert import split_vert
-from Automated_Design.toCanDo import toCanDo
+from Automated_Design.toCanDo import DnaInfo, calc_buff, d, wDX, gen_FE_norms
 from tests.sample_data import ply_file_01_tetrahedron, ply_file_05_icosahedron
 from tests.target_parsers import load_mat_file, load_graph_from_mat, \
     load_pseudonodes_from_mat, load_1d_list_from_mat, load_single_value, \
@@ -60,6 +60,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     target_0_scaf_seq = load_mat_file("0_scaf_seq.mat")[0]
     target_0_staple_name = load_mat_file("0_staple_name.mat")[0]
     target_0_scaf_name = load_mat_file("0_scaf_name.mat")[0]
+    target_0_coordinates = load_mat_file("0_coordinates.mat")  # TODO: Format
 
     target_1_vert_to_face = load_vert_to_face_from_mat('1_vert_to_face.mat')
     target_1_edge_length_mat_full = load_graph_from_mat(
@@ -98,6 +99,9 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     target_10_stap_seq_list = load_stap_seq_list_file("10_stap_seq_list.mat")
     target_10_stap_list = load_stap_list_file("10_stap_list.mat")
     target_10_named_stap_seq_list = load_named_stap_seq_list_file("10_named_stap_seq_list.mat")
+
+    target_11_buff_nt = load_1d_list_from_mat('11_buff_nt.mat')
+    target_11_edge_norms = load_mat_file('11_edge_norms.mat')  # TODO: Format
     target_11_dna_info = load_dna_info("11_dna_info.mat")
 
 
@@ -265,14 +269,63 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         self.assertEqual(actual_named_stap_seq_list, target_named_stap_seq_list)
 
     # 11
-    @expectedFailure
-    def test_toCanDo(self):
-        scaf_to_edge, scaf_seq, stap_list, stap_seq_list, coordinates, edges, edge_length_vec, faces, vert_to_face, fig = [None] * 10
-        actual_dnaInfo = toCanDo(scaf_to_edge, scaf_seq, stap_list,
-                                 stap_seq_list, coordinates, edges,
-                                 edge_length_vec, faces, vert_to_face, fig)
+    def test_calc_buff(self):
+        faces = self.target_0_faces
+        num_vert = len(self.target_2_edge_type_mat.nodes())
+        coordinates = self.target_0_coordinates
 
+        actual_buff_nt = calc_buff(faces, num_vert, coordinates, d, wDX)
+        target_buff_nt = self.target_11_buff_nt
+
+        self.assertEqual(actual_buff_nt, target_buff_nt)
+
+    def test_gen_FE_norms(self):
+        faces = self.target_0_faces
+        edges = self.target_0_edges
+        vert_to_face = self.target_1_vert_to_face
+        coordinates = self.target_0_coordinates
+
+        actual_edge_norms = gen_FE_norms(
+            coordinates, faces, edges, vert_to_face)
+        target_edge_norms = self.target_11_edge_norms
+
+        self.assertTrue(np.allclose(actual_edge_norms, target_edge_norms))
+
+    def test_DnaInfo_init(self):
+        scaf_to_edge = self.target_8_scaf_to_edge
+        scaf_seq = self.target_0_scaf_seq
+        stap_list = self.target_10_stap_list
+        stap_seq_list = self.target_10_stap_seq_list
+        coordinates = self.target_0_coordinates
+        edges = self.target_0_edges
+        edge_length_vec = self.target_0_edge_length_vec
+        faces = self.target_0_faces
+        vert_to_face = self.target_1_vert_to_face
+
+        actual_dnaInfo = DnaInfo(scaf_to_edge, scaf_seq, stap_list,
+                                 stap_seq_list, coordinates, edges,
+                                 edge_length_vec, faces, vert_to_face)
         target_dnaInfo = self.target_11_dna_info
 
-        self.maxDiff = 10
-        self.assertEqual(actual_dnaInfo, target_dnaInfo)
+        # assertions for dnaGenom:
+        actual_dNode = actual_dnaInfo.dnaGeom.dNode
+        target_dNode = target_dnaInfo['dnaGeom']['dNode']
+        self.assertTrue(np.allclose(actual_dNode, target_dNode))
+
+        actual_id_nt = actual_dnaInfo.dnaGeom.id_nt
+        target_id_nt = target_dnaInfo['dnaGeom']['id_nt']
+        self.assertTrue(np.allclose(actual_id_nt, target_id_nt))
+
+        actual_triad = actual_dnaInfo.dnaGeom.triad
+        target_triad = target_dnaInfo['dnaGeom']['triad']
+        self.assertTrue(np.allclose(actual_triad, target_triad))
+
+        # assertions for dnaInfo:
+        actual_dnaTop = actual_dnaInfo.dnaTop
+        target_dnaTop = target_dnaInfo['dnaTop']
+        # for row in target_dnaTop:
+        #     print row
+        self.assertEqual(len(actual_dnaTop), len(target_dnaTop))
+        for actual, target in zip(actual_dnaTop, target_dnaTop):
+            #TODO: write __eq__ opposite into DnaTop to clean this up?
+            self.assertEqual(str(actual), str(target))

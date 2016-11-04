@@ -9,6 +9,8 @@ import networkx as nx
 import numpy as np
 from scipy import io as sio
 
+from Automated_Design.toCanDo import DnaTop
+
 
 def load_mat_file(filename):
     full_data = sio.loadmat(path.join('tests', 'targets', filename))
@@ -204,6 +206,39 @@ def load_named_stap_seq_list_file(filename):
 
 
 def load_dna_info(filename):
-    data = load_mat_file(filename)
-    # TODO: This is going to need formatted
-    return data
+    """
+    There has to be a much better way to do this.  Namely, using the info you'd
+    get out of `thing.dtype` every step of the way (I don't know if order is
+    consistent across .mat targets if regenerated).  But it's probably not
+    worth figuring out, since these tests should have initial states hard coded
+    into the tests rather than depending on the from-matlab dumps.
+    """
+    full_data = sio.loadmat(path.join('tests', 'targets', filename))
+    data = full_data['dnaInfo'][0][0]
+    rawDnaTop = data[0][0]
+    dnaTop = []
+    for row in rawDnaTop:
+        this_id = row[0][0][0] - 1
+        this_up = row[1][0][0]
+        this_up = this_up - 1 if this_up > 0 else -1
+        this_down = row[2][0][0]
+        this_down = this_down - 1 if this_down > 0 else -1
+        this_across = row[3][0][0]
+        this_across = this_across - 1 if this_across > 0 else -1
+        this_seq = row[4][0][0]
+        dnaTop.append(
+            DnaTop(this_id, this_up, this_down, this_across, this_seq)
+        )
+
+    dnaGenom = data[1][0][0]
+    dNode = dnaGenom[0]
+    triad = dnaGenom[1]
+    id_nt = dnaGenom[2] - 1
+
+    dna_info = {'dnaTop': dnaTop,
+                'dnaGeom': {
+                    'dNode': dNode,
+                    'triad': triad,
+                    'id_nt': id_nt,
+                }}
+    return dna_info

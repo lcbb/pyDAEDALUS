@@ -23,7 +23,7 @@ def intersect_lists(a, b):
         a = list(a.flatten())
     if type(b) == np.ndarray:
         b = list(b.flatten())
-    #TODO: rewrite in a way that preverves order they're seen in... `a`?
+    #TODO: rewrite in a way that preverves order they're seen in?
 
     thing = set(a).intersection(set(b))
     return sorted(list(thing))

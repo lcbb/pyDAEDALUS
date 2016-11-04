@@ -1,6 +1,5 @@
 from os import path
 import numpy as np
-from matplotlib import pyplot as plt
 
 
 def ply_as_filename_to_input(fname_no_ply, min_len_nt=31, results_foldername=None):
@@ -181,6 +180,7 @@ def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername):
     #TODO: det default to print plots to file, unless explicitly stated to show on screen?
 
     def plot_edge_length_distributions(scale_edge_length_PLY, rounded_edge_length_PLY, results_foldername):
+        from matplotlib import pyplot as plt
         min_len_nt = min(rounded_edge_length_PLY)  #TODO: This is right, right?  It's a little cleaner to not have to import it if the info is already in a variable we're passing in.
         bins_for_hist = range(min_len_nt, max(rounded_edge_length_PLY) + 3, 1)
         bins_for_plotting = [x - 0.25 for x in bins_for_hist[:-1]]
