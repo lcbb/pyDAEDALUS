@@ -14,7 +14,7 @@ from Automated_Design.ply_to_input import ply_to_input
 from Automated_Design.set_routing_direction import set_routing_direction
 from Automated_Design.split_edge import split_edge
 from Automated_Design.split_vert import split_vert
-from Automated_Design.toCanDo import DnaInfo, calc_buff, d, wDX, gen_FE_norms
+from Automated_Design.dna_info import DnaInfo, calc_buff, d, wDX, gen_FE_norms
 from tests.sample_data import ply_file_01_tetrahedron, ply_file_05_icosahedron
 from tests.target_parsers import load_mat_file, load_graph_from_mat, \
     load_pseudonodes_from_mat, load_1d_list_from_mat, load_single_value, \

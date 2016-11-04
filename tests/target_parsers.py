@@ -9,7 +9,7 @@ import networkx as nx
 import numpy as np
 from scipy import io as sio
 
-from Automated_Design.toCanDo import DnaTop
+from Automated_Design.dna_info import DnaTop
 
 
 def load_mat_file(filename):
