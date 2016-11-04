@@ -515,4 +515,76 @@ class DnaInfo(object):
     def plot_stuff(self):
         return None
 
+    def save_dna_info_to_cando_file(self, cndoFN): #TODO: rename cndoFN to filename
+        """
+        Converts dnaInfo into a CanDo text file format.
+        """
+
+        def handle_1_indexing(val):
+            one_indexed = True
+            if one_indexed:
+                val = val + 1 if val >= 0 else val
+            return val
+
+# See http://cando-dna-origami.org/cndo-file-converter/ for file format
+        # All of the internal bits here are 0-indexed, but the output file needs to be 1-indexed!
+
+        fid = open(cndoFN, 'w')
+
+        # File header
+        fid.write(
+            '"CanDo (.cndo) file format version 1.0, Keyao Pan, Laboratory for Computational Biology and Biophysics, Massachusetts Institute of Technology, November 2015"\n')
+        fid.write('\n')
+
+        # dnaInfo.dnaTop
+        fid.write('dnaTop,id,up,down,across,seq\n')
+        for i, topology in enumerate(self.dnaTop):
+            fid.write('{},{},{},{},{},{}\n'.format(
+                handle_1_indexing(i),
+                handle_1_indexing(topology.id),
+                handle_1_indexing(topology.up),
+                handle_1_indexing(topology.down),
+                handle_1_indexing(topology.across),
+                topology.seq))
+        fid.write('\n')
+
+        # dnaInfo.dnaGeom.dNode
+        fid.write('dNode,"e0(1)","e0(2)","e0(3)"\n')
+        for i, node in enumerate(self.dnaGeom.dNode):
+            fid.write('{},{},{},{}\n'.format(
+                handle_1_indexing(i),
+                node[0],
+                node[1],
+                node[2]))
+        fid.write('\n')
+
+        # dnaInfo.dnaGeom.triad
+        fid.write(
+            'triad,"e1(1)","e1(2)","e1(3)","e2(1)","e2(2)","e2(3)","e3(1)","e3(2)","e3(3)"\n')
+        for i in range(self.dnaGeom.triad.shape[-1]):
+            triad = self.dnaGeom.triad[:, :, i]
+            fid.write('{},{},{},{},{},{},{},{},{},{}\n'.format(
+                handle_1_indexing(i),
+                -triad[0, 0],
+                -triad[1, 0],
+                -triad[2, 0],
+                triad[0, 1],
+                triad[1, 1],
+                triad[2, 1],
+                -triad[0, 2],
+                -triad[1, 2],
+                -triad[2, 2]))
+        fid.write('\n')
+
+        # dnaInfo.dnaGeom.id_nt
+        fid.write('id_nt,id1,id2\n')
+        for i, id_nt in enumerate(self.dnaGeom.id_nt):
+            fid.write('{},{},{}\n'.format(
+                handle_1_indexing(i),
+                id_nt[0],
+                id_nt[1]))
+
+        fid.close()
+
+
 

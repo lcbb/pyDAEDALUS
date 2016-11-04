@@ -329,3 +329,23 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         for actual, target in zip(actual_dnaTop, target_dnaTop):
             #TODO: write __eq__ opposite into DnaTop to clean this up?
             self.assertEqual(str(actual), str(target))
+
+    def test_dna_info_print_to_cando(self):
+        scaf_to_edge = self.target_8_scaf_to_edge
+        scaf_seq = self.target_0_scaf_seq
+        stap_list = self.target_10_stap_list
+        stap_seq_list = self.target_10_stap_seq_list
+        coordinates = self.target_0_coordinates
+        edges = self.target_0_edges
+        edge_length_vec = self.target_0_edge_length_vec
+        faces = self.target_0_faces
+        vert_to_face = self.target_1_vert_to_face
+
+        dnaInfo = DnaInfo(scaf_to_edge, scaf_seq, stap_list,
+                          stap_seq_list, coordinates, edges,
+                          edge_length_vec, faces, vert_to_face)
+        dnaInfo.save_dna_info_to_cando_file("THE_CANDO_THING.txt")
+
+        #TODO: mock out file writer to be string writer and assert string match
+        self.fail("Write these assertions!")
+        self.fail("And be sure to 1-index the file!")
