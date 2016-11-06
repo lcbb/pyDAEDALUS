@@ -48,11 +48,9 @@ Output: staples = cell array with E rows, each cell contains row vector.
     this license is available at https://opensource.org/licenses/GPL-2.0
     ##########################################################################
     """
-
     staples = [[None]*4 for i in range(num_edges)] # minimum two staples per edge
     end = -1 #TODO:  UUUUUUGHGRFFFF.  This varaible should be gone.
 
-    didit = False  #TODO: for debugging.  Remove.
 
     for edge_ID in range(num_edges):
         edge_bgn = edges[edge_ID][1] # lower on left
@@ -163,14 +161,14 @@ Output: staples = cell array with E rows, each cell contains row vector.
                 else: # 5/26, 6/27, 16
                     rght_SCS = min(16, len_rght)
 
+                # Define new regions
+                # Region with staples that cross scaffold crossovers
+                scaf_top_SCS = scaf_top_cut_left[-left_SCS:] + \
+                               scaf_top_cut_rght[:rght_SCS]
+                scaf_bot_SCS = scaf_bot_cut_left[-left_SCS:] + \
+                               scaf_bot_cut_rght[:rght_SCS]
 
-                # # Define new regions
-                # # Region with staples that cross scaffold crossovers
-                scaf_top_SCS = scaf_top_cut_left[-left_SCS:] + scaf_top_cut_rght[:rght_SCS]
-                scaf_bot_SCS = scaf_bot_cut_left[-left_SCS:] + scaf_bot_cut_rght[:rght_SCS]
-
-
-                # # Regions to the left and right of the scaf crossover staples
+                # Regions to the left and right of the scaf crossover staples
                 scaf_top_cut_left_noSCS = scaf_top_cut_left[:end-left_SCS]
                 scaf_top_cut_rght_noSCS = scaf_top_cut_rght[rght_SCS+1:]
                 len_left_noSCS = len(scaf_top_cut_left_noSCS)
@@ -258,21 +256,20 @@ Output: staples = cell array with E rows, each cell contains row vector.
                 for ten_Vstap_ID in [0, 2]: # len 10 staples
                     this_ten_Vstaple = staples[other_edge_ID][ten_Vstap_ID]
                     if this_ten_Vstaple: # if it is not empty
-                        five_prime_end = this_ten_Vstaple[0]
-                        # print '-----'
-                        # print type(five_prime_end), five_prime_end
-                        # if five_prime_end == 450:
-                        #     import ipdb; ipdb.set_trace()
-                        # print type(three_prime_end), three_prime_end
-                        thing = int(three_prime_end) - int(five_prime_end)  #TODO: Change datatype test data is read in as?  Occasionally getting overflow errors here without surrounding `int()`s.
-                        they_are_consecutive = (thing) == 1
-                        they_wrap_around = (three_prime_end == 0) and five_prime_end == (num_bases - 1)
-                        if they_are_consecutive or they_wrap_around:
-                            # # Concatenate with len_polyT zeros in between
-                            staples[edge_ID][elev_Vstap_ID] = this_eleven_Vstap + ([-1]*len_polyT) + this_ten_Vstaple
 
-                            # # Change five_prime_end staple to indicate where
-                            # # piece went, using - to make it not a real ID
+                        five_prime_end = this_ten_Vstaple[0]
+                        thing = int(three_prime_end) - int(five_prime_end)
+                        they_are_consecutive = (thing) == 1
+                        they_wrap_around = (three_prime_end == 0) and \
+                                           five_prime_end == (num_bases - 1)
+                        if they_are_consecutive or they_wrap_around:
+                            # Concatenate with len_polyT `None`s in between
+                            fill = [None] * len_polyT
+                            staples[edge_ID][elev_Vstap_ID] = \
+                                this_eleven_Vstap + fill + this_ten_Vstaple
+
+                            # Change five_prime_end staple to indicate where
+                            # piece went, using - to make it not a real ID
                             staples[other_edge_ID][ten_Vstap_ID] = [-edge_ID, -elev_Vstap_ID]
 
 
