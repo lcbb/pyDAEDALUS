@@ -177,8 +177,6 @@ def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername):
     else:
         singleXOs = 1
 
-    #TODO: det default to print plots to file, unless explicitly stated to show on screen?
-
     def plot_edge_length_distributions(scale_edge_length_PLY, rounded_edge_length_PLY, results_foldername):
         from matplotlib import pyplot as plt
         min_len_nt = min(rounded_edge_length_PLY)  #TODO: This is right, right?  It's a little cleaner to not have to import it if the info is already in a variable we're passing in.
