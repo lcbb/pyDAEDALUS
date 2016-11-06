@@ -1,7 +1,9 @@
+from StringIO import StringIO
 from unittest import TestCase, expectedFailure
 
 import networkx as nx
 import numpy as np
+from mock.mock import patch
 
 from Automated_Design.adj_scaf_nick_pos import adj_scaf_nick_pos
 from Automated_Design.adj_scaf_nick_pos import get_scaf_nick_pos
@@ -11,6 +13,7 @@ from Automated_Design.designate_edge_type import designate_edge_type
 from Automated_Design.enum_scaf_bases_DX import enum_scaf_bases_DX
 from Automated_Design.gen_stap_seq import gen_stap_seq
 from Automated_Design.ply_to_input import ply_to_input
+from Automated_Design.seq_to_text import seqtoText
 from Automated_Design.set_routing_direction import set_routing_direction
 from Automated_Design.split_edge import split_edge
 from Automated_Design.split_vert import split_vert
@@ -349,3 +352,35 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         #TODO: mock out file writer to be string writer and assert string match
         self.fail("Write these assertions!")
         self.fail("And be sure to 1-index the file!")
+
+    def test_seq_to_text(self):
+        # scaf_to_edge = self.target_8_scaf_to_edge
+        # scaf_seq = self.target_0_scaf_seq
+        # stap_list = self.target_10_stap_list
+        # stap_seq_list = self.target_10_stap_seq_list
+        # coordinates = self.target_0_coordinates
+        # edges = self.target_0_edges
+        # edge_length_vec = self.target_0_edge_length_vec
+        # faces = self.target_0_faces
+        # vert_to_face = self.target_1_vert_to_face
+        #
+        # dnaInfo = DnaInfo(scaf_to_edge, scaf_seq, stap_list,
+        #                   stap_seq_list, coordinates, edges,
+        #                   edge_length_vec, faces, vert_to_face)
+        #
+        # seqtoText(scaf_to_edge, edges, dnaInfo, "test_DONTEXIST.txt",
+        #           "buttercup", 0, "threebuttercups.txt")
+
+        self.fail("write me!")
+
+    def foo(self):
+        print("Dark Side")
+
+    # 13?
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_printing_with_mockZ(self, mock_stdout):
+        self.foo()
+
+        # raise Exception("..{}..".format(mock_stdout.getvalue()))
+        assert mock_stdout.getvalue() == 'Dark Side\n'
+
