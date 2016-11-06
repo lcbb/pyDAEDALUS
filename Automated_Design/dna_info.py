@@ -1,4 +1,5 @@
 import math
+from copy import deepcopy
 
 import mpmath
 import numpy as np
@@ -229,6 +230,8 @@ class DnaInfo(object):
         this license is available at https://opensource.org/licenses/GPL-2.0
         ##########################################################################
         """
+        stap_seq_list = deepcopy(stap_seq_list)
+        stap_list = deepcopy(stap_list)
 
         # # Initialize numbers of vertices, edges, staples, base paired nucleotides
         num_vert = len(coordinates)
