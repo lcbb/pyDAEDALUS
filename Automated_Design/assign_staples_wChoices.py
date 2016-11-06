@@ -49,8 +49,6 @@ Output: staples = cell array with E rows, each cell contains row vector.
     ##########################################################################
     """
     staples = [[None]*4 for i in range(num_edges)] # minimum two staples per edge
-    end = -1 #TODO:  UUUUUUGHGRFFFF.  This varaible should be gone.
-
 
     for edge_ID in range(num_edges):
         edge_bgn = edges[edge_ID][1] # lower on left
@@ -62,7 +60,7 @@ Output: staples = cell array with E rows, each cell contains row vector.
         edge_type = edge_type_mat[edge_bgn][edge_fin]['type']
 
         scaf_top = scaf_1 # low to high 5' to 3'
-        scaf_bot = scaf_2[end::-1] # low to high 3' to 5'
+        scaf_bot = scaf_2[-1::-1]  # low to high 3' to 5'
 
         # # Fragments 0-3 form vertex staples. 0 and 1 connect to 2 and 3 on
         # # other edges.
@@ -71,7 +69,7 @@ Output: staples = cell array with E rows, each cell contains row vector.
             #TODO: remove staples 1 and 4.  change init'd stap_ID to 4.
             staples[edge_ID][0] = scaf_bot[0:10] # 5 bp -> 10
             staples[edge_ID][1] = scaf_top[10::-1] # 6 bp -> 11
-            staples[edge_ID][2] = scaf_top[end:end-10:-1] # 5 bp -> 10
+            staples[edge_ID][2] = scaf_top[-1:-1 - 10:-1]  # 5 bp -> 10
             staples[edge_ID][3] = scaf_bot[-11:] # 6 bp -> 11
 
         else: # singleXOs off, doubleXOs instead
@@ -109,7 +107,9 @@ Output: staples = cell array with E rows, each cell contains row vector.
                 # # Add the extra staple if necessary
                 # # abutting the higher index vertex
                 if len_extra_stap > 0: # if an extra staple is required
-                    temp_stap = scaf_bot_cut[end-len_extra_stap+1:] + scaf_top_cut[end:end-len_extra_stap:-1]
+                    temp_stap = scaf_bot_cut[
+                                -1 - len_extra_stap + 1:] + scaf_top_cut[
+                                                            -1:-1 - len_extra_stap:-1]
                     staples[edge_ID].append(temp_stap)
                     stap_ID += 1  # at this point, stap_ID doesn't matter.  but for consistency..   #TODO: Can I remove stap_ID?
 
@@ -169,12 +169,12 @@ Output: staples = cell array with E rows, each cell contains row vector.
                                scaf_bot_cut_rght[:rght_SCS]
 
                 # Regions to the left and right of the scaf crossover staples
-                scaf_top_cut_left_noSCS = scaf_top_cut_left[:end-left_SCS]
+                scaf_top_cut_left_noSCS = scaf_top_cut_left[:-1 - left_SCS]
                 scaf_top_cut_rght_noSCS = scaf_top_cut_rght[rght_SCS+1:]
                 len_left_noSCS = len(scaf_top_cut_left_noSCS)
                 len_rght_noSCS = len(scaf_top_cut_rght_noSCS)
 
-                scaf_bot_cut_left_noSCS = scaf_bot_cut_left[:end-left_SCS]
+                scaf_bot_cut_left_noSCS = scaf_bot_cut_left[:-1 - left_SCS]
                 scaf_bot_cut_rght_noSCS = scaf_bot_cut_rght[rght_SCS+1:]
 
                 if scaf_top_cut_left_noSCS:
@@ -190,11 +190,12 @@ Output: staples = cell array with E rows, each cell contains row vector.
                     # # if len_cut <= 11, make single-crossover edge staple
                     staples[edge_ID].append(scaf_bot_SCS)
                     stap_ID += 1
-                    staples[edge_ID].append(scaf_top_SCS[end::-1])
+                    staples[edge_ID].append(scaf_top_SCS[-1::-1])
                     stap_ID += 1
                 else:
                     # # Do SCStaples, nick 8 bp away from 3'   ##!! should match the picture.
-                    staples[edge_ID].append(scaf_bot_SCS[-8:] + scaf_top_SCS[end:8-1:-1])
+                    staples[edge_ID].append(scaf_bot_SCS[-8:] + scaf_top_SCS[
+                                                                -1:8 - 1:-1])
                     stap_ID += 1
                     staples[edge_ID].append(scaf_top_SCS[8-1::-1] + scaf_bot_SCS[:-8])
                     stap_ID += 1
