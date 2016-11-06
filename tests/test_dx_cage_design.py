@@ -333,6 +333,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
             #TODO: write __eq__ opposite into DnaTop to clean this up?
             self.assertEqual(str(actual), str(target))
 
+    @expectedFailure
     def test_dna_info_print_to_cando(self):
         scaf_to_edge = self.target_8_scaf_to_edge
         scaf_seq = self.target_0_scaf_seq
@@ -353,6 +354,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         self.fail("Write these assertions!")
         self.fail("And be sure to 1-index the file!")
 
+    @expectedFailure
     def test_seq_to_text(self):
         # scaf_to_edge = self.target_8_scaf_to_edge
         # scaf_seq = self.target_0_scaf_seq
@@ -373,14 +375,14 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
 
         self.fail("write me!")
 
-    def foo(self):
-        print("Dark Side")
+    def print_a_thing(self):
+        print("Test String To Catch")
 
     # 13?
     @patch('sys.stdout', new_callable=StringIO)
-    def test_printing_with_mockZ(self, mock_stdout):
-        self.foo()
+    def test_printing_with_mocks(self, mock_stdout):
+        self.print_a_thing()
 
         # raise Exception("..{}..".format(mock_stdout.getvalue()))
-        assert mock_stdout.getvalue() == 'Dark Side\n'
+        assert mock_stdout.getvalue() == 'Test String To Catch\n'
 
