@@ -27,9 +27,6 @@ def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors, v
     # this license is available at https://opensource.org/licenses/GPL-2.0
     ###########################################################################
 
-    # print
-    # print(' -- start -- ', vert_ID)
-
     ########   find what neighbors are:
     # # Access edge_type_mat_allNodes, outputs are column vectors
     #TODO: the following line is no longer needed, since I'm directly referencing the graph?
@@ -44,7 +41,6 @@ def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors, v
 
     # # Identify neighboring pairs and add a new node between each pair
     list_a = range(degree - 1)
-    # print('a', list_a)
     for row_ID1 in list_a:
 
         # # Find neighbor 1 info
@@ -53,7 +49,6 @@ def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors, v
         face_1 = face_assign[neighbor_1]  # designated face, if assigned
 
         list_b = range(row_ID1 + 1, degree)
-        # print('b', list_b)
         for row_ID2 in list_b:
 
             # # Find neighbor info
@@ -74,23 +69,16 @@ def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors, v
                 shared_neighbor = set(v2f_vert_ID).intersection(set(v2f_n1)).intersection(set(v2f_n2))
                 #TODO: there has to be a way to clean up at least the for-for-if above...
 
-                # print(', ',(vert_ID,neighbor_1,neighbor_2), '->', (vert_ID,pseudo_vert[neighbor_1],pseudo_vert[neighbor_2]))
-                # print('. ', v2f_vert_ID, v2f_n1, v2f_n2)
-
                 if shared_neighbor:
-                    # print('n', shared_neighbor)
-
                     # # Record the face this new node belongs to
 
                     # assert len(shared_neighbor) <= 1 , "is multiple neighbors possible?"
-                    face_3 = list(shared_neighbor)
-
+                    face_3 = list(shared_neighbor)[0]
 
                     # # Check if connecting to another pseudo node if faces
                     # # match, otherwise don't add node
-
                     #  if face_1 == face_2 == face_3, but allowing for empty face_1 or face_2
-                    if (face_1 == 0 or face_1 == face_3) and (face_2 == 0 or face_2 == face_3):
+                    if (face_1 == None or face_1 == face_3) and (face_2 == None or face_2 == face_3):
 
                         # # Create a new node and store in pseudo_vert
                         new_node_id = len(pseudo_vert)  # create a new node
@@ -98,10 +86,14 @@ def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors, v
                         pseudo_vert.append(vert_ID)  # store in pseudo_vert
 
                         # # Incorporate new node into sparse matrix edge_type_mat_allNodes
-                        edge_type_mat_allNodes.add_edge(neighbor_1, new_node_id, attr_dict=val_1)
-                        edge_type_mat_allNodes.add_edge(new_node_id, neighbor_1, attr_dict=val_1)
-                        edge_type_mat_allNodes.add_edge(new_node_id, neighbor_2, attr_dict=val_2)
-                        edge_type_mat_allNodes.add_edge(neighbor_2, new_node_id, attr_dict=val_2)
+                        edge_type_mat_allNodes.add_edge(
+                            neighbor_1, new_node_id, attr_dict=val_1)
+                        edge_type_mat_allNodes.add_edge(
+                            new_node_id, neighbor_1, attr_dict=val_1)
+                        edge_type_mat_allNodes.add_edge(
+                            new_node_id, neighbor_2, attr_dict=val_2)
+                        edge_type_mat_allNodes.add_edge(
+                            neighbor_2, new_node_id, attr_dict=val_2)
 
                         # # Store in face_assign
                         face_assign.append(face_3)

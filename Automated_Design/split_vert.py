@@ -29,7 +29,7 @@ def split_vert(edge_type_mat_wHalfs, pseudo_vert, num_vert, vert_to_face):
     edge_type_mat_allNodes = edge_type_mat_wHalfs.copy()
 
     # # Initialize face_storage matrix for pseudo nodes added in this function
-    face_assign = [0] * len(pseudo_vert)
+    face_assign = [None] * len(pseudo_vert)
 
     for vert_ID in range(num_vert):  # for each real vertex
         neighbors = edge_type_mat_allNodes.in_edges(vert_ID, data=True)
@@ -37,7 +37,7 @@ def split_vert(edge_type_mat_wHalfs, pseudo_vert, num_vert, vert_to_face):
         # # arrange_neighbors identifies which neighboring vertices share faces
         # # and adds nodes at the vertex to route the scaffold around the
         # # vertex vert_ID accordingly
-        edge_type_mat_allNodes, pseudo_vert, face_assign = arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID,
-                                                                               neighbors, vert_to_face, face_assign)
-        # print(face_assign)
+        edge_type_mat_allNodes, pseudo_vert, face_assign = arrange_neighbors(
+            edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors,
+            vert_to_face, face_assign)
     return edge_type_mat_allNodes, pseudo_vert
