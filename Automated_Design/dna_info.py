@@ -313,7 +313,9 @@ class DnaInfo(object):
                         # TODO: Test this part (conditional and contents)!!!
                         nt_down = scaf_part[bp_ID + 1]
 
-                        five_prime_side_of_scaffold_nick = abs(nt_down - nt_ID) > 1
+                        # set larger int type in scaf test data to negate
+                        # the need for the following `int()`:
+                        five_prime_side_of_scaffold_nick = abs(int(nt_down) - nt_ID) > 1
                         not_scaffold_nick = nt_ID > 1 and nt_ID < n_bp
                         if five_prime_side_of_scaffold_nick and not_scaffold_nick:
                             scaf_nick_pos = bp_ID

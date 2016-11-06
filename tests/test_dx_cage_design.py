@@ -66,6 +66,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     target_0_singleXOs = load_single_value('0_singleXOs.mat')
     target_0_edge_length_vec = load_1d_list_from_mat('0_edge_length_vec.mat')
     target_0_scaf_seq = load_mat_file("0_scaf_seq.mat")[0]
+
     target_0_staple_name = load_mat_file("0_staple_name.mat")[0]
     target_0_scaf_name = load_mat_file("0_scaf_name.mat")[0]
     target_0_coordinates = load_mat_file("0_coordinates.mat")  # TODO: Format
@@ -161,7 +162,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         self.assertEqual(actual_pseudo_vert, target_pseudo_vert)
         self.assertTrue(is_isomorphic(actual_edge_type_mat_allNodes,
                                       target_edge_type_mat_allNodes))
-        
+
         # TODO: Graphs are isomorphic but not directly equal. ... okay?
         # self.assertEqual(actual_edge_type_mat_allNodes.nodes(),
         #                  target_edge_type_mat_allNodes.nodes())  # will pass
