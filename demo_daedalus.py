@@ -19,6 +19,10 @@ default_fname_no_ply = path.join('PLY_Files', '01_tetrahedron')
 @click.option('--results_foldername', default=None,
               help="""Define this if you want to save plots to a results folder
                       rather than display them immediately to screen.""")
+def run_demo_from_command_line(fname_no_ply, min_len_nt, results_foldername):
+    run_demo(fname_no_ply, min_len_nt, results_foldername)
+
+
 def run_demo(fname_no_ply, min_len_nt, results_foldername):
 
     if results_foldername:
@@ -35,4 +39,4 @@ def run_demo(fname_no_ply, min_len_nt, results_foldername):
 
 
 if __name__ == '__main__':
-    run_demo()
+    run_demo_from_command_line()
