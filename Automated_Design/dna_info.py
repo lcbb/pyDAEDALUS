@@ -528,7 +528,7 @@ class DnaInfo(object):
         def handle_1_indexing(val):
             one_indexed = True
             if one_indexed:
-                val = val + 1 if val >= 0 else val
+                val = int(val) + 1 if val >= 0 else val
             return val
 
 # See http://cando-dna-origami.org/cndo-file-converter/ for file format
@@ -586,8 +586,8 @@ class DnaInfo(object):
         for i, id_nt in enumerate(self.dnaGeom.id_nt):
             fid.write('{},{},{}\n'.format(
                 handle_1_indexing(i),
-                id_nt[0],
-                id_nt[1]))
+                handle_1_indexing(id_nt[0]),
+                handle_1_indexing(id_nt[1])))
 
         fid.close()
 

@@ -1,6 +1,8 @@
 import networkx as nx
 import numpy as np
 from os import path
+import pickle
+from datetime import datetime
 
 from Automated_Design.adj_scaf_nick_pos import adj_scaf_nick_pos, \
     get_scaf_nick_pos
@@ -90,10 +92,12 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
     ### 1. Generate sparse matrix of connectivities and vertex-face indexing ###
     # Create sparse matrices of connectivities and edge lengths
     file_name_without_containing_folder = path.split(file_name)[1]
+    shape_name = file_name_without_containing_folder
     full_graph = generate_graph(num_vert, edges, edge_length_vec)
     full_graph.name = file_name_without_containing_folder
-    nx.write_gml(full_graph,
-                 'tests/sample_files/' + full_graph.name + '_initial_graph.gml')
+    # In case of debugging, or generally wanting graph in generic format
+    # nx.write_gml(full_graph,
+    #              'tests/sample_files/' + full_graph.name + '_initial_graph.gml')
 
     # Identify presence of every vertex in every face
     vert_to_face = gen_vert_to_face(num_vert, faces)
@@ -151,19 +155,34 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
                                       singleXOs)
 
     ## 10. Assign sequence to staples #########################################
-    if scaf_seq:  # if a scaffold sequence has been input
-        # TODO: won't this always be true, since even if scaf_seq started as
-        # `[]`, it would have still been defined above?
-        [stap_seq, stap_seq_list, stap_list,
-         named_stap_seq_list] = gen_stap_seq(staples, num_edges, scaf_seq,
-                                             staple_name, scaf_name,
-                                             len_scaf_used)
+    if not scaf_seq:  # if a scaffold sequence has been input
+        raise Exception("How's that possible?")
+        # TODO: Right?, since even if scaf_seq started as `[]`, it would have
+        # still been defined above?
 
-        # Leaving this within above scaf_seq, since it relies on 10's output
-        ## 11. Port to CanDo, save information ####################################
-        dnaInfo = DnaInfo(scaf_to_edge, scaf_seq, stap_list, stap_seq_list,
-                          coordinates, edges, edge_length_vec, faces, vert_to_face)
+    [stap_seq, stap_seq_list, stap_list,
+     named_stap_seq_list] = gen_stap_seq(staples, num_edges, scaf_seq,
+                                         staple_name, scaf_name,
+                                         len_scaf_used)
 
+    # Leaving this within above scaf_seq, since it relies on 10's output
+    ## 11. Port to CanDo, save information ####################################
+    dnaInfo = DnaInfo(scaf_to_edge, scaf_seq, stap_list, stap_seq_list,
+                      coordinates, edges, edge_length_vec, faces, vert_to_face)
 
-    full_file_name = None
+    ## 11.5 Save DnaInfo
+    if singleXOs > 0:
+        staple_description = '_singleXOVs_'
+    else:
+        staple_description = '_doubleXOVs_'
+    date = datetime.now().strftime("%Y-%m-%d")
+    full_file_name = shape_name + '_scaf_' + scaf_name + staple_description + date
+
+    # ... as pickle dump.
+    pickled_dna_info_filename = 'dnaInfo_' + full_file_name + '.pickle'
+    pickle.dump(dnaInfo,open(pickled_dna_info_filename, 'w'))
+
+    # as cando file
+    dnaInfo.save_dna_info_to_cando_file(full_file_name + '.cndo')
+
     return full_file_name

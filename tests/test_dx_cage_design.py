@@ -357,7 +357,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         dnaInfo = DnaInfo(scaf_to_edge, scaf_seq, stap_list,
                           stap_seq_list, coordinates, edges,
                           edge_length_vec, faces, vert_to_face)
-        dnaInfo.save_dna_info_to_cando_file("THE_CANDO_THING.txt")
+        # dnaInfo.save_dna_info_to_cando_file("THE_CANDO_THING.txt")
 
         #TODO: mock out file writer to be string writer and assert string match
         self.fail("Write these assertions!")
