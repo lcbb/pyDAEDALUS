@@ -48,7 +48,9 @@ def adj_scaf_nick_pos(scaf_to_edge, scaf_nick_pos, num_bases):
 
     # # Adjust scaf_to_edge
     import numpy as np
-    num_edges, num_sides, dontcare = np.array(scaf_to_edge_adj).shape # num_sides should be 2
+    shape = np.array(scaf_to_edge_adj, dtype=np).shape # num_sides should be 2
+    num_edges = shape[0]
+    num_sides = shape[1]
 
     for edge_ID in range(num_edges):
         for sides_ID in range(num_sides):
