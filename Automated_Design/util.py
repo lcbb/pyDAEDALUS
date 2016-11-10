@@ -30,4 +30,15 @@ def intersect_lists(a, b):
 
 
 def find(iterable, val):
+    # A close-enough-to-a-match to matlab's `find` function.  Ideally, usage of
+    # this function will be refactored out.
+
+    # Some times, data comes in as an array.  Directly computing array equality
+    # breaks, so they first need converted over to iterables.
+    # If arrays, it is assumed the iterable is two dimensions and val is one.
+
+    if type(iterable) == np.ndarray:
+        iterable = [list(item) for item in iterable]
+    if type(val) == np.ndarray:
+        val == list(val)
     return [i for i in range(len(iterable)) if iterable[i] == val]

@@ -141,10 +141,10 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
                                          num_bases)
     scaf_to_edge = scaf_to_edge_adj
 
-    # ## 9. Add staples #########################################################
-    # staples = assign_staples_wChoices(edges, num_edges, edge_type_mat,
-    #                                   scaf_to_edge, num_bases, num_vert,
-    #                                   singleXOs)
+    ## 9. Add staples #########################################################
+    staples = assign_staples_wChoices(edges, num_edges, edge_type_mat,
+                                      scaf_to_edge, num_bases, num_vert,
+                                      singleXOs)
 
     full_file_name = None
     return full_file_name
