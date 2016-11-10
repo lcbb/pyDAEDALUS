@@ -7,7 +7,9 @@ from Automated_Design.adj_scaf_nick_pos import adj_scaf_nick_pos, \
 from Automated_Design.assign_scaf_to_edge import assign_scaf_to_edge
 from Automated_Design.assign_staples_wChoices import assign_staples_wChoices
 from Automated_Design.constants import SCAF_SEQ
+from Automated_Design.dna_info import DnaInfo
 from Automated_Design.enum_scaf_bases_DX import enum_scaf_bases_DX
+from Automated_Design.gen_stap_seq import gen_stap_seq
 from Automated_Design.set_routing_direction import set_routing_direction
 from Automated_Design.split_edge import split_edge
 from Automated_Design.split_vert import split_vert
@@ -58,8 +60,10 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
     len_scaf_used = 2 * sum(edge_length_vec)  # length of scaffold used
 
     # Determine the default scaffold sequence to use.
+    scaf_seq_default_used = False
     if not scaf_seq:  # if a scaffold sequence was not provided
         if len_scaf_used <= 7249:  # default to using M13 sequence
+            scaf_seq_default_used = True
             # Set scaffold sequence as full M13 scaffold, 7249 nucleotides
             scaf_seq = SCAF_SEQ  # from NEB
             scaf_name = 'full_M13'  # scaffold name
@@ -145,6 +149,16 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
     staples = assign_staples_wChoices(edges, num_edges, edge_type_mat,
                                       scaf_to_edge, num_bases, num_vert,
                                       singleXOs)
+
+    ## 10. Assign sequence to staples #########################################
+    if scaf_seq:  # if a scaffold sequence has been input
+        # TODO: won't this always be true, since even if scaf_seq started as
+        # `[]`, it would have still been defined above?
+        [stap_seq, stap_seq_list, stap_list,
+         named_stap_seq_list] = gen_stap_seq(staples, num_edges, scaf_seq,
+                                             staple_name, scaf_name,
+                                             len_scaf_used)
+
 
     full_file_name = None
     return full_file_name
