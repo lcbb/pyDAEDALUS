@@ -1,9 +1,12 @@
 import math
 from copy import deepcopy
+from time import sleep
 
 import mpmath
 import numpy as np
 
+from Automated_Design.contsants import VERMILLION, ORANG, BLU, WHITE, \
+    REDPURPLE
 from Automated_Design.util import intersect_lists
 
 
@@ -271,6 +274,7 @@ class DnaInfo(object):
         dist_want = d*(buff_nt[vert_1] + edge_length + buff_nt[vert_2]) # desired distance length
         scale = dist_want/dist_curr # scaling factor
         coordinates = coordinates*scale # scale coordinates
+        self.scaled_coordinates = coordinates
 
         # # Edges
         for edge_ID in range(num_edges): # for each edge
@@ -421,8 +425,6 @@ class DnaInfo(object):
 
         self.dnaGeom = self.dnaGeom
 
-        # self.plot_stuff()
-
         # Initialize dnaTop
         self.dnaTop = []
 
@@ -517,8 +519,60 @@ class DnaInfo(object):
     def get_turn_angle_for_pos_scaf_nick_pos(self, num_nt):
         return 2 * np.pi * (int(np.floor(num_nt / 10.5)) + 0.5) / (num_nt + 1)
 
-    def plot_stuff(self):
-        return None
+    def plot_3d_model(self, filename):
+        import matplotlib.pyplot as plt
+        from mpl_toolkits.mplot3d import Axes3D
+
+        fig = plt.figure(3, figsize=(24, 24))
+        fig.clf()
+        ax = fig.add_subplot(111, projection='3d')
+
+        # # Plot numbered circles at each vertex
+        first_d = [loc[0] for loc in self.scaled_coordinates]
+        second_d = [loc[1] for loc in self.scaled_coordinates]
+        third_d = [loc[2] for loc in self.scaled_coordinates]
+        ax.scatter(first_d, second_d, third_d,
+                   marker='o',  # marker shape
+                   color=VERMILLION, # marker color
+                   edgecolor=VERMILLION,
+                   s=200)  # marker size
+
+
+        # Plot positions of each nucleotide as a line
+        first_d = [dNode[0] for dNode in self.dnaGeom.dNode]
+        second_d = [dNode[1] for dNode in self.dnaGeom.dNode]
+        third_d = [dNode[2] for dNode in self.dnaGeom.dNode]
+        ax.plot(first_d, second_d, third_d,
+                '-',
+                color=BLU,
+                linewidth=5,)
+
+
+        first_d = [loc[0] for loc in self.scaled_coordinates]
+        second_d = [loc[1] for loc in self.scaled_coordinates]
+        third_d = [loc[2] for loc in self.scaled_coordinates]
+        for i, (first, second, third) in enumerate(zip(first_d, second_d, third_d)):
+            ax.text(first, second, third,
+                    str(i), color=WHITE,
+                    horizontalalignment='center', verticalalignment='center')
+
+
+        #
+        # # # Plot 5' end (orange square)
+        # plot3(self.dnaGeom.dNode(1, 1), self.dnaGeom.dNode(1, 2), self.dnaGeom.dNode(1, 3),
+        #       's', 'MarkerEdgeColor', ORANG, 'MarkerFaceColor', ORANG,
+        #       'MarkerSize', 10)
+        # # # Plot 3' end (purple circle)
+        # plot3(self.dnaGeom.dNode(end, 1), self.dnaGeom.dNode(end, 2),
+        #       self.dnaGeom.dNode(end, 3), 'o', 'MarkerEdgeColor', REDPURPLE,
+        #       'MarkerFaceColor', redpurple, 'MarkerSize', 8)  # 'LineWidth',4,
+
+        ax.set_xlabel('Angstroms', fontdict={'size': 16})
+        ax.set_ylabel('Angstroms', fontdict={'size': 16})
+        ax.set_zlabel('Angstroms', fontdict={'size': 16})
+
+        # plt.show()
+        plt.savefig(filename, bbox_inches='tight', pad_inches=0)
 
     def save_dna_info_to_cando_file(self, cndoFN): #TODO: rename cndoFN to filename
         """

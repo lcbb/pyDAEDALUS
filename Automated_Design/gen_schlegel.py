@@ -1,5 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
+
+from Automated_Design.contsants import REDPURPLE, VERMILLION, WHITE, SKYBLUE
 from Automated_Design.util import generate_graph
 
 
@@ -30,12 +32,6 @@ def gen_schlegel(edges, coordinates, faces, edge_type_mat=None, schlegel_filenam
     this license is available at https:##opensource.org#licenses#GPL-2.0
     ##########################################################################
     """
-
-    # Colors:
-    vermillion = tuple(np.array([213, 94, 0], dtype=np.float) / 255)
-    redpurple = tuple(np.array([204, 121, 167], dtype=np.float) / 255)
-    skyblue = tuple(np.array([86, 180, 233], dtype=np.float) / 255)
-    white = tuple(np.array([255, 255, 255], dtype=np.float) / 255)
 
     # Choose Biggest Face:
     big_face = max(faces, key=len)
@@ -88,7 +84,7 @@ def gen_schlegel(edges, coordinates, faces, edge_type_mat=None, schlegel_filenam
                 # # Store as new xycoord for vert_ID
                 xycoord[vert_ID, :] = midpt
 
-    f = plt.figure(0, figsize=(8, 8)) #TODO: Why preserver the fig number?
+    f = plt.figure(2, figsize=(8, 8))
     f.clf()
     plt.xlim((-1.2, 1.2))
     plt.ylim((-1.2, 1.2))
@@ -113,19 +109,19 @@ def gen_schlegel(edges, coordinates, faces, edge_type_mat=None, schlegel_filenam
 
         # TODO rename `edge_type_mat` to something that involves `graph`
         if edge_type_mat.edge[edge_bgn][edge_fin]['type'] == 2:  #if this is a tree edge:
-            plt.plot(x_vec, y_vec, linestyle='-', color=redpurple, linewidth=8)
+            plt.plot(x_vec, y_vec, linestyle='-', color=REDPURPLE, linewidth=8)
         else:  #if this is a non-tree edge:
-            plt.plot(x_vec, y_vec, linestyle='-', color=skyblue, linewidth=5)
+            plt.plot(x_vec, y_vec, linestyle='-', color=SKYBLUE, linewidth=5)
 
     # Plot nodes:
     plt.plot(xycoord[:, 0], xycoord[:, 1], 'o',
-             color=vermillion, markeredgecolor=vermillion, markersize=15)
+             color=VERMILLION, markeredgecolor=VERMILLION, markersize=15)
 
     # Plot node labels:
     for i, node_xy in enumerate(xycoord):
         x, y = node_xy
-        plt.text(x, y, str(i), color=white, fontname='Arial',
-        horizontalalignment='center', verticalalignment='center')
+        plt.text(x, y, str(i), color=WHITE, fontname='serif',
+                 horizontalalignment='center', verticalalignment='center')
 
     if schlegel_filename:
         plt.savefig(schlegel_filename, bbox_inches='tight')

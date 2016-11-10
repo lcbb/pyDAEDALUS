@@ -168,13 +168,15 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
                                          len_scaf_used)
 
     # Display named stap_seq_list
-    print('')
-    for i in range(len(stap_seq)):
-        for j in range(len(stap_seq[i])):
-            if stap_seq[i][j]:
-                print("{}, {} : {}".format(
-                    i, j, stap_seq[i][j]))
-    print('')
+    def display_named_stap_seq_list(stap_seq):
+        print('')
+        for i in range(len(stap_seq)):
+            for j in range(len(stap_seq[i])):
+                if stap_seq[i][j]:
+                    print("{}, {} : {}".format(
+                        i, j, stap_seq[i][j]))
+        print('')
+    # display_named_stap_seq_list(stap_seq)
 
     # Leaving this within above scaf_seq, since it relies on 10's output
     ## 11. Port to CanDo, save information ####################################
@@ -189,7 +191,11 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
     date = datetime.now().strftime("%Y-%m-%d")
     full_file_name = shape_name + '_scaf_' + scaf_name + staple_description + date
 
-    # ... as pickle dumps.
+    # ... as a 3d plot
+    plot_filename = full_file_name + '.png'
+    dnaInfo.plot_3d_model(plot_filename)
+
+    # as pickle dumps.
     pickled_dna_info_filename = 'dnaInfo_' + full_file_name + '.pickle'
     pickle.dump(dnaInfo, open(pickled_dna_info_filename, 'w'))
 
@@ -209,10 +215,10 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
     dnaInfo.save_dna_info_to_cando_file(full_file_name + '.cndo')
 
     # And also save staple sequences
-    if scaf_name == 'fake_scaf':  # if fake scaffold,
-        print('No real staples\n')  # do not save staple sequences
-    else:
-        print('Real staples\n')
-        csv_staples(full_file_name, named_stap_seq_list)
+    # if scaf_name == 'fake_scaf':  # if fake scaffold,
+    #     print('No real staples\n')  # do not save staple sequences
+    # else:
+    #     print('Real staples\n')
+        # csv_staples(full_file_name, named_stap_seq_list)
 
     return full_file_name

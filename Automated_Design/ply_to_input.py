@@ -181,7 +181,7 @@ def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername):
         bins_for_plotting = [x - 0.25 for x in bins_for_hist[:-1]]
 
 
-        fig_31 = plt.figure(31, figsize=(8, 6))
+        fig_31 = plt.figure(0, figsize=(8, 6))
         fig_31.clf()
         y31 = np.histogram(scale_edge_length_PLY, bins=bins_for_hist)[0]
         plt.bar(bins_for_plotting, y31, width=0.5)
@@ -193,7 +193,7 @@ def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername):
         plt.xticks(bins_for_hist)
 
 
-        fig_32 = plt.figure(32, figsize=(8, 6))
+        fig_32 = plt.figure(1, figsize=(8, 6))
         fig_32.clf()
         y32 = np.histogram(rounded_edge_length_PLY, bins=bins_for_hist)[0]
         bins_a = [x - 0.125 for x in bins_for_plotting]
