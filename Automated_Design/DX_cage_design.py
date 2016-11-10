@@ -12,6 +12,7 @@ from Automated_Design.constants import SCAF_SEQ
 from Automated_Design.dna_info import DnaInfo
 from Automated_Design.enum_scaf_bases_DX import enum_scaf_bases_DX
 from Automated_Design.gen_stap_seq import gen_stap_seq
+from Automated_Design.seq_to_text import seqtoText
 from Automated_Design.set_routing_direction import set_routing_direction
 from Automated_Design.split_edge import split_edge
 from Automated_Design.split_vert import split_vert
@@ -178,9 +179,21 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
     date = datetime.now().strftime("%Y-%m-%d")
     full_file_name = shape_name + '_scaf_' + scaf_name + staple_description + date
 
-    # ... as pickle dump.
+    # ... as pickle dumps.
     pickled_dna_info_filename = 'dnaInfo_' + full_file_name + '.pickle'
-    pickle.dump(dnaInfo,open(pickled_dna_info_filename, 'w'))
+    pickle.dump(dnaInfo, open(pickled_dna_info_filename, 'w'))
+
+    route_info_dump = {'scaf_to_edge':scaf_to_edge ,
+                       'scaf_seq':scaf_seq ,
+                       'stap_list':stap_list ,
+                       'stap_seq_list':stap_seq_list ,
+                       'named_stap_seq_list':named_stap_seq_list ,
+                       'coordinates':coordinates ,
+                       'edges':edges ,
+                       'faces':faces ,
+                       'edge_length_vec': edge_length_vec}
+    route_info_dump_filename = 'routeInfo_' + full_file_name + '.pickle'
+    pickle.dump(route_info_dump, open(route_info_dump_filename, 'w'))
 
     # as cando file
     dnaInfo.save_dna_info_to_cando_file(full_file_name + '.cndo')
