@@ -9,6 +9,7 @@ from Automated_Design.adj_scaf_nick_pos import adj_scaf_nick_pos, \
 from Automated_Design.assign_scaf_to_edge import assign_scaf_to_edge
 from Automated_Design.assign_staples_wChoices import assign_staples_wChoices
 from Automated_Design.constants import SCAF_SEQ
+from Automated_Design.csv_staples import csv_staples
 from Automated_Design.dna_info import DnaInfo
 from Automated_Design.enum_scaf_bases_DX import enum_scaf_bases_DX
 from Automated_Design.gen_stap_seq import gen_stap_seq
@@ -197,5 +198,12 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
 
     # as cando file
     dnaInfo.save_dna_info_to_cando_file(full_file_name + '.cndo')
+
+    # And also save staple sequences
+    if scaf_name == 'fake_scaf':  # if fake scaffold,
+        print('No real staples\n')  # do not save staple sequences
+    else:
+        print('Real staples\n')
+        csv_staples(full_file_name, named_stap_seq_list)
 
     return full_file_name
