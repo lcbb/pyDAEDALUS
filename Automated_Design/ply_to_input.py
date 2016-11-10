@@ -68,7 +68,6 @@ def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername):
             coords_on_this_line = map(float, line_as_list)
             coordinates_as_list.append(coords_on_this_line)
 
-        #TODO: make this into an array?
         # coordinates_as_array = np.array(coordinates_as_list, dtype=np.float64)
         return coordinates_as_list
 
@@ -85,9 +84,8 @@ def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername):
             vertices = line_as_list_of_ints[1:]
 
             assert number_of_vertices == len(vertices)
-            faces_as_list.append([number_of_vertices, vertices])
+            faces_as_list.append(vertices)
 
-        #TODO: make this into an array?
         return faces_as_list
 
     faces = extract_faces_from_file(f, num_faces)
@@ -95,7 +93,7 @@ def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername):
     def remove_unused_vertices(coordinates, faces, number_of_vertices):
         # Determine if you need to clean the vertex indices:
         used_face_ids_as_list = []
-        for n, vertices in faces:
+        for vertices in faces:
             used_face_ids_as_list += vertices
         unique_used_faces_as_set = set(used_face_ids_as_list)
         unique_used_faces_as_list = sorted(list(unique_used_faces_as_set))  # sort to enforce consistency
@@ -103,7 +101,6 @@ def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername):
 
         # Then clean if needed:
         if cleaning_needed:
-            #TODO: raise warning if cleaning is needed / used?
             # Remove unused row from coordinates data.
             new_coordinates = []
             for i, row in enumerate(coordinates):
@@ -112,14 +109,12 @@ def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername):
             coordinates = new_coordinates
 
             new_faces = []
-            for face in faces:
-                number_of_vertices = face[0]
-                current_vertices = face[1]
+            for current_vertices in faces:
                 new_vertices = []
                 for vertex in current_vertices:
                     new_vertex = unique_used_faces_as_list.index(vertex)
                     new_vertices.append(new_vertex)
-                new_faces.append([number_of_vertices, new_vertices])
+                new_faces.append(new_vertices)
             faces = new_faces
 
         return coordinates, faces
@@ -128,7 +123,7 @@ def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername):
 
     def get_edges_from_faces(faces):
         edges = []
-        for number_of_vertices, vertices in faces:
+        for vertices in faces:
             curr_face = list(vertices)  #force python to make copy rather than create reference
             curr_face += [curr_face[0]]
             for i in range(len(curr_face)-1):
@@ -224,6 +219,8 @@ def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername):
 
     plot_edge_length_distributions(scale_edge_length_PLY, rounded_edge_length_PLY, results_foldername)
 
-
+    # TODO: ?
+    # coordinates = np.array(coordinates)
+    # faces = np.array(faces)
 
     return [coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs]
