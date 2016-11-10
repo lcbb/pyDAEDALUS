@@ -167,6 +167,15 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
                                          staple_name, scaf_name,
                                          len_scaf_used)
 
+    # Display named stap_seq_list
+    print('')
+    for i in range(len(stap_seq)):
+        for j in range(len(stap_seq[i])):
+            if stap_seq[i][j]:
+                print("{}, {} : {}".format(
+                    i, j, stap_seq[i][j]))
+    print('')
+
     # Leaving this within above scaf_seq, since it relies on 10's output
     ## 11. Port to CanDo, save information ####################################
     dnaInfo = DnaInfo(scaf_to_edge, scaf_seq, stap_list, stap_seq_list,
