@@ -219,8 +219,7 @@ def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername):
 
     plot_edge_length_distributions(scale_edge_length_PLY, rounded_edge_length_PLY, results_foldername)
 
-    # TODO: ?
-    # coordinates = np.array(coordinates)
+    coordinates = np.array(coordinates)
     # faces = np.array(faces)
 
     return [coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs]
