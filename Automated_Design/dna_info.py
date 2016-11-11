@@ -556,16 +556,22 @@ class DnaInfo(object):
                     str(i), color=WHITE,
                     horizontalalignment='center', verticalalignment='center')
 
-
-        #
-        # # # Plot 5' end (orange square)
-        # plot3(self.dnaGeom.dNode(1, 1), self.dnaGeom.dNode(1, 2), self.dnaGeom.dNode(1, 3),
-        #       's', 'MarkerEdgeColor', ORANG, 'MarkerFaceColor', ORANG,
-        #       'MarkerSize', 10)
-        # # # Plot 3' end (purple circle)
-        # plot3(self.dnaGeom.dNode(end, 1), self.dnaGeom.dNode(end, 2),
-        #       self.dnaGeom.dNode(end, 3), 'o', 'MarkerEdgeColor', REDPURPLE,
-        #       'MarkerFaceColor', redpurple, 'MarkerSize', 8)  # 'LineWidth',4,
+        # # Plot 5' end (orange square)
+        ax.scatter([self.dnaGeom.dNode[0][0]],
+                   [self.dnaGeom.dNode[0][1]],
+                   [self.dnaGeom.dNode[0][2]],
+                   marker='s',
+                   color=ORANG,
+                   edgecolor=ORANG,
+                   s=500)
+        # # Plot 3' end (purple circle)
+        ax.scatter([self.dnaGeom.dNode[-1][0]],
+                   [self.dnaGeom.dNode[-1][1]],
+                   [self.dnaGeom.dNode[-1][2]],
+                   marker='o',
+                   color=REDPURPLE,
+                   edgecolor=REDPURPLE,
+                   s=400)  # 'LineWidth',4,
 
         ax.set_xlabel('Angstroms', fontdict={'size': 16})
         ax.set_ylabel('Angstroms', fontdict={'size': 16})
