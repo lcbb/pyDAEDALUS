@@ -11,12 +11,12 @@ A port of DAEDALUS from Matlab to Python.
 
 `python demo_daedalus.py` to run with everything set to default.
 `python demo_daedalus.py --help` to see what options are available, including their default values.
-`python demo_daedalus.py --results_foldername=Results` to run program and save all plots to `Results` folder rather than print them to screen.  Note foldername is relative to this project's root and has to already exist.
-`python demo_daedalus.py --fname_no_ply=PLY_Files/05_icosahedron` to run program on `05_icosahedron` file within folder `PLY_files`.  Note filename unless specified relative to project root and the format has to match your OS (this example uses Linux filename structure).
-`python demo_daedalus.py --fname_no_ply=PLY_Files/05_icosahedron --results_foldername=Results` to both run on given shape and save plots into specified folder.
+`python demo_daedalus.py --display_plots` to run everything as default, and also display plots to your screen (plots will still be saved to disk as well).
+`python demo_daedalus.py --fname_no_ply=PLY_Files/05_icosahedron` to run program on `05_icosahedron` file within folder `PLY_files`.  Note filename unless specified is relative to project root and the format has to match your OS (this example uses Linux filename structure).
+`python demo_daedalus.py --fname_no_ply=PLY_Files/05_icosahedron --display_plots` to both run on given shape and to display plots to your screen.
 
 
-Saving to Results includes shape name and `min_len_nt` in all output files so you can run multiple shapes and not have filename collisions.
+All files saved into Results includes both shape name and `min_len_nt` in the filename to avoid undesired filename collisions.
 
 # Tests
 Currently using Python's built in `unittest` package.  All tests import into `test.py`, so calling the

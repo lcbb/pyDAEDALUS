@@ -1,11 +1,11 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from Automated_Design.contsants import REDPURPLE, VERMILLION, WHITE, SKYBLUE
+from Automated_Design.constants import VERMILLION, REDPURPLE, SKYBLUE, WHITE
 from Automated_Design.util import generate_graph
 
 
-def gen_schlegel(edges, coordinates, faces, edge_type_mat=None, schlegel_filename=None):
+def gen_schlegel(edges, coordinates, faces, schlegel_filename, edge_type_mat=None):
     """
     Plots vertices and edges in Schlegel diagram, tracing scaffold path in
     colored lines
@@ -123,10 +123,6 @@ def gen_schlegel(edges, coordinates, faces, edge_type_mat=None, schlegel_filenam
         plt.text(x, y, str(i), color=WHITE, fontname='serif',
                  horizontalalignment='center', verticalalignment='center')
 
-    if schlegel_filename:
-        plt.savefig(schlegel_filename, bbox_inches='tight')
-    else:
-        #Should I make showing an option?  Either way, should I also save the earlier distribution plots?
-        plt.show()
+    plt.savefig(schlegel_filename, bbox_inches='tight')
 
     return xycoord

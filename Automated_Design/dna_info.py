@@ -5,8 +5,7 @@ from time import sleep
 import mpmath
 import numpy as np
 
-from Automated_Design.contsants import VERMILLION, ORANG, BLU, WHITE, \
-    REDPURPLE
+from Automated_Design.constants import VERMILLION, REDPURPLE, WHITE, BLU, ORANG
 from Automated_Design.util import intersect_lists
 
 
@@ -577,8 +576,8 @@ class DnaInfo(object):
         ax.set_ylabel('Angstroms', fontdict={'size': 16})
         ax.set_zlabel('Angstroms', fontdict={'size': 16})
 
-        # plt.show()
         plt.savefig(filename, bbox_inches='tight', pad_inches=0)
+
 
     def save_dna_info_to_cando_file(self, cndoFN): #TODO: rename cndoFN to filename
         """

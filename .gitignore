@@ -5,4 +5,5 @@
 .cache
 Drawings
 tests/.cache/
-Results
+Results/*
+!Results/README.md

@@ -8,7 +8,7 @@ from Automated_Design.adj_scaf_nick_pos import adj_scaf_nick_pos, \
     get_scaf_nick_pos
 from Automated_Design.assign_scaf_to_edge import assign_scaf_to_edge
 from Automated_Design.assign_staples_wChoices import assign_staples_wChoices
-from Automated_Design.constants import SCAF_SEQ
+from Automated_Design.constants import SCAF_SEQ, RESULTS_FOLDERNAME
 from Automated_Design.csv_staples import csv_staples
 from Automated_Design.dna_info import DnaInfo
 from Automated_Design.enum_scaf_bases_DX import enum_scaf_bases_DX
@@ -23,7 +23,8 @@ from gen_schlegel import gen_schlegel
 from gen_vert_to_face import gen_vert_to_face
 
 
-def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs, scaf_seq, scaf_name, results_foldername=None):
+def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
+                   staple_name, singleXOs, scaf_seq, scaf_name):
     """
     Creates scaffold routing and staple placement of a DX-based DNA origami
     nano cage.
@@ -111,12 +112,14 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
     # # Type 2: Spanning tree edges, i.e. 0 scaffold crossovers in DX cage
     edge_type_mat = designate_edge_type(full_graph)
     graph_with_spanning_tree_marked = edge_type_mat   #TODO: this rename
-    if results_foldername:
-        schlegel_filename = file_name_without_containing_folder + '_schlegel.png'
-        full_schlegel_filename = path.join(results_foldername, schlegel_filename)
-    else:
-        full_schlegel_filename = None
-    gen_schlegel(edges, coordinates, faces, edge_type_mat=edge_type_mat, schlegel_filename=full_schlegel_filename)
+
+    schlegel_filename = file_name_without_containing_folder + '_schlegel.png'
+    full_schlegel_filename = path.join(RESULTS_FOLDERNAME, schlegel_filename)
+
+    gen_schlegel(edges, coordinates, faces,
+                 schlegel_filename=full_schlegel_filename,
+                 edge_type_mat=edge_type_mat)
+
     edge_type_mat = edge_type_mat.to_directed()  # MST in networkx requires an undirected graph?  Later code requires directed?
 
     ## 3. Add nodes to edges ##################################################
@@ -193,11 +196,14 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
 
     # ... as a 3d plot
     plot_filename = full_file_name + '.png'
-    dnaInfo.plot_3d_model(plot_filename)
+    full_plot_filename = path.join(RESULTS_FOLDERNAME, plot_filename)
+    dnaInfo.plot_3d_model(full_plot_filename)
 
     # as pickle dumps.
     pickled_dna_info_filename = 'dnaInfo_' + full_file_name + '.pickle'
-    pickle.dump(dnaInfo, open(pickled_dna_info_filename, 'w'))
+    full_pickled_dna_info_filename = path.join(RESULTS_FOLDERNAME,
+                                               pickled_dna_info_filename)
+    pickle.dump(dnaInfo, open(full_pickled_dna_info_filename, 'w'))
 
     route_info_dump = {'scaf_to_edge':scaf_to_edge ,
                        'scaf_seq':scaf_seq ,
@@ -209,10 +215,14 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name, staple
                        'faces':faces ,
                        'edge_length_vec': edge_length_vec}
     route_info_dump_filename = 'routeInfo_' + full_file_name + '.pickle'
-    pickle.dump(route_info_dump, open(route_info_dump_filename, 'w'))
+    full_route_info_filename = path.join(RESULTS_FOLDERNAME,
+                                         route_info_dump_filename)
+    pickle.dump(route_info_dump, open(full_route_info_filename, 'w'))
 
     # as cando file
-    dnaInfo.save_dna_info_to_cando_file(full_file_name + '.cndo')
+    cando_filename = full_file_name + '.cndo'
+    full_cando_filename = path.join(RESULTS_FOLDERNAME, cando_filename)
+    dnaInfo.save_dna_info_to_cando_file(full_cando_filename)
 
     # And also save staple sequences
     # if scaf_name == 'fake_scaf':  # if fake scaffold,
