@@ -27,4 +27,5 @@ if __name__ == '__main__':
 
     for filename in tqdm([f for f in ply_filenames if f[-4:] == '.ply']):
         fname_no_ply = filename[:-4]
-        run_demo(fname_no_ply, min_len_nt=52, results_foldername=out_directory)
+        run_demo(fname_no_ply, min_len_nt=52,
+                 display_plots=False, print_to_console=False)

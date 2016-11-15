@@ -24,7 +24,8 @@ from gen_vert_to_face import gen_vert_to_face
 
 
 def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
-                   staple_name, singleXOs, scaf_seq, scaf_name):
+                   staple_name, singleXOs, scaf_seq, scaf_name,
+                   print_to_console=True):
     """
     Creates scaffold routing and staple placement of a DX-based DNA origami
     nano cage.
@@ -179,7 +180,8 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
                     print("{}, {} : {}".format(
                         i, j, stap_seq[i][j]))
         print('')
-    # display_named_stap_seq_list(stap_seq)
+    if print_to_console:
+        display_named_stap_seq_list(stap_seq)
 
     # Leaving this within above scaf_seq, since it relies on 10's output
     ## 11. Port to CanDo, save information ####################################
@@ -225,10 +227,12 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     dnaInfo.save_dna_info_to_cando_file(full_cando_filename)
 
     # And also save staple sequences
-    # if scaf_name == 'fake_scaf':  # if fake scaffold,
-    #     print('No real staples\n')  # do not save staple sequences
-    # else:
-    #     print('Real staples\n')
-        # csv_staples(full_file_name, named_stap_seq_list)
+    if scaf_name == 'fake_scaf':  # if fake scaffold,
+        if print_to_console:
+            print('No real staples\n')  # do not save staple sequences
+    else:
+        if print_to_console:
+            print('Real staples\n')
+        csv_staples(full_file_name, named_stap_seq_list)
 
     return full_file_name
