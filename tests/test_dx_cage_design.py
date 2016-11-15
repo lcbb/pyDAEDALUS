@@ -34,7 +34,7 @@ class TestPlyImport(TestCase):
     @patch('matplotlib.figure.Figure.savefig')
     def test_01_tetrahedron(self, savefig_mock):
         f = open_string_as_file(ply_file_01_tetrahedron)
-        coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs = ply_to_input("01_tetrahedron", f, min_len_nt=52, results_foldername='Results')
+        coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs = ply_to_input("01_tetrahedron", f, min_len_nt=52)
         self.assertEqual(len(coordinates), 4)
         self.assertEqual(len(faces), 4)
         # TODO: mock fig itself and assert about what's `fig_mock.plot`ed
@@ -43,7 +43,7 @@ class TestPlyImport(TestCase):
     @patch('matplotlib.figure.Figure.savefig')
     def test_05_icosahedron(self, savefig_mock):
         f = open_string_as_file(ply_file_05_icosahedron)
-        coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs = ply_to_input("05_tetrahedron", f, min_len_nt=52, results_foldername='Results')
+        coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs = ply_to_input("05_tetrahedron", f, min_len_nt=52)
         self.assertEqual(len(coordinates), 12)
         self.assertEqual(len(faces), 20)
         # TODO: mock fig itself and assert about what's `fig_mock.plot`ed
