@@ -1,6 +1,5 @@
 import math
 from copy import deepcopy
-from time import sleep
 
 import mpmath
 import numpy as np
@@ -43,6 +42,7 @@ class DnaTop(object):
 
     def __repr__(self):
         return self.__str__()
+
 
 def calc_buff(faces, num_vert, coordinates, d, wDX):
     """
@@ -99,7 +99,7 @@ def calc_buff(faces, num_vert, coordinates, d, wDX):
 
     buff_nt = [0] * num_vert
 
-    # # For creating no discontinuities
+    # For creating no discontinuities
     for vert_ID in range(num_vert):
         sum_of_angles = sum(vert_angles[vert_ID])
         theta_max = max(vert_angles[vert_ID])
@@ -154,7 +154,8 @@ def gen_FE_norms(coordinates, faces, edges, vert_to_face):
 
         normal_vec = np.cross(b_vec, a_vec)  # cross-product for normal
 
-        face_norms[face_ID] = normal_vec / np.linalg.norm(normal_vec)  # normalize
+        # normalize
+        face_norms[face_ID] = normal_vec / np.linalg.norm(normal_vec)
 
     for edge_ID in range(len(edges)):
         edge_bgn = edges[edge_ID][0]
@@ -164,12 +165,13 @@ def gen_FE_norms(coordinates, faces, edges, vert_to_face):
                                           vert_to_face[edge_fin])
 
         normal_vec = face_norms[bordering_faces[0]] + \
-                     face_norms[bordering_faces[1]]
+            face_norms[bordering_faces[1]]
 
-        edge_norms[edge_ID] = normal_vec / np.linalg.norm(
-            normal_vec)  # normalize
+        # normalize
+        edge_norms[edge_ID] = normal_vec / np.linalg.norm(normal_vec)
 
     return edge_norms
+
 
 def tensor_product(a, b):
     """
@@ -182,15 +184,18 @@ def tensor_product(a, b):
     m = a.reshape(1, -1) * b.reshape(-1, 1)
     return m
 
+
 class DnaInfo(object):
-    def __init__(self, scaf_to_edge, scaf_seq, stap_list, stap_seq_list, coordinates, edges, edge_length_vec, faces, vert_to_face):
+    def __init__(self, scaf_to_edge, scaf_seq, stap_list, stap_seq_list,
+                 coordinates, edges, edge_length_vec, faces, vert_to_face):
         """
         Generate file to sent to CanDo for rendering and finite element
         simulation.
-        Inputs: scaf_to_edge = Ex2 cell array, where each row corresponds to one
-                   edge, 1st column is duplex from low ID to high ID vertex,
-                   2nd column is from high to low. Each element is a row vector
-                   containing the scaffold base IDs in order on that duplex.
+        Inputs: scaf_to_edge = Ex2 cell array, where each row corresponds to
+                   one edge, 1st column is duplex from low ID to high ID
+                   vertex, 2nd column is from high to low. Each element is a
+                   row vector containing the scaffold base IDs in order on that
+                   duplex.
                 scaf_seq = string of scaffold, length may be longer than
                    required. First nucleotide will be placed at index 1
                 stap_list = columnar cell array, each cell contains string of
@@ -199,7 +204,8 @@ class DnaInfo(object):
                    index information
                 coordinates = Vx3 matrix of spatial coordinates of vertices
                 edges = Ex2 matrix where each row corresponds to one edge,
-                   denoting the vertices being connected. 1st column > 2nd column
+                   denoting the vertices being connected. 1st column > 2nd
+                   column
                 num_edges = number of edges, E
                 edge_length_vec = row vector of edge types, corresponding to
                    edge_length_mat_full
@@ -209,10 +215,12 @@ class DnaInfo(object):
                    dnaTop(n) = structure with info of nucleotide n. Fields:
                       id = identification number
                       up = id of nucleotide upstream (towards 5') (-1 if N/A)
-                      down = id of nucleotide downstream (towards 3') (-1 if N/A)
+                      down = id of nucleotide downstream (towards 3') (-1 if
+                      N/A)
                       across = id of base paired nucleotide (-1 if N/A)
                       seq = identity of base (char A,T,C,G)
-                   dnaGeom = structure with geometric info of base pairs. Arrays:
+                   dnaGeom = structure with geometric info of base pairs.
+                       Arrays:
                       dNode = n_bp x 3 matrix of spatial location
                       triad = 3 x 3 x n_bp matrix of spatial orientation
                       id_nt = n_bp x 2 matrix of nucleotides that compose base
@@ -220,22 +228,23 @@ class DnaInfo(object):
                       Note that single stranded nucleotides are ignored here.
         Note: Helicity of the nucleotides has not been implemented. The
         orientation is correct at each scaffold and staple crossover, but not
-        necessarily in between. CanDo pre-mechanical model calculates the correct
-        orientation of these nucleotides.
+        necessarily in between. CanDo pre-mechanical model calculates the
+        correct orientation of these nucleotides.
         (see CanDo for more detailed information)
-        ##########################################################################
+        #######################################################################
         by Sakul Ratanalert, MIT, Bathe Lab, 2016
 
         Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
         M.I.T. hereby makes following copyrightable material available to the
         public under GNU General Public License, version 2 (GPL-2.0). A copy of
         this license is available at https://opensource.org/licenses/GPL-2.0
-        ##########################################################################
+        #######################################################################
         """
         stap_seq_list = deepcopy(stap_seq_list)
         stap_list = deepcopy(stap_list)
 
-        # # Initialize numbers of vertices, edges, staples, base paired nucleotides
+        # Initialize numbers of vertices, edges, staples, base paired
+        # nucleotides:
         num_vert = len(coordinates)
         num_edges = len(edge_length_vec)
         num_stap = len(stap_list)
@@ -243,7 +252,7 @@ class DnaInfo(object):
         # because could be inputting seq larger than necessary
 
         # TODO: Delete this?  Not used elsewhere.
-        # # Calculate length of each staple
+        # Calculate length of each staple
         '''
         len_stap = zeros(num_stap,1)
         for stap_ID in range(len(stap_list)):
@@ -255,29 +264,29 @@ class DnaInfo(object):
 
         # Note: preferred nucleotide always on scaffold strand
 
-        # # Generate dnaGeom
+        # Generate dnaGeom
 
-        # # Generate buffers at vertices and unit normal vectors at edges
+        # Generate buffers at vertices and unit normal vectors at edges
         buff_nt = calc_buff(faces, num_vert, coordinates, d, wDX)
         edge_norms = gen_FE_norms(coordinates, faces, edges, vert_to_face)
 
-        # # Scale coordinates. Structure is centered at origin, assume relative
-        # # lengths already correct.
-        edge_to_scale = edges[0] # arbitrary choose first edge to scale
-        vert_1 = edge_to_scale[0] # first vertex of edge
-        vert_2 = edge_to_scale[1] # second vertex of edge
-        edge_length = edge_length_vec[0] # length of vertex, base pairs
-        coord_1 = coordinates[vert_1] # coordinates of first vertex
-        coord_2 = coordinates[vert_2] # coordinates of second vertex
-        dist_curr = np.linalg.norm(coord_2 - coord_1) # current distance length
-        dist_want = d*(buff_nt[vert_1] + edge_length + buff_nt[vert_2]) # desired distance length
-        scale = dist_want/dist_curr # scaling factor
-        coordinates = coordinates*scale # scale coordinates
+        # Scale coordinates. Structure is centered at origin, assume relative
+        # lengths already correct.
+        edge_to_scale = edges[0]  # arbitrary choose first edge to scale
+        vert_1 = edge_to_scale[0]  # first vertex of edge
+        vert_2 = edge_to_scale[1]  # second vertex of edge
+        edge_length = edge_length_vec[0]  # length of vertex, base pairs
+        coord_1 = coordinates[vert_1]  # coordinates of first vertex
+        coord_2 = coordinates[vert_2]  # coordinates of second vertex
+        current_distance = np.linalg.norm(coord_2 - coord_1)
+        desired_distance = d*(buff_nt[vert_1] + edge_length + buff_nt[vert_2])
+        scale = desired_distance/current_distance  # scaling factor
+        coordinates *= scale  # scale coordinates
         self.scaled_coordinates = coordinates
 
-        # # Edges
-        for edge_ID in range(num_edges): # for each edge
-            for low_to_high in [0, 1]: # for each direction per edge
+        # Edges
+        for edge_ID in range(num_edges):  # for each edge
+            for low_to_high in [0, 1]:  # for each direction per edge
                 if low_to_high == 0:
                     edge_bgn = edges[edge_ID][1]
                     edge_fin = edges[edge_ID][0]
@@ -285,29 +294,31 @@ class DnaInfo(object):
                     edge_bgn = edges[edge_ID][0]
                     edge_fin = edges[edge_ID][1]
 
-                # # Obtain coordinates of end vertices
+                # Obtain coordinates of end vertices
                 coord_bgn = coordinates[edge_bgn]
                 coord_fin = coordinates[edge_fin]
 
-                z_axis = (coord_fin - coord_bgn) # row vector
-                z_axis = z_axis/np.linalg.norm(z_axis) # normalize
+                z_axis = (coord_fin - coord_bgn)  # row vector
+                z_axis = z_axis/np.linalg.norm(z_axis)  # normalize
 
-                scaf_part = scaf_to_edge[edge_ID][low_to_high] # scaffold bases
-                len_edge = len(scaf_part) # length of edge, base pairs
+                scaf_part = scaf_to_edge[edge_ID][low_to_high]  # scaff bases
+                len_edge = len(scaf_part)  # length of edge, base pairs
 
-                for bp_ID in range(len_edge): # for each base pair in edge
-                    numerator = (buff_nt[edge_bgn] + bp_ID)
-                    denominator = (buff_nt[edge_bgn] + len_edge + buff_nt[edge_fin])
-                    rel_location = float(numerator) / denominator  # relative location
+                for bp_ID in range(len_edge):  # for each base pair in edge
+                    numerator = buff_nt[edge_bgn] + bp_ID
+                    denominator = (buff_nt[edge_bgn] + len_edge +
+                                   buff_nt[edge_fin])
+                    relative_location = float(numerator) / denominator
 
-                    axis_pos = coord_bgn*(1-rel_location) + coord_fin*rel_location # 3D position along edge axis
+                    axis_pos = coord_bgn*(1-relative_location) + \
+                        coord_fin*relative_location  # 3D position on edge axis
                     edge_norm = edge_norms[edge_ID]
 
-                    y_axis = np.cross(edge_norm, z_axis) # row vector
-                    y_axis = y_axis/np.linalg.norm(y_axis) # normalize
+                    y_axis = np.cross(edge_norm, z_axis)  # row vector
+                    y_axis /= np.linalg.norm(y_axis)  # normalize
 
-                    nt_ID = scaf_part[bp_ID] # nucleotide id
-                    axis_pos = axis_pos + y_axis*IHD/2 # shift to correct side
+                    nt_ID = scaf_part[bp_ID]  # nucleotide id
+                    axis_pos = axis_pos + y_axis*IHD/2  # shift to correct side
 
                     # Search for scaffold crossover, 4 base pairs per crossover
                     scaf_nick_pos = 0
@@ -318,31 +329,28 @@ class DnaInfo(object):
 
                         # set larger int type in scaf test data to negate
                         # the need for the following `int()`:
-                        five_prime_side_of_scaffold_nick = abs(int(nt_down) - nt_ID) > 1
+                        five_prime_side_of_scaff_nick = \
+                            abs(int(nt_down) - nt_ID) > 1
                         not_scaffold_nick = nt_ID > 1 and nt_ID < n_bp
-                        if five_prime_side_of_scaffold_nick and not_scaffold_nick:
+                        if five_prime_side_of_scaff_nick and not_scaffold_nick:
                             scaf_nick_pos = bp_ID
 
+                    x_axis = np.cross(y_axis, z_axis)  # calculate x-axis
 
-                    x_axis = np.cross(y_axis, z_axis) # calculate x-axis
+                    # Store in dnaGeom
+                    self.dnaGeom.dNode[nt_ID] = axis_pos
+                    self.dnaGeom.triad[:, 0, nt_ID] = x_axis
+                    self.dnaGeom.triad[:, 1, nt_ID] = y_axis
+                    self.dnaGeom.triad[:, 2, nt_ID] = z_axis
+                    self.dnaGeom.id_nt[nt_ID] = [nt_ID, nt_ID + n_bp]
 
-                    # # Store in dnaGeom
-                    self.dnaGeom.dNode[nt_ID] = axis_pos # position, row vector
-                    self.dnaGeom.triad[:,0,nt_ID] = x_axis
-                    self.dnaGeom.triad[:,1,nt_ID] = y_axis
-                    self.dnaGeom.triad[:,2,nt_ID] = z_axis # axes, 3 col vectors
-                    self.dnaGeom.id_nt[nt_ID] = [nt_ID, nt_ID + n_bp] # nts in bp
-
-                zXz = tensor_product(z_axis, z_axis) # tensor product of z, row vector
+                # tensor product of z, row vector
+                zXz = tensor_product(z_axis, z_axis)
                 assert zXz.shape == (3, 3)
-                # sizezXz = zXz.shape
-                # if sizezXz(1) != 3:
-                #     zXz = z_axis*z_axis'
-                #     print('Check this tensor product!')
 
                 zX = np.array([
                         [0,          -z_axis[2],  z_axis[1]],
-                        [ z_axis[2],          0, -z_axis[0]],
+                        [z_axis[2],           0, -z_axis[0]],
                         [-z_axis[1],  z_axis[0],          0]
                     ])
 
@@ -354,7 +362,7 @@ class DnaInfo(object):
                     for bp_ID in range(scaf_nick_pos):
                         num_nt = scaf_nick_pos
                         start_nt = 0
-                        nt_ID = scaf_part[bp_ID] # nucleotide id
+                        nt_ID = scaf_part[bp_ID]  # nucleotide id
 
                         turnAngle = self.get_turn_angle_for_pos_scaf_nick_pos(
                             num_nt)
@@ -367,17 +375,19 @@ class DnaInfo(object):
 
                         y_axis = np.inner(rot_matrix, y_axis)
 
-                        x_axis = np.cross(y_axis, z_axis) # calculate x-axis
+                        x_axis = np.cross(y_axis, z_axis)  # calculate x-axis
 
-                        # # Store in dnaGeom
+                        # Store in dnaGeom
                         self.dnaGeom.triad[:, 0, nt_ID] = x_axis
                         self.dnaGeom.triad[:, 1, nt_ID] = y_axis
                         self.dnaGeom.triad[:, 2, nt_ID] = z_axis
 
-                    for bp_ID in range(scaf_nick_pos, len_edge):  # was `scaf_nick_pos+1:len_edge`
+                    # TODO: was `scaf_nick_pos+1:len_edge`
+                    for bp_ID in range(scaf_nick_pos, len_edge):
                         num_nt = len_edge-scaf_nick_pos
-                        start_nt = scaf_nick_pos  # was `start_nt = scaf_nick_pos+1`
-                        nt_ID = scaf_part[bp_ID] # nucleotide id
+                        # TODO: was `start_nt = scaf_nick_pos+1`
+                        start_nt = scaf_nick_pos
+                        nt_ID = scaf_part[bp_ID]  # nucleotide id
 
                         turnAngle = self.get_turn_angle_for_pos_scaf_nick_pos(
                             num_nt)
@@ -390,9 +400,9 @@ class DnaInfo(object):
 
                         y_axis = np.inner(rot_matrix, y_axis)
 
-                        x_axis = np.cross(y_axis, z_axis) # calculate x-axis
+                        x_axis = np.cross(y_axis, z_axis)  # calculate x-axis
 
-                        # # Store in dnaGeom
+                        # Store in dnaGeom
                         self.dnaGeom.triad[:, 0, nt_ID] = x_axis
                         self.dnaGeom.triad[:, 1, nt_ID] = y_axis
                         self.dnaGeom.triad[:, 2, nt_ID] = z_axis
@@ -401,7 +411,7 @@ class DnaInfo(object):
                     for bp_ID in range(len_edge):
                         num_nt = len_edge
                         start_nt = 0
-                        nt_ID = scaf_part[bp_ID] # nucleotide id
+                        nt_ID = scaf_part[bp_ID]  # nucleotide id
 
                         turnAngle = self.get_turn_angle_for_zero_scaf_nick_pos(
                             num_nt)  # scalar
@@ -416,11 +426,10 @@ class DnaInfo(object):
 
                         x_axis = np.cross(y_axis, z_axis)  # calculate x-axis
 
-                        # # Store in dnaGeom
+                        # Store in dnaGeom
                         self.dnaGeom.triad[:, 0, nt_ID] = x_axis
                         self.dnaGeom.triad[:, 1, nt_ID] = y_axis
                         self.dnaGeom.triad[:, 2, nt_ID] = z_axis
-
 
         self.dnaGeom = self.dnaGeom
 
@@ -428,114 +437,112 @@ class DnaInfo(object):
         self.dnaTop = []
 
         for scaf_seq_ID in range(n_bp):
-            # # Set id in dnaTop
+            # Set id in dnaTop
             this_id = scaf_seq_ID
 
-            # # Set up in dnaTop
+            # Set up in dnaTop
             if scaf_seq_ID == 0:
                 this_up = -1
             else:
                 this_up = scaf_seq_ID-1
 
-            # # Set down in dnaTop
+            # Set down in dnaTop
             if scaf_seq_ID == n_bp - 1:
                 this_down = -1
             else:
                 this_down = scaf_seq_ID+1
 
-            # # Set across in dnaTop
+            # Set across in dnaTop
             this_across = scaf_seq_ID + n_bp
 
-            # # Set seq in dnaTop
+            # Set seq in dnaTop
             this_seq = scaf_seq[scaf_seq_ID].upper()
 
             self.dnaTop.append(
                 DnaTop(this_id, this_up, this_down, this_across, this_seq))
 
+        # Staples:
+        polyT_ID = 2*n_bp  # initialize polyT counter at end of all paired nts
 
-        # # Staples
-
-        polyT_ID = 2*n_bp # initialize polyT counter at end of all paired nts
-
-        for stap_ID in range(num_stap): # for each staple
+        for stap_ID in range(num_stap):  # for each staple
             stap = stap_list[stap_ID]
 
-            # # IDs: Change polyT from 0 to nonzero and staple to staple + n_bp
+            # IDs: Change polyT from 0 to nonzero and staple to staple + n_bp
             for stap_base in range(len(stap)):
-                if stap[stap_base] == None: # part of polyT
-                    stap[stap_base] = polyT_ID # change from 0 to polyT
+                if stap[stap_base] is None:  # part of polyT
+                    stap[stap_base] = polyT_ID  # change from 0 to polyT
 
                     while not polyT_ID < len(self.dnaTop):
                         self.dnaTop.append(
                             DnaTop(None, None, None, None, None))
 
-                    self.dnaTop[polyT_ID].across = -1 # no across
-                    polyT_ID = polyT_ID + 1 # increment
+                    self.dnaTop[polyT_ID].across = -1  # no across
+                    polyT_ID += 1  # increment
                 else:
-                    stap[stap_base] = stap[stap_base] + n_bp # new staple base ID
+                    # new staple base ID:
+                    stap[stap_base] = stap[stap_base] + n_bp
 
-            for stap_base in range(len(stap)): # for each base in staple
+            for stap_base in range(len(stap)):  # for each base in staple
 
-                stap_seq_ID = stap[stap_base] # ID of staple base
+                stap_seq_ID = stap[stap_base]  # ID of staple base
                 while not stap_seq_ID < len(self.dnaTop):
                     self.dnaTop.append(DnaTop(None, None, None, None, None))
 
-                # # Set id in dnaTop
+                # Set id in dnaTop
                 self.dnaTop[stap_seq_ID].id = stap_seq_ID
 
-                # # Set up in dnaTop
-                if stap_base == 0: # if 5' end
+                # Set up in dnaTop
+                if stap_base == 0:  # if 5' end
                     self.dnaTop[stap_seq_ID].up = -1
                 else:
                     self.dnaTop[stap_seq_ID].up = stap[stap_base-1]
 
-                # # Set down in dnaTop
-                if stap_base == len(stap)-1: # if 3' end
+                # Set down in dnaTop
+                if stap_base == len(stap)-1:  # if 3' end
                     self.dnaTop[stap_seq_ID].down = -1
                 else:
                     self.dnaTop[stap_seq_ID].down = stap[stap_base+1]
 
-                # # Set across in dnaTop
-                if self.dnaTop[stap_seq_ID].across is None: # not part of polyT
-                    # print "ever?"
+                # Set across in dnaTop
+                if self.dnaTop[stap_seq_ID].across is None:  # not in polyT
                     self.dnaTop[stap_seq_ID].across = stap_seq_ID - n_bp
 
-                # # Set upper in dnaTop
-                self.dnaTop[stap_seq_ID].seq = stap_seq_list[stap_ID][stap_base].upper()
+                # Set upper in dnaTop
+                self.dnaTop[stap_seq_ID].seq = \
+                    stap_seq_list[stap_ID][stap_base].upper()
 
-
-    # def faux_insert_into_list(self):
-
-    def get_turn_angle_for_zero_scaf_nick_pos(self, num_nt):
+    @staticmethod
+    def get_turn_angle_for_zero_scaf_nick_pos(num_nt):
         return 2 * np.pi * int(round(num_nt / 10.5)) / (num_nt + 1)
 
-    def get_rot_matrix(self, bp_ID, start_nt, turnAngle, zX, zXz):
+    @staticmethod
+    def get_rot_matrix(bp_ID, start_nt, turnAngle, zX, zXz):
         rot_matrix = np.cos(turnAngle * (bp_ID - start_nt + 0.5)) * np.eye(3) \
                      + np.sin(turnAngle * (bp_ID - start_nt + 0.5)) * zX \
                      + (1 - np.cos(turnAngle * (bp_ID - start_nt + 0.5))) * zXz
         return rot_matrix
 
-    def get_turn_angle_for_pos_scaf_nick_pos(self, num_nt):
+    @staticmethod
+    def get_turn_angle_for_pos_scaf_nick_pos(num_nt):
         return 2 * np.pi * (int(np.floor(num_nt / 10.5)) + 0.5) / (num_nt + 1)
 
     def plot_3d_model(self, filename):
         import matplotlib.pyplot as plt
-        from mpl_toolkits.mplot3d import Axes3D
+        from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
 
         fig = plt.figure(3, figsize=(24, 24))
         fig.clf()
         ax = fig.add_subplot(111, projection='3d')
 
-        # # Plot numbered circles at each vertex
+        # Plot numbered circles at each vertex
         first_d = [loc[0] for loc in self.scaled_coordinates]
         second_d = [loc[1] for loc in self.scaled_coordinates]
         third_d = [loc[2] for loc in self.scaled_coordinates]
         ax.scatter(first_d, second_d, third_d,
                    marker='o',  # marker shape
-                   color=VERMILLION, # marker color
+                   color=VERMILLION,  # marker color
                    edgecolor=VERMILLION,
                    s=200)  # marker size
-
 
         # Plot positions of each nucleotide as a line
         first_d = [dNode[0] for dNode in self.dnaGeom.dNode]
@@ -544,18 +551,18 @@ class DnaInfo(object):
         ax.plot(first_d, second_d, third_d,
                 '-',
                 color=BLU,
-                linewidth=5,)
-
+                linewidth=5)
 
         first_d = [loc[0] for loc in self.scaled_coordinates]
         second_d = [loc[1] for loc in self.scaled_coordinates]
         third_d = [loc[2] for loc in self.scaled_coordinates]
-        for i, (first, second, third) in enumerate(zip(first_d, second_d, third_d)):
+        for i, (first, second, third) in enumerate(zip(
+                first_d, second_d, third_d)):
             ax.text(first, second, third,
                     str(i), color=WHITE,
                     horizontalalignment='center', verticalalignment='center')
 
-        # # Plot 5' end (orange square)
+        # Plot 5' end (orange square)
         ax.scatter([self.dnaGeom.dNode[0][0]],
                    [self.dnaGeom.dNode[0][1]],
                    [self.dnaGeom.dNode[0][2]],
@@ -563,7 +570,7 @@ class DnaInfo(object):
                    color=ORANG,
                    edgecolor=ORANG,
                    s=500)
-        # # Plot 3' end (purple circle)
+        # Plot 3' end (purple circle)
         ax.scatter([self.dnaGeom.dNode[-1][0]],
                    [self.dnaGeom.dNode[-1][1]],
                    [self.dnaGeom.dNode[-1][2]],
@@ -578,10 +585,13 @@ class DnaInfo(object):
 
         plt.savefig(filename, bbox_inches='tight', pad_inches=0)
 
-
-    def save_dna_info_to_cando_file(self, cndoFN): #TODO: rename cndoFN to filename
+    def save_dna_info_to_cando_file(self, cando_filename):
         """
         Converts dnaInfo into a CanDo text file format.
+        See http://cando-dna-origami.org/cndo-file-converter/ for file format
+
+        WARNING!  While all of the internal bits here are 0-indexed, the
+        output file needs to be 1-indexed.
         """
 
         def handle_1_indexing(val):
@@ -590,14 +600,13 @@ class DnaInfo(object):
                 val = int(val) + 1 if val >= 0 else val
             return val
 
-# See http://cando-dna-origami.org/cndo-file-converter/ for file format
-        # All of the internal bits here are 0-indexed, but the output file needs to be 1-indexed!
-
-        fid = open(cndoFN, 'w')
+        fid = open(cando_filename, 'w')
 
         # File header
         fid.write(
-            '"CanDo (.cndo) file format version 1.0, Keyao Pan, Laboratory for Computational Biology and Biophysics, Massachusetts Institute of Technology, November 2015"\n')
+            '"CanDo (.cndo) file format version 1.0, Keyao Pan, Laboratory '
+            'for Computational Biology and Biophysics, Massachusetts '
+            'Institute of Technology, November 2015"\n')
         fid.write('\n')
 
         # dnaInfo.dnaTop
@@ -623,8 +632,8 @@ class DnaInfo(object):
         fid.write('\n')
 
         # dnaInfo.dnaGeom.triad
-        fid.write(
-            'triad,"e1(1)","e1(2)","e1(3)","e2(1)","e2(2)","e2(3)","e3(1)","e3(2)","e3(3)"\n')
+        fid.write('triad,"e1(1)","e1(2)","e1(3)","e2(1)",'
+                  '"e2(2)","e2(3)","e3(1)","e3(2)","e3(3)"\n')
         for i in range(self.dnaGeom.triad.shape[-1]):
             triad = self.dnaGeom.triad[:, :, i]
             fid.write('{},{},{},{},{},{},{},{},{},{}\n'.format(
@@ -649,6 +658,3 @@ class DnaInfo(object):
                 handle_1_indexing(id_nt[1])))
 
         fid.close()
-
-
-
