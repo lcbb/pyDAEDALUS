@@ -1,7 +1,6 @@
 from unittest import main
 
-# Import all tests here using `import *` to put test classes into this namespace
-from tests.test_dx_cage_design import *
+from tests.test_dx_cage_design import *  # noqa: F401, F403
 
 
 if __name__ == '__main__':
