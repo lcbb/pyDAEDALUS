@@ -3,27 +3,28 @@ import numpy as np
 
 
 def generate_graph(num_vert, edges, edge_length_vec=None):
-    G = nx.Graph()
+    graph = nx.Graph()
     for n in range(num_vert):
-        G.add_node(n)
+        graph.add_node(n)
     for edge, length in zip(edges, edge_length_vec):
         if edge_length_vec:
-            G.add_edge(edge[0], edge[1], length=length)
+            graph.add_edge(edge[0], edge[1], length=length)
         else:
-            G.add_edge(edge[0], edge[1])
-        # TODO: verfiy the length property is not used as 'weight' in spanning tree alg.
+            graph.add_edge(edge[0], edge[1])
+        # TODO: verify the length property is not used as 'weight' in
+        # spanning tree alg.
 
-    full_graph = G
-    return full_graph
+    return graph
 
 
 def intersect_lists(a, b):
-    #in case `a` and `b` are np.arrays.
+    # in case `a` and `b` are np.arrays:
     if type(a) == np.ndarray:
         a = list(a.flatten())
     if type(b) == np.ndarray:
         b = list(b.flatten())
-    #TODO: rewrite in a way that preverves order they're seen in?
+
+    # TODO: rewrite in a way that preverves order they're seen in?
 
     thing = set(a).intersection(set(b))
     return sorted(list(thing))

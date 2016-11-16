@@ -40,18 +40,22 @@ def ply_as_filename_to_input(fname_no_ply, min_len_nt=31):
     return ply_to_input(fname_no_ply, f, min_len_nt)
 
 
-#TODO: clean up the almost-redundant `fname_no_ply` and `f` being passed in here.
+# TODO: clean up the almost-redundant `fname_no_ply` and `f`:
 def ply_to_input(fname_no_ply, f, min_len_nt):
 
     file_name = fname_no_ply + '_' + str(min_len_nt)
 
     def extract_number_from_keyword_in_ply_file(filestream, keyword):
         # TODO: make regular expression?
+
+        # Eat (read through) all lines up to and including line with `keyword`:
         line = ''
         while keyword not in line:
             line = filestream.readline()
 
-        number = int(line.strip().split()[-1]) # grab last whitespace-delimited bit from line and convert to int
+        # grab last whitespace-delimited bit from line and convert to int:
+        number = int(line.strip().split()[-1])
+
         return number
 
     num_vert = extract_number_from_keyword_in_ply_file(f, 'element vertex')
@@ -70,13 +74,11 @@ def ply_to_input(fname_no_ply, f, min_len_nt):
             coords_on_this_line = map(float, line_as_list)
             coordinates_as_list.append(coords_on_this_line)
 
-        # coordinates_as_array = np.array(coordinates_as_list, dtype=np.float64)
         return coordinates_as_list
 
     coordinates = extract_coordinates_from_file(f, num_vert)
 
     def extract_faces_from_file(filestream, number_of_faces):
-        # TODO: verify this filestream doesn't restart
 
         faces_as_list = []
         for face_id in range(number_of_faces):
@@ -98,7 +100,8 @@ def ply_to_input(fname_no_ply, f, min_len_nt):
         for vertices in faces:
             used_face_ids_as_list += vertices
         unique_used_faces_as_set = set(used_face_ids_as_list)
-        unique_used_faces_as_list = sorted(list(unique_used_faces_as_set))  # sort to enforce consistency
+        # sort to enforce consistency:
+        unique_used_faces_as_list = sorted(list(unique_used_faces_as_set))
         cleaning_needed = len(unique_used_faces_as_set) < number_of_vertices
 
         # Then clean if needed:
@@ -126,7 +129,7 @@ def ply_to_input(fname_no_ply, f, min_len_nt):
     def get_edges_from_faces(faces):
         edges = []
         for vertices in faces:
-            curr_face = list(vertices)  #force python to make copy rather than create reference
+            curr_face = list(vertices)  # force python to make make copy
             curr_face += [curr_face[0]]
             for i in range(len(curr_face)-1):
                 if curr_face[i + 1] > curr_face[i]:
@@ -135,17 +138,16 @@ def ply_to_input(fname_no_ply, f, min_len_nt):
 
     edges = get_edges_from_faces(faces)
 
-
     def get_edge_lengths(edges, coordinates):
         edge_length_vec = []
         for edge in edges:
             beginning, end = edge
-            length = np.linalg.norm(np.array(coordinates[beginning]) - np.array(coordinates[end]))
+            length = np.linalg.norm(np.array(coordinates[beginning]) -
+                                    np.array(coordinates[end]))
             edge_length_vec.append(length)
         return edge_length_vec
 
     edge_length_PLY = get_edge_lengths(edges, coordinates)
-
 
     def get_scaled_and_rounded_edge_lengths(edge_lengths, min_len_nt):
         min_edge_PLY = min(edge_lengths)
@@ -166,7 +168,8 @@ def ply_to_input(fname_no_ply, f, min_len_nt):
             rounded_edge_length_PLY.append(int(final_length))
         return scale_edge_length_PLY, rounded_edge_length_PLY
 
-    scale_edge_length_PLY, rounded_edge_length_PLY = get_scaled_and_rounded_edge_lengths(edge_length_PLY, min_len_nt)
+    scale_edge_length_PLY, rounded_edge_length_PLY = \
+        get_scaled_and_rounded_edge_lengths(edge_length_PLY, min_len_nt)
     edge_length_vec = rounded_edge_length_PLY
 
     # Other parameters
@@ -177,11 +180,11 @@ def ply_to_input(fname_no_ply, f, min_len_nt):
     else:
         singleXOs = 1
 
-    def plot_edge_length_distributions(scale_edge_length_PLY, rounded_edge_length_PLY):
-        min_len_nt = min(rounded_edge_length_PLY)  #TODO: This is right, right?  It's a little cleaner to not have to import it if the info is already in a variable we're passing in.
+    def plot_edge_length_distributions(scale_edge_length_PLY,
+                                       rounded_edge_length_PLY):
+        min_len_nt = min(rounded_edge_length_PLY)
         bins_for_hist = range(min_len_nt, max(rounded_edge_length_PLY) + 3, 1)
         bins_for_plotting = [x - 0.25 for x in bins_for_hist[:-1]]
-
 
         fig_31 = plt.figure(0, figsize=(8, 6))
         fig_31.clf()

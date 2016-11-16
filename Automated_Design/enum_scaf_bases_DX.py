@@ -1,5 +1,6 @@
 import math
 
+
 def enum_scaf_bases_DX(route_real, route_vals, edge_length_mat_full):
     """
     Enumerates scaffold bases for N-arm DX tile-based cages
@@ -25,7 +26,6 @@ def enum_scaf_bases_DX(route_real, route_vals, edge_length_mat_full):
     this license is available at https://opensource.org/licenses/GPL-2.0
     ##########################################################################
     """
-    yet = True
     # # Initialize output variables and length of route
     len_route = len(route_real)  # length of route
     edge_bgn_vec = []
@@ -34,19 +34,18 @@ def enum_scaf_bases_DX(route_real, route_vals, edge_length_mat_full):
 
     for route_ID in range(len_route):  # for each vertex in the route
         edge_bgn = route_real[route_ID]  # current edge
-    
+
         # # Find edge_fin, the other end of the edge
-        if route_ID == len_route - 1:  # if last vertex, use first vertex in route
-            edge_fin = route_real[0]
+        if route_ID == len_route - 1:  # if last vertex...
+            edge_fin = route_real[0]  # use first vertex in route.
         else:  # else use next vertex
             edge_fin = route_real[route_ID + 1]
 
         # # Find edge_before, the vertex visited prior to edge_bgn
-        if route_ID == 0:  # if first vertex, use last vertex in route
-            edge_before = route_real[-1]
+        if route_ID == 0:  # if first vertex...
+            edge_before = route_real[-1]  # use last vertex in route.
         else:  # else use previous vertex
             edge_before = route_real[route_ID - 1]
-
 
         # Get edge type: 2 (no scafold crossover) or -1 (half of an edge
         # with 1 scaffold crossover)
@@ -69,9 +68,10 @@ def enum_scaf_bases_DX(route_real, route_vals, edge_length_mat_full):
             # # Adjust len_edge according to parity of len and quotient
             if quot_is_odd:  # quotient is odd, scaff cross in middle
                 if len_is_odd:  # outgoing + returning = len_edge
-                    len_edge_adjusted = len_edge  # both half-tiles equal length
+                    len_edge_adjusted = len_edge
 
-                    if edge_before == edge_fin:  # returning half-strand, 3' end, 1 shorter
+                    # if returning half-strand, 3' end, 1 shorter
+                    if edge_before == edge_fin:
                         route_val = -3  # -3 = returning half-strand
                         len_half = math.floor(len_edge_adjusted / 2)
                     else:  # outgoing half-strand, 5' end, 1 longer
@@ -79,10 +79,8 @@ def enum_scaf_bases_DX(route_real, route_vals, edge_length_mat_full):
                         len_half = math.ceil(len_edge_adjusted / 2)
 
                 else:  # len is even, outgoing + returning = len_edge +/-1
-                    if yet:
-                        # import ipdb; ipdb.set_trace()
-                        yet = False
-                    if edge_before == edge_fin:  # returning half-strand, 3' end, 1 shorter
+                    # if returning half-strand, 3' end, 1 shorter
+                    if edge_before == edge_fin:
                         route_val = -3  # -3 = returning half-strand
 
                         if edge_bgn > edge_fin:  # shorter half-tile
@@ -104,7 +102,8 @@ def enum_scaf_bases_DX(route_real, route_vals, edge_length_mat_full):
 
             else:  # quotient is even, scaffold 5/6 bp from middle
                 if len_is_odd:  # outgoing + returning = len_edge +/-10
-                    if edge_before == edge_fin:  # returning half-strand, 3' end, 1 shorter
+                    # if returning half-strand, 3' end, 1 shorter
+                    if edge_before == edge_fin:
                         route_val = -3  # -3 = returning half-strand
 
                         if edge_bgn > edge_fin:  # shorter half
@@ -125,7 +124,8 @@ def enum_scaf_bases_DX(route_real, route_vals, edge_length_mat_full):
                         len_half = math.ceil(len_edge_adjusted / 2)
 
                 else:  # len is even, outgoing + returning = len_edge +/-11
-                    if edge_before == edge_fin:  # returning half-strand, 3' end, 1 shorter
+                    # if returning half-strand, 3' end, 1 shorter:
+                    if edge_before == edge_fin:
                         route_val = -3  # -3 = returning half-strand
 
                         if edge_bgn > edge_fin:  # shorter half
@@ -145,12 +145,11 @@ def enum_scaf_bases_DX(route_real, route_vals, edge_length_mat_full):
 
                         len_half = math.ceil(len_edge_adjusted / 2)
 
-            len_half = int(len_half)  #len_half should be int-able by now
+            len_half = int(len_half)  # len_half should be int-able by now
 
             # # Add to edge_{bgn,fin,type}_vec
             edge_bgn_vec = edge_bgn_vec + ([edge_bgn] * len_half)
             edge_fin_vec = edge_fin_vec + ([edge_fin] * len_half)
-            edge_type_vec = edge_type_vec + ([route_val] * len_half)  # 2, -3, -5
-
+            edge_type_vec = edge_type_vec + ([route_val] * len_half)
 
     return [edge_bgn_vec, edge_fin_vec, edge_type_vec]

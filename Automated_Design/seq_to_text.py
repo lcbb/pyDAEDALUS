@@ -148,5 +148,3 @@ def seqtoText(scaf_to_edge, edges, dnaInfo, file_name, scaf_name, singleXOs,
         fid.write("         5'3' 5'3' \r\n\r\n\r\n")
 
     fid.close()
-
-
