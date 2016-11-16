@@ -14,7 +14,6 @@ from Automated_Design.designate_edge_type import designate_edge_type
 from Automated_Design.enum_scaf_bases_DX import enum_scaf_bases_DX
 from Automated_Design.gen_stap_seq import gen_stap_seq
 from Automated_Design.ply_to_input import ply_to_input
-from Automated_Design.seq_to_text import seqtoText
 from Automated_Design.set_routing_direction import set_routing_direction
 from Automated_Design.split_edge import split_edge
 from Automated_Design.split_vert import split_vert
@@ -34,7 +33,9 @@ class TestPlyImport(TestCase):
     @patch('matplotlib.figure.Figure.savefig')
     def test_01_tetrahedron(self, savefig_mock):
         f = open_string_as_file(ply_file_01_tetrahedron)
-        coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs = ply_to_input("01_tetrahedron", f, min_len_nt=52)
+        coordinates, edges, faces, edge_length_vec, file_name, \
+            staple_name, singleXOs = ply_to_input(
+                "01_tetrahedron", f, min_len_nt=52)
         self.assertEqual(len(coordinates), 4)
         self.assertEqual(len(faces), 4)
         # TODO: mock fig itself and assert about what's `fig_mock.plot`ed
@@ -43,7 +44,9 @@ class TestPlyImport(TestCase):
     @patch('matplotlib.figure.Figure.savefig')
     def test_05_icosahedron(self, savefig_mock):
         f = open_string_as_file(ply_file_05_icosahedron)
-        coordinates, edges, faces, edge_length_vec, file_name, staple_name, singleXOs = ply_to_input("05_tetrahedron", f, min_len_nt=52)
+        coordinates, edges, faces, edge_length_vec, file_name, \
+            staple_name, singleXOs = ply_to_input(
+                "05_tetrahedron", f, min_len_nt=52)
         self.assertEqual(len(coordinates), 12)
         self.assertEqual(len(faces), 20)
         # TODO: mock fig itself and assert about what's `fig_mock.plot`ed
@@ -81,13 +84,16 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
 
     target_2_edge_type_mat = load_graph_from_mat('2_edge_type_mat.mat',
                                                  graph_type=nx.Graph())
-    target_3_edge_type_mat_wHalfs = load_graph_from_mat('3_edge_type_mat_wHalfs.mat')
+    target_3_edge_type_mat_wHalfs = load_graph_from_mat(
+        '3_edge_type_mat_wHalfs.mat')
     target_3_pseudo_vert = load_pseudonodes_from_mat('3_pseudo_vert.mat')
 
-    target_4_edge_type_mat_allNodes = load_graph_from_mat('4_edge_type_mat_allNodes.mat')
+    target_4_edge_type_mat_allNodes = load_graph_from_mat(
+        '4_edge_type_mat_allNodes.mat')
     target_4_pseudo_vert = load_pseudonodes_from_mat('4_pseudo_vert.mat')
 
-    target_5_route_real = load_1d_list_from_mat('5_route_real.mat', are_1_indexed_nodes = True)
+    target_5_route_real = load_1d_list_from_mat('5_route_real.mat',
+                                                are_1_indexed_nodes=True)
     target_5_route_vals = load_1d_list_from_mat('5_route_vals.mat')
 
     target_6_edge_bgn_vec = list(
@@ -107,12 +113,12 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     target_10_stap_seq = load_stap_seq_file("10_stap_seq.mat")
     target_10_stap_seq_list = load_stap_seq_list_file("10_stap_seq_list.mat")
     target_10_stap_list = load_stap_list_file("10_stap_list.mat")
-    target_10_named_stap_seq_list = load_named_stap_seq_list_file("10_named_stap_seq_list.mat")
+    target_10_named_stap_seq_list = load_named_stap_seq_list_file(
+        "10_named_stap_seq_list.mat")
 
     target_11_buff_nt = load_1d_list_from_mat('11_buff_nt.mat')
     target_11_edge_norms = load_mat_file('11_edge_norms.mat')  # TODO: Format
     target_11_dna_info = load_dna_info("11_dna_info.mat")
-
 
     # 1:  I'm using a networkx.Graph rather than sparse matrix.  No direct
     # assertion possible, though we still could do assertions on the
@@ -131,14 +137,16 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
                          len(target_edge_type_mat.edges()))
         self.assertEqual(actual_edge_type_mat.edges(data=True),
                          target_edge_type_mat.edges(data=True))
-        #TODO: assert graphs are isomorphic instead of directly equal?
+        # TODO: assert graphs are isomorphic instead of directly equal?
 
     # 3
     def test_split_edge(self):
-        edge_type_mat = self.target_2_edge_type_mat.to_directed()  #TODO:  Figure out where this transition needs to happen, and move it out of this test!!!
+        edge_type_mat = self.target_2_edge_type_mat.to_directed()
+        # TODO:  Figure out where `.to_directed` transition needs to happen!
         num_vert = len(edge_type_mat.nodes())
 
-        actual_edge_type_mat_wHalfs, actual_pseudo_vert = split_edge(edge_type_mat, num_vert)
+        actual_edge_type_mat_wHalfs, actual_pseudo_vert = split_edge(
+            edge_type_mat, num_vert)
 
         target_edge_type_mat_wHalfs = self.target_3_edge_type_mat_wHalfs
         target_pseudo_vert = self.target_3_pseudo_vert
@@ -155,7 +163,8 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         num_vert = len(np.unique(pseudo_vert))
         vert_to_face = self.target_1_vert_to_face
 
-        actual_edge_type_mat_allNodes, actual_pseudo_vert = split_vert(edge_type_mat_wHalfs, pseudo_vert, num_vert, vert_to_face)
+        actual_edge_type_mat_allNodes, actual_pseudo_vert = split_vert(
+            edge_type_mat_wHalfs, pseudo_vert, num_vert, vert_to_face)
 
         target_edge_type_mat_allNodes = self.target_4_edge_type_mat_allNodes
         target_pseudo_vert = self.target_4_pseudo_vert
@@ -164,10 +173,6 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
                                       target_edge_type_mat_allNodes))
 
         # TODO: Graphs are isomorphic but not directly equal. ... okay?
-        # self.assertEqual(actual_edge_type_mat_allNodes.nodes(),
-        #                  target_edge_type_mat_allNodes.nodes())  # will pass
-        # self.assertEqual(set(actual_edge_type_mat_allNodes.edges()),
-        #                  set(target_edge_type_mat_allNodes.edges()))  # will fail
 
     # 5
     def test_set_routing_direction(self):
@@ -235,7 +240,8 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         scaf_to_edge = self.target_7_scaf_to_edge
         scaf_nick_pos = self.target_8_scaf_nick_pos
 
-        actual_scaf_to_edge_adj = adj_scaf_nick_pos(scaf_to_edge, scaf_nick_pos, num_bases)
+        actual_scaf_to_edge_adj = adj_scaf_nick_pos(
+            scaf_to_edge, scaf_nick_pos, num_bases)
 
         target_scaf_to_edge = self.target_8_scaf_to_edge
         self.assertEqual(actual_scaf_to_edge_adj, target_scaf_to_edge)
@@ -245,7 +251,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         singleXOs = self.target_0_singleXOs
         edges = self.target_0_edges
         num_edges = len(edges)
-        edge_type_mat = self.target_2_edge_type_mat.to_directed()  #TODO:  Same as other time I call `.to_directed`!
+        edge_type_mat = self.target_2_edge_type_mat.to_directed()
         scaf_to_edge = self.target_8_scaf_to_edge
         num_bases = len(self.target_6_edge_type_vec)
         num_vert = len(edge_type_mat.nodes())
@@ -261,12 +267,12 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
     def test_gen_stap_seq(self):
         staples = self.target_9_staples
         num_edges = len(self.target_0_edges)
-        len_scaf_used = 2*sum(self.target_0_edge_length_vec)  # TODO: it seems like this variable will be undefined if random scaf seq is used!
+        len_scaf_used = 2*sum(self.target_0_edge_length_vec)
         scaf_seq = self.target_0_scaf_seq
         staple_name = self.target_0_staple_name
         scaf_name = self.target_0_scaf_name
         actual_stap_seq, actual_stap_seq_list, \
-        actual_stap_list, actual_named_stap_seq_list \
+            actual_stap_list, actual_named_stap_seq_list \
             = gen_stap_seq(staples, num_edges, scaf_seq,
                            staple_name, scaf_name, len_scaf_used)
 
@@ -278,7 +284,8 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         self.assertEqual(actual_stap_seq, target_stap_seq)
         self.assertEqual(actual_stap_seq_list, target_stap_seq_list)
         self.assertEqual(actual_stap_list, target_stap_list)
-        self.assertEqual(actual_named_stap_seq_list, target_named_stap_seq_list)
+        self.assertEqual(actual_named_stap_seq_list,
+                         target_named_stap_seq_list)
 
     # 11
     def test_calc_buff(self):
@@ -339,27 +346,27 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         #     print row
         self.assertEqual(len(actual_dnaTop), len(target_dnaTop))
         for actual, target in zip(actual_dnaTop, target_dnaTop):
-            #TODO: write __eq__ opposite into DnaTop to clean this up?
+            # TODO: write __eq__ opposite into DnaTop to clean this up?
             self.assertEqual(str(actual), str(target))
 
     @expectedFailure
     def test_dna_info_print_to_cando(self):
-        scaf_to_edge = self.target_8_scaf_to_edge
-        scaf_seq = self.target_0_scaf_seq
-        stap_list = self.target_10_stap_list
-        stap_seq_list = self.target_10_stap_seq_list
-        coordinates = self.target_0_coordinates
-        edges = self.target_0_edges
-        edge_length_vec = self.target_0_edge_length_vec
-        faces = self.target_0_faces
-        vert_to_face = self.target_1_vert_to_face
+        # scaf_to_edge = self.target_8_scaf_to_edge
+        # scaf_seq = self.target_0_scaf_seq
+        # stap_list = self.target_10_stap_list
+        # stap_seq_list = self.target_10_stap_seq_list
+        # coordinates = self.target_0_coordinates
+        # edges = self.target_0_edges
+        # edge_length_vec = self.target_0_edge_length_vec
+        # faces = self.target_0_faces
+        # vert_to_face = self.target_1_vert_to_face
 
-        dnaInfo = DnaInfo(scaf_to_edge, scaf_seq, stap_list,
-                          stap_seq_list, coordinates, edges,
-                          edge_length_vec, faces, vert_to_face)
+        # dnaInfo = DnaInfo(scaf_to_edge, scaf_seq, stap_list,
+        #                   stap_seq_list, coordinates, edges,
+        #                   edge_length_vec, faces, vert_to_face)
         # dnaInfo.save_dna_info_to_cando_file("THE_CANDO_THING.txt")
 
-        #TODO: mock out file writer to be string writer and assert string match
+        # TODO: mock out file writer to be string writer
         self.fail("Write these assertions!")
         self.fail("And be sure to 1-index the file!")
 
@@ -394,4 +401,3 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
 
         # raise Exception("..{}..".format(mock_stdout.getvalue()))
         assert mock_stdout.getvalue() == 'Test String To Catch\n'
-
