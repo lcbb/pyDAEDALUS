@@ -7,14 +7,17 @@ from demo_daedalus import run_demo
 
 
 def grab_all_ply_filenames_from_directory(directory):
-    filenames = sorted(f for f in listdir(directory) if path.isfile(path.join(directory, f)))
+    filenames = sorted(f for f in listdir(directory)
+                       if path.isfile(path.join(directory, f)))
     filenames = [path.join(directory, filename) for filename in filenames]
     return filenames
+
 
 def create_empty_directory(directory):
     if path.exists(directory):
         shutil.rmtree(directory)
     mkdir(directory)
+
 
 if __name__ == '__main__':
     ply_directory = 'PLY_Files'
