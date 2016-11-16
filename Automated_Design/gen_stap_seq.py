@@ -1,18 +1,6 @@
 import numpy as np
 
 
-# #TODO: Test this function too?  If so, how to test what prints to terminal?
-# def assign_sequence_to_staples(staples, num_edges, scaf_seq, staple_name, scaf_name, len_scaf_used):
-#     if True: #TODO: if a staple sequence has been initialized:
-#         gen_stap_seq(staples, num_edges, scaf_seq, staple_name, scaf_name,
-#                      len_scaf_used)
-#         print_staple_stuff("dunno")
-#
-#     #TODO: which of this needs to actually be returned?
-#     stap_seq, stap_seq_list, stap_list, named_stap_seq_list = [None] * 4
-#     return [stap_seq, stap_seq_list, stap_list, named_stap_seq_list]
-
-
 def gen_stap_seq(staples, num_edges, scaf_seq, staple_name, scaf_name,
                  len_scaf_used):
     # Generate staple sequences from scaffold sequence
@@ -48,7 +36,6 @@ def gen_stap_seq(staples, num_edges, scaf_seq, staple_name, scaf_name,
     stap_list = []
     named_stap_seq_list = []
 
-
     for edge_ID in range(num_edges):
         staps_for_this_edge = []
         for stap_ID in range(len(staples[edge_ID])):
@@ -72,12 +59,15 @@ def gen_stap_seq(staples, num_edges, scaf_seq, staple_name, scaf_name,
                 # # Store seq in named_stap_seq_list. First number is Edge ID,
                 # # Second is 5' end of staple. Third indicates vertex or edge
                 # # staple.
-                if stap_ID <= 3:  # Vertex staple  # # Might not just-transfer over to my indexing!
-                    named_stap_seq_a = staple_name + '_{}-{}-V'.format(edge_ID, stap[0])
+                if stap_ID <= 3:  # Vertex staple
+                    named_stap_seq_a = staple_name + '_{}-{}-V'.format(
+                        edge_ID, stap[0])
                 else:  # Edge staple
-                    named_stap_seq_a = staple_name + '_{}-{}-E'.format(edge_ID, stap[0])
+                    named_stap_seq_a = staple_name + '_{}-{}-E'.format(
+                        edge_ID, stap[0])
                 named_stap_seq_b = seq
-                named_stap_seq_list.append([named_stap_seq_a, named_stap_seq_b])
+                named_stap_seq_list.append(
+                    [named_stap_seq_a, named_stap_seq_b])
 
                 stap_list.append(stap)  # store stap in stap_list
         stap_seq.append(staps_for_this_edge)
@@ -86,7 +76,7 @@ def gen_stap_seq(staples, num_edges, scaf_seq, staple_name, scaf_name,
 
     # # Add sequence of scaffold at end
     block_size = 10000
-    if len_scaf_used > block_size:  # for readabiliy now, used to be for excel limits
+    if len_scaf_used > block_size:  # now for readabiliy, was for excel limits
         num_mults = int(np.floor(float(len_scaf_used) / block_size))
         # leftover = len_scaf_used % 10000
         for i in range(num_mults):
@@ -108,4 +98,3 @@ def gen_stap_seq(staples, num_edges, scaf_seq, staple_name, scaf_name,
         named_stap_seq_list.append([named_stap_seq_a, named_stap_seq_b])
 
     return [stap_seq, stap_seq_list, stap_list, named_stap_seq_list]
-

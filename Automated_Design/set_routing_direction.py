@@ -1,6 +1,4 @@
 import numpy as np
-from networkx import simple_cycles
-from networkx.algorithms.euler import eulerian_circuit, is_eulerian
 from networkx.algorithms.simple_paths import all_simple_paths
 
 
@@ -32,19 +30,22 @@ def check_direction(route_real, vert_to_face, faces):
     vtf_1 = vert_to_face[first_face_route[0]]
     vtf_2 = vert_to_face[first_face_route[1]]
     vtf_3 = vert_to_face[first_face_route[2]]
-    first_face_ID = set(vtf_1).intersection(set(vtf_2)).intersection(set(vtf_3)).pop()
+    first_face_ID = set(vtf_1)\
+        .intersection(set(vtf_2))\
+        .intersection(set(vtf_3)).pop()
 
     first_face = faces[first_face_ID]
 
     check_cycle = first_face + first_face
     correct_direction = 0
-    for check in range(len(first_face)):  #faces were given initially as
+    for check in range(len(first_face)):  # faces were given initially as
         excerpt_to_check = check_cycle[check:(check + 3)]
         distance = np.linalg.norm(first_face_route - excerpt_to_check)
-        if distance == 0: # that is, if there is a match
+        if distance == 0:  # that is, if there is a match
             correct_direction = correct_direction + 1
 
-    assert correct_direction < 2 # 0->wrong direction.  1->right direction. 2 or more -> should never
+    # 0->wrong direction.  1->right direction. 2 or more -> should never
+    assert correct_direction < 2
 
     if correct_direction == 0:  # routing is clockwise, wrong direction
         return False
@@ -52,7 +53,8 @@ def check_direction(route_real, vert_to_face, faces):
         return True
 
 
-def set_routing_direction(edge_type_mat_allNodes, num_vert, pseudo_vert, faces, vert_to_face):
+def set_routing_direction(edge_type_mat_allNodes, num_vert, pseudo_vert,
+                          faces, vert_to_face):
     """
     Sets routing direction for traversing scaffold route path
     Inputs: edge_type_mat_allNodes = sparse matrix where
@@ -76,15 +78,18 @@ def set_routing_direction(edge_type_mat_allNodes, num_vert, pseudo_vert, faces, 
     this license is available at https://opensource.org/licenses/GPL-2.0
     ##########################################################################
     """
-    #TODO: This one's certainly going to need better test coverage.  At least including both branches of direction being right/wrong.
+    # TODO: Add to test coverage: At least including both branches of
+    # direction being right/wrong.
 
     # Choose a starting connected node (arbitrary start position).
     # Vertices #1-#V (V = number of vertices) are no longer connected in the
     # graph network
-    start_node = 2*num_vert+2 # this node is a pseudo-node at Vertex 1
+    start_node = 2*num_vert+2  # this node is a pseudo-node at Vertex 1
 
     next_nodes = edge_type_mat_allNodes.neighbors(start_node)  # you'll have 2
-    for next_node in next_nodes: #TODO: Convert to generator, since you only need to make the second path if the first is the wrong direction?
+    # TODO: Convert to generator, since you only need to make the second
+    # path if the first is the wrong direction?
+    for next_node in next_nodes:
         paths = all_simple_paths(
             edge_type_mat_allNodes, start_node, next_node)
 
@@ -94,29 +99,30 @@ def set_routing_direction(edge_type_mat_allNodes, num_vert, pseudo_vert, faces, 
 
         route_real = path
         temp_route_real = route_real + [route_real[0]]
-        route_vals = [edge_type_mat_allNodes[temp_route_real[i]][temp_route_real[i+1]]['type'] for i in range(len(route_real))]
-
+        route_vals = [edge_type_mat_allNodes
+                      [temp_route_real[i]][temp_route_real[i+1]]['type']
+                      for i in range(len(route_real))]
 
         dereferenced_path = dereference_pseudonodes_in_path(path, pseudo_vert)
         route_real = dereferenced_path
 
-        #TODO: Review that this code is really no longer needed given how I'm
+        # TODO: Review that this code is really no longer needed given how I'm
         # picking start node / generating the paths.
 
         # Does this differ from previous 'magic' number that picks first vert?
         # # # For consistency, start routing at a tree edge (route_vals = 2)
         # # # with Vertex 1 upstream (route_real = 1)
-        # start_route = (i for i in range(len(route_real)) if route_real[i] == 1 and route_vals[i] == 2)
+        # start_route = (i for i in range(len(route_real)) \
+        #     if route_real[i] == 1 and route_vals[i] == 2)
         # start_route = intersect(find(route_real == 1), find(route_vals == 2))
         # start_route = start_route(1) # in case there are multiple choices
         #
         # # # Shift route_real and route_vals to start at start_route
         # route_real = [route_real[start_route:end], route_real[0:start_route]]
-        # route_vals = [route_vals(start_route:end), route_vals(1:start_route-1)]
+        # route_vals = [route_vals(start_route:end), \
+        #     route_vals(1:start_route-1)]
 
-
-        if check_direction(route_real, vert_to_face, faces):  # Reverse direction
+        if check_direction(route_real, vert_to_face, faces):
             return [route_real, route_vals]
 
     raise Exception("one of the two above should have returned")
-

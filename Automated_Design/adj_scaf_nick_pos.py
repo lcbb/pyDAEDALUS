@@ -13,7 +13,8 @@ def get_scaf_nick_pos(edges, route_real, edge_length_vec):
     from_nodes = np.where(edges[:, 0] == max_node)[0]
     to_nodes = np.where(edges[:, 1] == min_node)[0]
 
-    first_edge = intersect_lists(from_nodes, to_nodes)[0]  #TODO: assured to always have 1 result?
+    # TODO: assured to always have 1 result?
+    first_edge = intersect_lists(from_nodes, to_nodes)[0]
 
     first_edge_length = edge_length_vec[first_edge]
     if first_edge_length < 42:  # == 31
@@ -37,7 +38,7 @@ def adj_scaf_nick_pos(scaf_to_edge, scaf_nick_pos, num_bases):
     ###########################################################################
     # by Sakul Ratanalert, MIT, Bathe Lab, 2016
     #
-    # Copyright 2016. Massachusetts Institute of Technology. Rights Reserved. 
+    # Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
     # M.I.T. hereby makes following copyrightable material available to the
     # public under GNU General Public License, version 2 (GPL-2.0). A copy of
     # this license is available at https://opensource.org/licenses/GPL-2.0
@@ -48,13 +49,14 @@ def adj_scaf_nick_pos(scaf_to_edge, scaf_nick_pos, num_bases):
 
     # # Adjust scaf_to_edge
     import numpy as np
-    shape = np.array(scaf_to_edge_adj, dtype=np).shape # num_sides should be 2
+    shape = np.array(scaf_to_edge_adj, dtype=np).shape  # num_sides should be 2
     num_edges = shape[0]
     num_sides = shape[1]
 
     for edge_ID in range(num_edges):
         for sides_ID in range(num_sides):
-            scaf_to_edge_adj[edge_ID][sides_ID] = adjust(scaf_to_edge[edge_ID][sides_ID], scaf_nick_pos, num_bases)
+            scaf_to_edge_adj[edge_ID][sides_ID] = adjust(
+                scaf_to_edge[edge_ID][sides_ID], scaf_nick_pos, num_bases)
 
     return scaf_to_edge_adj
 
@@ -73,7 +75,7 @@ def adjust(old_num_vec, scaf_nick_pos, num_bases):
     for i in range(len(old_num_vec)):
         new_num = (int(old_num_vec[i]) - int(scaf_nick_pos)) % int(num_bases)
 
-        #TODO: Doesn't this always return `new_num`?
+        # TODO: Doesn't this always return `new_num`?
         if new_num == num_bases:  # if is now last base
             new_num_vec[i] = num_bases  # set to last base
         else:

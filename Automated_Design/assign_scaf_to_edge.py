@@ -32,7 +32,7 @@ def assign_scaf_to_edge(edges, num_edges, edge_type_mat, edge_bgn_vec,
     """
 
     scaf_to_edge = []
-    for edge_ID in range(num_edges):  #TODO: convert to `for edge in edges:`
+    for edge_ID in range(num_edges):  # TODO: convert to `for edge in edges:`
         # first column low to high, second column high to low
         row = [None, None]
         for high_to_low in [1, 2]:  # for each duplex direction on edge
@@ -46,7 +46,7 @@ def assign_scaf_to_edge(edges, num_edges, edge_type_mat, edge_bgn_vec,
                 edge_fin = edges[edge_ID][0]
 
             edge_type = edge_type_mat[edge_bgn][edge_fin]['type']
-            if edge_type == 2:  # tree edge  #TODO: extract into constant
+            if edge_type == 2:  # tree edge  # TODO: extract into constant
                 bases = intersect_lists(find(edge_bgn_vec, edge_bgn),
                                         find(edge_fin_vec, edge_fin))
             else:  # non-tree edge

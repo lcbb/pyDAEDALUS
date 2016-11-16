@@ -1,14 +1,18 @@
-from networkx.algorithms.mst import prim_mst, kruskal_mst
+from networkx.algorithms.mst import prim_mst
+
 
 def designate_edge_type(full_graph):
     """
-    Calculate minimum spanning tree, and label the links in the full graph that are also in the min spanning tree as such:
+    Calculate minimum spanning tree, and label the links in the full graph
+    that are also in the min spanning tree as such:
         1 is non-spanning tree edge: DX edge with 1 scaffold crossover
         2 is spanning tree edge: DX edge with 0 scaffold crossovers
     """
     tree = prim_mst(full_graph)
 
-    full_tree = tree #networkx undirected networks already implicitly can be considered a symmetrical matrix
+    # networkx undirected networks already implicitly can be considered a
+    # symmetrical matrix
+    full_tree = tree
 
     tree_edges = full_tree.edges()
     for edge in full_graph.edges():
