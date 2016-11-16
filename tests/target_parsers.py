@@ -20,15 +20,16 @@ def load_mat_file(filename):
     key = (key for key in full_data.keys() if key[0] is not '_').next()
     data = full_data[key]
     return data
-    #TODO: declare all these files currently used as 1_tetra...
+    # TODO: declare all these files currently used as 1_tetra...
 
 
-def load_graph_from_mat(filename, edge_attribute='type', graph_type=nx.DiGraph()):
+def load_graph_from_mat(filename, edge_attribute='type',
+                        graph_type=nx.DiGraph()):
     graph_as_sparse_matrix = load_mat_file(filename)
     graph = nx.from_scipy_sparse_matrix(graph_as_sparse_matrix,
                                         create_using=graph_type,
                                         edge_attribute=edge_attribute)
-    #intify 'type' if that's the property used (defaults to float)
+    # intify 'type' if that's the property used (defaults to float)
     if edge_attribute == 'type':
         for i, j, attribute in graph.edges(data=True):
             graph[i][j]['type'] = int(attribute['type'])
@@ -38,10 +39,10 @@ def load_graph_from_mat(filename, edge_attribute='type', graph_type=nx.DiGraph()
 def load_pseudonodes_from_mat(filename):
     pseudonodes = load_mat_file(filename)
     pseudonodes = pseudonodes - 1
-    return list(pseudonodes.flatten())  #convert shape(N,1) to shape(N)
+    return list(pseudonodes.flatten())  # convert shape(N,1) to shape(N)
 
 
-def load_1d_list_from_mat(filename, are_1_indexed_nodes = False):
+def load_1d_list_from_mat(filename, are_1_indexed_nodes=False):
     data = load_mat_file(filename)
     if are_1_indexed_nodes:  # convert to 0 indexed nodes
         data = data - 1
@@ -177,7 +178,7 @@ def load_named_stap_seq_list_file(filename):
 
     def de_1_index_name_b(name):
         parts = name.split('(')
-        parts = [parts[0] ] + parts[1].split('-')
+        parts = [parts[0]] + parts[1].split('-')
         parts = parts[:2] + parts[2].split(')')
         decrimented_name = '{}({}-{}){}'.format(
             parts[0], str(int(parts[1])-1), str(int(parts[2])-1), parts[3])
@@ -194,7 +195,7 @@ def load_named_stap_seq_list_file(filename):
                 cleaned_row.append(None)
         named_stap_seq_list.append(cleaned_row)
 
-    #take 1 indexing in names down to 0 indexing
+    # take 1 indexing in names down to 0 indexing
     splitter = named_stap_seq_list.index([None, None])
     for row in named_stap_seq_list[:splitter]:
         row[0] = de_1_index_name_a(row[0])
