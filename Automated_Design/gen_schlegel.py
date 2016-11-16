@@ -5,7 +5,8 @@ from Automated_Design.constants import VERMILLION, REDPURPLE, SKYBLUE, WHITE
 from Automated_Design.util import generate_graph
 
 
-def gen_schlegel(edges, coordinates, faces, schlegel_filename, edge_type_mat=None):
+def gen_schlegel(edges, coordinates, faces, schlegel_filename,
+                 edge_type_mat=None):
     """
     Plots vertices and edges in Schlegel diagram, tracing scaffold path in
     colored lines
@@ -14,7 +15,7 @@ def gen_schlegel(edges, coordinates, faces, schlegel_filename, edge_type_mat=Non
               E = number of edges
             coordinates = Vx3 matrix of spatial coordinates of vertices,
               V = number of vertices
-            faces = Fx2 cell matrix, where F is the number of faces.        #TODO: Polish up these 'faces' docs
+            faces = Fx2 cell matrix, where F is the number of faces.
                 The first column details how many vertices the face has
                 The second column details the vertex IDs of the face
             edge_type_mat = sparse matrix where
@@ -37,9 +38,8 @@ def gen_schlegel(edges, coordinates, faces, schlegel_filename, edge_type_mat=Non
     big_face = max(faces, key=len)
 
     # Initialize:
-    num_face_vert = len(big_face)  # for best results choose most vertices per face
-    num_vert = len(coordinates)  # number of vertices
-    num_edges = len(edges)  # number of edges
+    num_face_vert = len(big_face)
+    num_vert = len(coordinates)
 
     # If edge_type_mat isn't specified, generate it.
     if edge_type_mat is None:
@@ -55,13 +55,13 @@ def gen_schlegel(edges, coordinates, faces, schlegel_filename, edge_type_mat=Non
     for i in range(num_face_vert):  # for each vertex in big face
         xycoord[big_face[i]] = [np.cos(angle * i), np.sin(angle * i)]
 
-
-    # # Calculate positions of other vertices through iterative process
+    # Calculate positions of other vertices through iterative process
     for repeat_ID in range(num_repeat):
 
-        for vert_ID in range(num_vert): # For each vertex,
+        for vert_ID in range(num_vert):  # For each vertex,
             if vert_ID not in big_face:  # that's not in big_face,
-                # move the xycoord of the given vertex to the centerpont of all neighboring nodes.
+                # move the xycoord of the given vertex to the centerpont
+                # of all neighboring nodes.
 
                 # # Find vert_ID
                 find_vert_row, find_vert_col = np.where(edges == vert_ID)
@@ -78,8 +78,9 @@ def gen_schlegel(edges, coordinates, faces, schlegel_filename, edge_type_mat=Non
 
                 # # # Find midpoint
                 num_nbr = len(find_vert_col)
-                midpt = np.array([sum(nbr_coord[:, 0]), sum(nbr_coord[:, 1])]) / num_nbr
-
+                midpt = np.array(
+                    [sum(nbr_coord[:, 0]), sum(nbr_coord[:, 1])]
+                    ) / num_nbr
 
                 # # Store as new xycoord for vert_ID
                 xycoord[vert_ID, :] = midpt
@@ -88,10 +89,8 @@ def gen_schlegel(edges, coordinates, faces, schlegel_filename, edge_type_mat=Non
     f.clf()
     plt.xlim((-1.2, 1.2))
     plt.ylim((-1.2, 1.2))
-    #TODO: `axis equal` resolvede by figsize?
     plt.axis('off')
 
-    # TODO:  `for thickfirst = 1:2` needed?  Yes.  Plot blue lines then pink line.
     for edge in edges:
         # Get end vertices
         edge_bgn, edge_fin = edge
@@ -108,9 +107,9 @@ def gen_schlegel(edges, coordinates, faces, schlegel_filename, edge_type_mat=Non
         y_vec = [y_bgn, y_fin]
 
         # TODO rename `edge_type_mat` to something that involves `graph`
-        if edge_type_mat.edge[edge_bgn][edge_fin]['type'] == 2:  #if this is a tree edge:
+        if edge_type_mat.edge[edge_bgn][edge_fin]['type'] == 2:
             plt.plot(x_vec, y_vec, linestyle='-', color=REDPURPLE, linewidth=8)
-        else:  #if this is a non-tree edge:
+        else:  # if this is a non-tree edge:
             plt.plot(x_vec, y_vec, linestyle='-', color=SKYBLUE, linewidth=5)
 
     # Plot nodes:
