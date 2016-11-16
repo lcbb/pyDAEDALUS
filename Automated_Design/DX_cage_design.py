@@ -1,4 +1,3 @@
-import networkx as nx
 import numpy as np
 from os import path
 import pickle
@@ -13,7 +12,6 @@ from Automated_Design.csv_staples import csv_staples
 from Automated_Design.dna_info import DnaInfo
 from Automated_Design.enum_scaf_bases_DX import enum_scaf_bases_DX
 from Automated_Design.gen_stap_seq import gen_stap_seq
-from Automated_Design.seq_to_text import seqtoText
 from Automated_Design.set_routing_direction import set_routing_direction
 from Automated_Design.split_edge import split_edge
 from Automated_Design.split_vert import split_vert
@@ -34,7 +32,7 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
             edges = Ex2 matrix where each row corresponds to one edge,
               denoting the vertices being connected. 1st column > 2nd column
             faces = F cell matrix, where F is the number of faces.
-              The second column details the vertex IDs of the face                #TODO: polish up these 'faces' docs
+              The second column details the vertex IDs of the face
             edge_length_vec = column vector of edge lengths
             file_name = string to name structure
             staple_name = string to name staples to order (can be same as
@@ -61,15 +59,12 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     """
 
-
     # Determine the minimum length scaffold fragment to use.
     len_scaf_used = 2 * sum(edge_length_vec)  # length of scaffold used
 
     # Determine the default scaffold sequence to use.
-    scaf_seq_default_used = False
     if not scaf_seq:  # if a scaffold sequence was not provided
         if len_scaf_used <= 7249:  # default to using M13 sequence
-            scaf_seq_default_used = True
             # Set scaffold sequence as full M13 scaffold, 7249 nucleotides
             scaf_seq = SCAF_SEQ  # from NEB
             scaf_name = 'full_M13'  # scaffold name
@@ -93,26 +88,22 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     num_vert = len(coordinates)
     num_edges = len(edges)
 
-    ### 1. Generate sparse matrix of connectivities and vertex-face indexing ###
+    # 1. Generate sparse matrix of connectivities and vertex-face indexing ###
     # Create sparse matrices of connectivities and edge lengths
     file_name_without_containing_folder = path.split(file_name)[1]
     shape_name = file_name_without_containing_folder
     full_graph = generate_graph(num_vert, edges, edge_length_vec)
     full_graph.name = file_name_without_containing_folder
-    # In case of debugging, or generally wanting graph in generic format
-    # nx.write_gml(full_graph,
-    #              'tests/sample_files/' + full_graph.name + '_initial_graph.gml')
 
     # Identify presence of every vertex in every face
     vert_to_face = gen_vert_to_face(num_vert, faces)
 
-
-    ## 2. Generate spanning tree ##############################################
-    # # Designate edges as type 1 or 2:
-    # # Type 1: Non-spanning tree, i.e. 1 scaffold crossover in DX cage
-    # # Type 2: Spanning tree edges, i.e. 0 scaffold crossovers in DX cage
+    # 2. Generate spanning tree ##############################################
+    # Designate edges as type 1 or 2:
+    # Type 1: Non-spanning tree, i.e. 1 scaffold crossover in DX cage
+    # Type 2: Spanning tree edges, i.e. 0 scaffold crossovers in DX cage
     edge_type_mat = designate_edge_type(full_graph)
-    graph_with_spanning_tree_marked = edge_type_mat   #TODO: this rename
+    # graph_with_spanning_tree_marked = edge_type_mat   # TODO: this rename
 
     schlegel_filename = file_name_without_containing_folder + '_schlegel.png'
     full_schlegel_filename = path.join(RESULTS_FOLDERNAME, schlegel_filename)
@@ -121,46 +112,50 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
                  schlegel_filename=full_schlegel_filename,
                  edge_type_mat=edge_type_mat)
 
-    edge_type_mat = edge_type_mat.to_directed()  # MST in networkx requires an undirected graph?  Later code requires directed?
+    edge_type_mat = edge_type_mat.to_directed()
+    # MST in networkx requires an undirected graph?
+    # Later code requires directed?
 
-    ## 3. Add nodes to edges ##################################################
+    # 3. Add nodes to edges ##################################################
     # Add two nodes to each nontree edge to implement scaffold crossovers
     edge_type_mat_wHalfs, pseudo_vert = split_edge(edge_type_mat, num_vert)
-    graph_with_edges_split = edge_type_mat_wHalfs  #TODO: this rename
+    # graph_with_edges_split = edge_type_mat_wHalfs  # TODO: this rename
 
-    ## 4. Add nodes to vertices ###############################################
+    # 4. Add nodes to vertices ###############################################
     # # Split each vertex into N nodes, where N is degree of vertex
     edge_type_mat_allNodes, pseudo_vert = split_vert(
         edge_type_mat_wHalfs, pseudo_vert, num_vert, vert_to_face)
 
-    ## 5. Set direction of routing ############################################
+    # 5. Set direction of routing ############################################
     [route_real, route_vals] = set_routing_direction(
         edge_type_mat_allNodes, num_vert, pseudo_vert, faces, vert_to_face)
 
-    ## 6. Enumerate scaffold bases ############################################
-    edge_length_mat_full = full_graph  #TODO: Did I save the ege lengths onto this one, too?  If not, need to propogate edge lengths to this point
+    # 6. Enumerate scaffold bases ############################################
+    edge_length_mat_full = full_graph
+    # TODO: Did I save the ege lengths onto this one, too?  If not, need to
+    # propogate edge lengths to this point
     [edge_bgn_vec, edge_fin_vec, edge_type_vec] = enum_scaf_bases_DX(
         route_real, route_vals, edge_length_mat_full)
 
     num_bases = len(edge_type_vec)
 
-    ## 7. Assign enumerated scaffold bases to edges ###########################
+    # 7. Assign enumerated scaffold bases to edges ###########################
     scaf_to_edge = assign_scaf_to_edge(edges, num_edges, edge_type_mat,
                                        edge_bgn_vec, edge_fin_vec,
                                        edge_type_vec)
 
-    ## 8. Adjust scaffold nick position #######################################
+    # 8. Adjust scaffold nick position #######################################
     scaf_nick_pos = get_scaf_nick_pos(edges, route_real, edge_length_vec)
     scaf_to_edge_adj = adj_scaf_nick_pos(scaf_to_edge, scaf_nick_pos,
                                          num_bases)
     scaf_to_edge = scaf_to_edge_adj
 
-    ## 9. Add staples #########################################################
+    # 9. Add staples #########################################################
     staples = assign_staples_wChoices(edges, num_edges, edge_type_mat,
                                       scaf_to_edge, num_bases, num_vert,
                                       singleXOs)
 
-    ## 10. Assign sequence to staples #########################################
+    # 10. Assign sequence to staples #########################################
     if not scaf_seq:  # if a scaffold sequence has been input
         raise Exception("How's that possible?")
         # TODO: Right?, since even if scaf_seq started as `[]`, it would have
@@ -184,17 +179,18 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
         display_named_stap_seq_list(stap_seq)
 
     # Leaving this within above scaf_seq, since it relies on 10's output
-    ## 11. Port to CanDo, save information ####################################
+    # 11. Port to CanDo, save information ####################################
     dnaInfo = DnaInfo(scaf_to_edge, scaf_seq, stap_list, stap_seq_list,
                       coordinates, edges, edge_length_vec, faces, vert_to_face)
 
-    ## 11.5 Save DnaInfo
+    # 11.5 Save DnaInfo
     if singleXOs > 0:
         staple_description = '_singleXOVs_'
     else:
         staple_description = '_doubleXOVs_'
     date = datetime.now().strftime("%Y-%m-%d")
-    full_file_name = shape_name + '_scaf_' + scaf_name + staple_description + date
+    full_file_name = shape_name + '_scaf_' + scaf_name + \
+        staple_description + date
 
     # ... as a 3d plot
     plot_filename = full_file_name + '.png'
@@ -207,14 +203,14 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
                                                pickled_dna_info_filename)
     pickle.dump(dnaInfo, open(full_pickled_dna_info_filename, 'w'))
 
-    route_info_dump = {'scaf_to_edge':scaf_to_edge ,
-                       'scaf_seq':scaf_seq ,
-                       'stap_list':stap_list ,
-                       'stap_seq_list':stap_seq_list ,
-                       'named_stap_seq_list':named_stap_seq_list ,
-                       'coordinates':coordinates ,
-                       'edges':edges ,
-                       'faces':faces ,
+    route_info_dump = {'scaf_to_edge': scaf_to_edge,
+                       'scaf_seq': scaf_seq,
+                       'stap_list': stap_list,
+                       'stap_seq_list': stap_seq_list,
+                       'named_stap_seq_list': named_stap_seq_list,
+                       'coordinates': coordinates,
+                       'edges': edges,
+                       'faces': faces,
                        'edge_length_vec': edge_length_vec}
     route_info_dump_filename = 'routeInfo_' + full_file_name + '.pickle'
     full_route_info_filename = path.join(RESULTS_FOLDERNAME,
