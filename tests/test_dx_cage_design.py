@@ -153,8 +153,8 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         self.assertEqual(actual_pseudo_vert, target_pseudo_vert)
         self.assertEqual(actual_edge_type_mat_wHalfs.nodes(),
                          target_edge_type_mat_wHalfs.nodes())
-        self.assertEqual(actual_edge_type_mat_wHalfs.edges(),
-                         target_edge_type_mat_wHalfs.edges())
+        self.assertEqual(set(actual_edge_type_mat_wHalfs.edges()),
+                         set(target_edge_type_mat_wHalfs.edges()))
 
     # 4
     def test_split_vert(self):

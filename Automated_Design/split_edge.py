@@ -32,7 +32,15 @@ def split_edge(edge_type_mat, num_vert):
     non_tree_edges = [edge for edge in edge_type_mat.edges(data=True)
                       if edge[2]['type'] == 1]
 
-    # ID non-tree edges (value 1), replace with 2 half-edges (value = -1)
+    # # ID non-tree edges (value 1), replace with 2 half-edges (value = -1)
+    # edges = edge_type_mat.edges()
+    # for i in range(num_vert):
+    #     for j in range(num_vert):
+    #         if (i, j) in edges:
+    #             properties = edge_type_mat[i][j]
+    #             if properties['type'] == 1:
+    # !! replace the next two lines with the above 6 if you want an exact
+    # match with the matlab code.  (else, order of pseudonodes not assured)
     for edge in non_tree_edges:
         i, j, properties = edge
         # `i` is the node that stays. `j` is cut off and replaced by pseudo
