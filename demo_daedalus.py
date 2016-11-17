@@ -5,9 +5,8 @@ import click
 from Automated_Design.ply_to_input import ply_as_filename_to_input
 from Automated_Design.DX_cage_design import DX_cage_design
 
-
-default_fname_no_ply = path.join(
-    'PLY_Files', '05_icosahedron')  # No '.ply' extension required
+# No '.ply' extension required
+default_fname_no_ply = path.join('PLY_Files', '05_icosahedron')
 
 
 @click.command()
