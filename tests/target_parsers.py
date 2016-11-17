@@ -11,9 +11,11 @@ from scipy import io as sio
 
 from Automated_Design.dna_info import DnaTop
 
+TARGETS_FOLDERNAME = 'Targets45DoubleTorus'
+TARGETS_FOLDERNAME = 'Targets01Tetrahedron'
 
 def load_mat_file(filename):
-    full_data = sio.loadmat(path.join('tests', 'targets', filename))
+    full_data = sio.loadmat(path.join('tests', TARGETS_FOLDERNAME, filename))
     # full_data.keys()
     # >>> ['thing', '__version__', '__header__', '__globals__']
     # where `thing` is whatever var was originally saved.
@@ -214,7 +216,7 @@ def load_dna_info(filename):
     worth figuring out, since these tests should have initial states hard coded
     into the tests rather than depending on the from-matlab dumps.
     """
-    full_data = sio.loadmat(path.join('tests', 'targets', filename))
+    full_data = sio.loadmat(path.join('tests', TARGETS_FOLDERNAME, filename))
     data = full_data['dnaInfo'][0][0]
     rawDnaTop = data[0][0]
     dnaTop = []
