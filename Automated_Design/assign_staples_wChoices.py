@@ -113,7 +113,9 @@ Output: staples = cell array with E rows, each cell contains row vector.
 
             else:  # nontree edge, 1 scaffold crossover
 
-                num_21staps = floor(len_cut/21)  # number of 21x2-nt staples
+                # number of 21x2-nt staples
+                num_21staps = int(floor(len_cut/21))
+
 
                 # Going to match Table S1 to find what X and Y are.
                 # TODO: also done in enum_scaff_bases.  Extract both as func
@@ -167,22 +169,14 @@ Output: staples = cell array with E rows, each cell contains row vector.
                     scaf_bot_cut_rght[:rght_SCS]
 
                 # Regions to the left and right of the scaf crossover staples
-                scaf_top_cut_left_noSCS = scaf_top_cut_left[:-1 - left_SCS]
-                scaf_top_cut_rght_noSCS = scaf_top_cut_rght[rght_SCS+1:]
+                scaf_top_cut_left_noSCS = scaf_top_cut_left[:-left_SCS]
+                scaf_top_cut_rght_noSCS = scaf_top_cut_rght[rght_SCS:]
                 len_left_noSCS = len(scaf_top_cut_left_noSCS)
                 len_rght_noSCS = len(scaf_top_cut_rght_noSCS)
 
-                scaf_bot_cut_left_noSCS = scaf_bot_cut_left[:-1 - left_SCS]
-                scaf_bot_cut_rght_noSCS = scaf_bot_cut_rght[rght_SCS+1:]
+                scaf_bot_cut_left_noSCS = scaf_bot_cut_left[:-left_SCS]
+                scaf_bot_cut_rght_noSCS = scaf_bot_cut_rght[rght_SCS:]
 
-                if scaf_top_cut_left_noSCS:
-                    raise Exception("Test")
-                if scaf_top_cut_rght_noSCS:
-                    raise Exception("Test")
-                if scaf_bot_cut_left_noSCS:
-                    raise Exception("Test")
-                if scaf_bot_cut_rght_noSCS:
-                    raise Exception("Test")
 
                 if len_cut <= 11:
                     # # if len_cut <= 11, make single-crossover edge staple
@@ -199,14 +193,11 @@ Output: staples = cell array with E rows, each cell contains row vector.
                         scaf_top_SCS[8-1::-1] + scaf_bot_SCS[:-8])
                     stap_ID += 1
 
-                # total length 42 or less, merge staples  ##!! Then to
-                # seperate check to see if you merge them
-                # TODO: ^--
+                # total length 42 or less, merge staples
                 if len_cut <= 21:
-                    raise Exception("Test")
-                    staples[edge_ID][stap_ID-2] = staples[edge_ID][stap_ID-2]\
-                        + staples[edge_ID][stap_ID-1]
-                    staples[edge_ID][stap_ID-1] = []
+                    staples[edge_ID][-2] = staples[edge_ID][-2]\
+                        + staples[edge_ID][-1]
+                    staples[edge_ID][-1].pop()  # remove last element
 
                 # # Do LEFT of SCS
                 num_21staps = int(floor(len_left_noSCS/21))
@@ -215,17 +206,15 @@ Output: staples = cell array with E rows, each cell contains row vector.
                 # # Add the extra staple if necessary, should go closest to
                 # vertex:
                 if len_extra_stap > 0:  # if an extra staple is required
-                    raise Exception("Test")
-                    temp_stap = scaf_top_cut_left_noSCS[len_extra_stap:1:-1] +\
-                        scaf_bot_cut_left_noSCS[1:len_extra_stap]
-                    staples[edge_ID][stap_ID] = temp_stap
-                    stap_ID = stap_ID + 1  # increment staple ID
+                    temp_stap = scaf_top_cut_left_noSCS[len_extra_stap::-1] +\
+                        scaf_bot_cut_left_noSCS[:len_extra_stap]
+                    staples[edge_ID].append(temp_stap)
 
                     # # Cut out this region
                     scaf_top_cut_left_noSCS = scaf_top_cut_left_noSCS[
-                                              len_extra_stap+1:]
+                                              len_extra_stap:]
                     scaf_bot_cut_left_noSCS = scaf_bot_cut_left_noSCS[
-                                              len_extra_stap+1:]
+                                              len_extra_stap:]
 
                 # # Add the staples that span 21 bp
                 staples[edge_ID] += generate_spanning_21_bp_staples(
@@ -242,10 +231,8 @@ Output: staples = cell array with E rows, each cell contains row vector.
                     scaf_top_cut_rght_noSCS)
 
                 # # Add the extra staple if necessary, should go closest to
-                # vertex  ##!! add staple at end instead of beginning
-                # TODO  ^--
+                # vertex
                 if len_extra_stap > 0:  # if an extra staple is required
-                    raise Exception("Test")
                     temp_stap = scaf_bot_cut_rght_noSCS[len_extra_stap:] + \
                         scaf_top_cut_rght_noSCS[-1:len_extra_stap:-1]
                     staples[edge_ID].append(temp_stap)
