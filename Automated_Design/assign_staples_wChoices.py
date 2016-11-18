@@ -116,7 +116,6 @@ Output: staples = cell array with E rows, each cell contains row vector.
                 # number of 21x2-nt staples
                 num_21staps = int(floor(len_cut/21))
 
-
                 # Going to match Table S1 to find what X and Y are.
                 # TODO: also done in enum_scaff_bases.  Extract both as func
                 # # Detect scaffold crossover location
@@ -176,7 +175,6 @@ Output: staples = cell array with E rows, each cell contains row vector.
 
                 scaf_bot_cut_left_noSCS = scaf_bot_cut_left[:-left_SCS]
                 scaf_bot_cut_rght_noSCS = scaf_bot_cut_rght[rght_SCS:]
-
 
                 if len_cut <= 11:
                     # # if len_cut <= 11, make single-crossover edge staple

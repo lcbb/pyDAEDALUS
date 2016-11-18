@@ -11,8 +11,8 @@ from scipy import io as sio
 
 from Automated_Design.dna_info import DnaTop
 
-TARGETS_FOLDERNAME = 'Targets45DoubleTorus'
 TARGETS_FOLDERNAME = 'Targets01Tetrahedron'
+
 
 def load_mat_file(filename):
     full_data = sio.loadmat(path.join('tests', TARGETS_FOLDERNAME, filename))
