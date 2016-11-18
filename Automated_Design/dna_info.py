@@ -264,7 +264,7 @@ class DnaInfo(object):
 
         # Note: preferred nucleotide always on scaffold strand
 
-        # Generate dnaGeom
+        # Generate dnaGeom first:
 
         # Generate buffers at vertices and unit normal vectors at edges
         buff_nt = calc_buff(faces, num_vert, coordinates, d, wDX)
@@ -324,7 +324,6 @@ class DnaInfo(object):
                     scaf_nick_pos = 0
 
                     if bp_ID > 0 and bp_ID < (len_edge-1):
-                        # TODO: Test this part (conditional and contents)!!!
                         nt_down = scaf_part[bp_ID + 1]
 
                         # set larger int type in scaf test data to negate
@@ -355,10 +354,6 @@ class DnaInfo(object):
                     ])
 
                 if scaf_nick_pos > 0:
-                    # TODO: Test this part!!!  Tetrahedron doesn't reach here.
-                    # raise Exception("Test this!  It seems my test case"
-                    #                 "of tetrahedron doesn't hit this section"
-                    #                 "of code")
                     for bp_ID in range(scaf_nick_pos):
                         num_nt = scaf_nick_pos
                         start_nt = 0
@@ -382,10 +377,8 @@ class DnaInfo(object):
                         self.dnaGeom.triad[:, 1, nt_ID] = y_axis
                         self.dnaGeom.triad[:, 2, nt_ID] = z_axis
 
-                    # TODO: was `scaf_nick_pos+1:len_edge`
                     for bp_ID in range(scaf_nick_pos, len_edge):
                         num_nt = len_edge-scaf_nick_pos
-                        # TODO: was `start_nt = scaf_nick_pos+1`
                         start_nt = scaf_nick_pos
                         nt_ID = scaf_part[bp_ID]  # nucleotide id
 
@@ -430,8 +423,6 @@ class DnaInfo(object):
                         self.dnaGeom.triad[:, 0, nt_ID] = x_axis
                         self.dnaGeom.triad[:, 1, nt_ID] = y_axis
                         self.dnaGeom.triad[:, 2, nt_ID] = z_axis
-
-        self.dnaGeom = self.dnaGeom
 
         # Initialize dnaTop
         self.dnaTop = []
