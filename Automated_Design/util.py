@@ -8,7 +8,7 @@ def generate_graph(num_vert, edges, edge_length_vec=None):
         graph.add_node(n)
     for edge, length in zip(edges, edge_length_vec):
         if edge_length_vec:
-            graph.add_edge(edge[0], edge[1], length=length)
+            graph.add_edge(edge[0], edge[1], length=float(length))
         else:
             graph.add_edge(edge[0], edge[1])
         # TODO: verify the length property is not used as 'weight' in
