@@ -32,7 +32,7 @@ def seqtoText(scaf_to_edge, edges, dnaInfo, file_name, scaf_name, singleXOs,
 
     # TODO: Add bit about 0-indexing!!
 
-    fid = open('seq_{}.txt'.format(full_file_name), 'w')
+    fid = open(full_file_name, 'w')
 
     num_edges = len(edges)
 
@@ -67,7 +67,7 @@ def seqtoText(scaf_to_edge, edges, dnaInfo, file_name, scaf_name, singleXOs,
             edge_bgn, edge_fin, edge_ID))
         fid.write("         3'5' 3'5' \r\n")
         fid.write('              | | {} {}\r\n'.format(
-            dnaInfo.dnaTop(scaf_right(0)).seq, scaf_right(0)
+            dnaInfo.dnaTop[scaf_right[0]].seq, scaf_right[0]
         ))
 
         # Cut off first of scaf_right and invert scaf_left
@@ -76,71 +76,71 @@ def seqtoText(scaf_to_edge, edges, dnaInfo, file_name, scaf_name, singleXOs,
 
         for nt_ID in range(len(scaf_right)):
             # Left nucleotides
-            scaf_left_ID = scaf_left(nt_ID)
-            stap_left_ID = dnaInfo.dnaTop(scaf_left_ID).across
+            scaf_left_ID = scaf_left[nt_ID]
+            stap_left_ID = dnaInfo.dnaTop[scaf_left_ID].across
 
             # Right nucleotides
-            scaf_right_ID = scaf_right(nt_ID)
-            stap_right_ID = dnaInfo.dnaTop(scaf_right_ID).across
+            scaf_right_ID = scaf_right[nt_ID]
+            stap_right_ID = dnaInfo.dnaTop[scaf_right_ID].across
 
             #    text pos '01234567'
             middle = list('| |  | |')
 
             # Left scaffold nick or crossover?
-            if dnaInfo.dnaTop(scaf_left_ID).up == -1:
+            if dnaInfo.dnaTop[scaf_left_ID].up == -1:
                 middle[0] = '.'
-            elif dnaInfo.dnaTop(scaf_left_ID).down == -1:
+            elif dnaInfo.dnaTop[scaf_left_ID].down == -1:
                 middle[0] = '^'
-            elif dnaInfo.dnaTop(scaf_left_ID).up == scaf_right_ID:
+            elif dnaInfo.dnaTop[scaf_left_ID].up == scaf_right_ID:
                 middle[0] = '<'
                 middle[1] = '<'
                 middle[3] = '<'
-            elif dnaInfo.dnaTop(scaf_left_ID).down == scaf_right_ID:
+            elif dnaInfo.dnaTop[scaf_left_ID].down == scaf_right_ID:
                 middle[0] = '>'
                 middle[1] = '>'
                 middle[3] = '>'
 
             # Right scaffold nick or crossover?
-            if dnaInfo.dnaTop(scaf_right_ID).up == -1:
+            if dnaInfo.dnaTop[scaf_right_ID].up == -1:
                 middle[7] = '.'
-            elif dnaInfo.dnaTop(scaf_right_ID).down == -1:
+            elif dnaInfo.dnaTop[scaf_right_ID].down == -1:
                 middle[7] = 'v'
-            elif dnaInfo.dnaTop(scaf_right_ID).up == scaf_left_ID:
+            elif dnaInfo.dnaTop[scaf_right_ID].up == scaf_left_ID:
                 middle[4] = '>'
                 middle[6] = '>'
                 middle[7] = '>'
-            elif dnaInfo.dnaTop(scaf_right_ID).down == scaf_left_ID:
+            elif dnaInfo.dnaTop[scaf_right_ID].down == scaf_left_ID:
                 middle[4] = '<'
                 middle[6] = '<'
                 middle[7] = '<'
 
             # Left staple nick or crossover?
-            if dnaInfo.dnaTop(stap_left_ID).up == -1:
+            if dnaInfo.dnaTop[stap_left_ID].up == -1:
                 middle[2] = '.'
-            elif dnaInfo.dnaTop(stap_left_ID).down == -1:
+            elif dnaInfo.dnaTop[stap_left_ID].down == -1:
                 middle[2] = 'v'
-            elif dnaInfo.dnaTop(stap_left_ID).up == stap_right_ID:
+            elif dnaInfo.dnaTop[stap_left_ID].up == stap_right_ID:
                 middle[2:3+1] = '+<'
-            elif dnaInfo.dnaTop(stap_left_ID).down == stap_right_ID:
+            elif dnaInfo.dnaTop[stap_left_ID].down == stap_right_ID:
                 middle[2:3+1] = '+>'
 
             # Right staple nick or crossover?
-            if dnaInfo.dnaTop(stap_right_ID).up == -1:
+            if dnaInfo.dnaTop[stap_right_ID].up == -1:
                 middle[5] = '.'
-            elif dnaInfo.dnaTop(stap_right_ID).down == -1:
+            elif dnaInfo.dnaTop[stap_right_ID].down == -1:
                 middle[5] = '^'
-            elif dnaInfo.dnaTop(stap_right_ID).up == stap_left_ID:
+            elif dnaInfo.dnaTop[stap_right_ID].up == stap_left_ID:
                 middle[4:5+1] = '>+'
-            elif dnaInfo.dnaTop(stap_right_ID).down == stap_left_ID:
+            elif dnaInfo.dnaTop[stap_right_ID].down == stap_left_ID:
                 middle[4:5+1] = '<+'
 
             middle = ''.join(middle)
 
             # Left scaffold nucleotide
             fid.write('{:>6} {} {} {} {:<6}\r\n'.format(
-                scaf_left_ID, dnaInfo.dnaTop(scaf_left_ID).seq,
+                scaf_left_ID, dnaInfo.dnaTop[scaf_left_ID].seq,
                 middle,
-                dnaInfo.dnaTop(scaf_right_ID).seq, scaf_right_ID
+                dnaInfo.dnaTop[scaf_right_ID].seq, scaf_right_ID
             ))  # TODO: to give an exact match, `{:<6}` -> `{}`
 
         fid.write('{:>6} {} | |\r\n'.format(

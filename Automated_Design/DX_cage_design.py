@@ -12,6 +12,7 @@ from Automated_Design.csv_staples import csv_staples
 from Automated_Design.dna_info import DnaInfo
 from Automated_Design.enum_scaf_bases_DX import enum_scaf_bases_DX
 from Automated_Design.gen_stap_seq import gen_stap_seq
+from Automated_Design.seq_to_text import seqtoText
 from Automated_Design.set_routing_direction import set_routing_direction
 from Automated_Design.split_edge import split_edge
 from Automated_Design.split_vert import split_vert
@@ -230,5 +231,10 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
         if print_to_console:
             print('Real staples\n')
         csv_staples(full_file_name, named_stap_seq_list)
+
+    seq_filename = path.join(RESULTS_FOLDERNAME,
+                             'seq_{}.txt'.format(full_file_name))
+    seqtoText(scaf_to_edge, edges, dnaInfo, file_name, scaf_name,
+              singleXOs, seq_filename)
 
     return full_file_name
