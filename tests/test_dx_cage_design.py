@@ -30,7 +30,7 @@ from tests.utils import open_string_as_file
 
 class TestPlyImport(TestCase):
     # Mock out `savefig` to prevent figure from actually saving.
-    @patch('matplotlib.figure.Figure.savefig')
+    @patch('Automated_Design.plotters.plot_edge_length_distributions')
     def test_01_tetrahedron(self, savefig_mock):
         f = open_string_as_file(ply_file_01_tetrahedron)
         coordinates, edges, faces, edge_length_vec, file_name, \
@@ -41,7 +41,7 @@ class TestPlyImport(TestCase):
         # TODO: mock fig itself and assert about what's `fig_mock.plot`ed
 
     # Mock out `savefig` to prevent figure from actually saving.
-    @patch('matplotlib.figure.Figure.savefig')
+    @patch('Automated_Design.plotters.plot_edge_length_distributions')
     def test_05_icosahedron(self, savefig_mock):
         f = open_string_as_file(ply_file_05_icosahedron)
         coordinates, edges, faces, edge_length_vec, file_name, \
