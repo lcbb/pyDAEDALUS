@@ -2,6 +2,8 @@
 
 Your 3D models can be input using the Polygon File Format (.ply).
 
+|build|
+
 # Installation
 
 1. Clone this repo
@@ -25,3 +27,8 @@ Currently using Python's built in `unittest` package.  All tests import into `te
  * Simply run the tests file to run all tests: `python test.py`
  * To run a test class, specify the test class name as the first arg to `test.py`: `python test.py TestIntegrationsUsing01Tetrahedron`
  * To run a single test, additionally specify the function name like this: `python test.py TestIntegrationsUsing01Tetrahedron.test_split_edge`
+
+
+.. |build| image:: https://travis-ci.com/TheGrimmScientist/Daedalus.svg?token=ygEd7xu7GnyJQrcup1bE&branch=master
+    :target: https://travis-ci.com/TheGrimmScientist/Daedalus
+    :alt: Build status of the master branch
