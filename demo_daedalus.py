@@ -1,7 +1,8 @@
-from os import path
+from os import path, makedirs
 
 import click
 
+from Automated_Design.constants import RESULTS_FOLDERNAME
 from Automated_Design.ply_to_input import ply_as_filename_to_input
 from Automated_Design.DX_cage_design import DX_cage_design
 
@@ -28,6 +29,10 @@ def run_demo_from_command_line(fname_no_ply, min_len_nt,
 
 def run_demo(fname_no_ply, min_len_nt,
              display_plots=False, print_to_console=True):
+
+    # Create `Results` directory if it doesn't already exist
+    if not path.exists(RESULTS_FOLDERNAME):
+        makedirs(RESULTS_FOLDERNAME)
 
     coordinates, edges, faces, edge_length_vec, file_name, \
         staple_name, singleXOs = ply_as_filename_to_input(
