@@ -1,11 +1,9 @@
 from os import path
 import numpy as np
 
-import matplotlib
-matplotlib.use('TkAgg')
-from matplotlib import pyplot as plt  # noqa: E402
+from matplotlib import pyplot as plt
 
-from Automated_Design.constants import RESULTS_FOLDERNAME  # noqa: E402
+from Automated_Design.constants import RESULTS_FOLDERNAME
 
 
 def ply_as_filename_to_input(fname_no_ply, min_len_nt=31):
