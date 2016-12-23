@@ -1,4 +1,7 @@
-A port of DAEDALUS from Matlab to Python.
+[Daedalus](http://daedalus-dna-origami-portal.org/) - software to render nearly any 3D geometry as a scaffolded DNA origami nanoparticle.
+
+Your 3D models can be input using the Polygon File Format (.ply).
+
 
 
 # Installation
