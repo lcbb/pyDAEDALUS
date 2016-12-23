@@ -1,9 +1,11 @@
 from os import path
 import numpy as np
 
-from matplotlib import pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib import pyplot as plt  # noqa: E402
 
-from Automated_Design.constants import RESULTS_FOLDERNAME
+from Automated_Design.constants import RESULTS_FOLDERNAME  # noqa: E402
 
 
 def ply_as_filename_to_input(fname_no_ply, min_len_nt=31):
