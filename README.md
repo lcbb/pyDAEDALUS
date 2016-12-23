@@ -2,11 +2,9 @@
 
 Your 3D models can be input using the Polygon File Format (.ply).
 
-
-
 # Installation
 
-1. clone this repo
+1. Clone this repo
 1. (optional) Set up a virtualenv.
 1. `pip -r requirements` in this project's root.
 
