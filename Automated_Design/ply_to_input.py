@@ -2,7 +2,7 @@ from os import path
 import numpy as np
 
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('TkAgg')
 from matplotlib import pyplot as plt  # noqa: E402
 
 from Automated_Design.constants import RESULTS_FOLDERNAME  # noqa: E402
