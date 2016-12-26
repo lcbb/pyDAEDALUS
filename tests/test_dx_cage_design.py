@@ -29,23 +29,23 @@ from tests.utils import open_string_as_file
 
 
 @patch('Automated_Design.plotters.plot_edge_length_distributions')
-def test_ply_input_for_01_tetrahedron(self, savefig_mock):
+def test_ply_input_for_01_tetrahedron(savefig_mock):
     f = open_string_as_file(ply_file_01_tetrahedron)
     coordinates, edges, faces, edge_length_vec, file_name, \
         staple_name, singleXOs = ply_to_input(
             "01_tetrahedron", f, min_len_nt=52)
-    self.assertEqual(len(coordinates), 4)
-    self.assertEqual(len(faces), 4)
+    assert len(coordinates) == 4
+    assert len(faces) == 4
 
 
 @patch('Automated_Design.plotters.plot_edge_length_distributions')
-def test_ply_input_for_05_icosahedron(self, savefig_mock):
+def test_ply_input_for_05_icosahedron(savefig_mock):
     f = open_string_as_file(ply_file_05_icosahedron)
     coordinates, edges, faces, edge_length_vec, file_name, \
         staple_name, singleXOs = ply_to_input(
             "05_tetrahedron", f, min_len_nt=52)
-    self.assertEqual(len(coordinates), 12)
-    self.assertEqual(len(faces), 20)
+    assert len(coordinates) == 12
+    assert len(faces) == 19
 
 
 class TestIntegrationsUsing01Tetrahedron(TestCase):
