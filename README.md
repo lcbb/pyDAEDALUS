@@ -2,7 +2,7 @@
 
 Your 3D models can be input using the Polygon File Format (.ply).
 
-[![Build Status](https://travis-ci.com/TheGrimmScientist/Daedalus.svg?token=ygEd7xu7GnyJQrcup1bE&branch=master)](https://travis-ci.com/TheGrimmScientist/Daedalus)
+[![Build Status](https://travis-ci.com/TheGrimmScientist/Daedalus.svg?token=ygEd7xu7GnyJQrcup1bE&branch=master)](https://travis-ci.com/TheGrimmScientist/Daedalus) [![Coverage Status](https://coveralls.io/repos/github/TheGrimmScientist/Daedalus/badge.svg?t=xRpjvC)](https://coveralls.io/github/TheGrimmScientist/Daedalus)
 
 # Installation
 
