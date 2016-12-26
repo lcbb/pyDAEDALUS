@@ -1,6 +1,3 @@
-from StringIO import StringIO
-from unittest import TestCase, expectedFailure
-
 import networkx as nx
 import numpy as np
 from mock.mock import patch
@@ -45,10 +42,10 @@ def test_ply_input_for_05_icosahedron(savefig_mock):
         staple_name, singleXOs = ply_to_input(
             "05_tetrahedron", f, min_len_nt=52)
     assert len(coordinates) == 12
-    assert len(faces) == 19
+    assert len(faces) == 20
 
 
-class TestIntegrationsUsing01Tetrahedron(TestCase):
+class TestIntegrationsUsing01Tetrahedron:
     """
         Walk through whole chain of processing using the 01_tetrahedron as the
     example comparing to what the actual output from the matlab version were.
@@ -127,12 +124,12 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         actual_edge_type_mat = designate_edge_type(full_graph)
 
         target_edge_type_mat = self.target_2_edge_type_mat
-        self.assertEqual(actual_edge_type_mat.nodes(),
-                         target_edge_type_mat.nodes())
-        self.assertEqual(len(actual_edge_type_mat.edges()),
-                         len(target_edge_type_mat.edges()))
-        self.assertEqual(actual_edge_type_mat.edges(data=True),
-                         target_edge_type_mat.edges(data=True))
+        assert actual_edge_type_mat.nodes() == \
+            target_edge_type_mat.nodes()
+        assert len(actual_edge_type_mat.edges()) == \
+            len(target_edge_type_mat.edges())
+        assert actual_edge_type_mat.edges(data=True) == \
+            target_edge_type_mat.edges(data=True)
         # TODO: assert graphs are isomorphic instead of directly equal?
 
     # 3
@@ -146,11 +143,11 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
 
         target_edge_type_mat_wHalfs = self.target_3_edge_type_mat_wHalfs
         target_pseudo_vert = self.target_3_pseudo_vert
-        self.assertEqual(actual_pseudo_vert, target_pseudo_vert)
-        self.assertEqual(actual_edge_type_mat_wHalfs.nodes(),
-                         target_edge_type_mat_wHalfs.nodes())
-        self.assertEqual(set(actual_edge_type_mat_wHalfs.edges()),
-                         set(target_edge_type_mat_wHalfs.edges()))
+        assert actual_pseudo_vert == target_pseudo_vert
+        assert actual_edge_type_mat_wHalfs.nodes() == \
+            target_edge_type_mat_wHalfs.nodes()
+        assert set(actual_edge_type_mat_wHalfs.edges()) == \
+            set(target_edge_type_mat_wHalfs.edges())
 
     # 4
     def test_split_vert(self):
@@ -164,10 +161,9 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
 
         target_edge_type_mat_allNodes = self.target_4_edge_type_mat_allNodes
         target_pseudo_vert = self.target_4_pseudo_vert
-        self.assertEqual(actual_pseudo_vert, target_pseudo_vert)
-        self.assertTrue(is_isomorphic(actual_edge_type_mat_allNodes,
-                                      target_edge_type_mat_allNodes))
-
+        assert actual_pseudo_vert == target_pseudo_vert
+        assert is_isomorphic(actual_edge_type_mat_allNodes,
+                             target_edge_type_mat_allNodes)
         # TODO: Graphs are isomorphic but not directly equal. ... okay?
 
     # 5
@@ -184,8 +180,8 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
 
         target_route_real = self.target_5_route_real
         target_route_vals = self.target_5_route_vals
-        self.assertEqual(actual_route_real, target_route_real)
-        self.assertEqual(actual_route_vals, target_route_vals)
+        assert actual_route_real == target_route_real
+        assert actual_route_vals == target_route_vals
 
     # 6
     def test_enum_scaf_bases_DX(self):
@@ -199,9 +195,9 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         target_edge_bgn_vec = self.target_6_edge_bgn_vec
         target_edge_fin_vec = self.target_6_edge_fin_vec
         target_edge_type_vec = self.target_6_edge_type_vec
-        self.assertEqual(actual_edge_bgn_vec, target_edge_bgn_vec)
-        self.assertEqual(actual_edge_fin_vec, target_edge_fin_vec)
-        self.assertEqual(actual_edge_type_vec, target_edge_type_vec)
+        assert actual_edge_bgn_vec == target_edge_bgn_vec
+        assert actual_edge_fin_vec == target_edge_fin_vec
+        assert actual_edge_type_vec == target_edge_type_vec
 
     # 7
     def test_assign_scaf_to_edge(self):
@@ -217,7 +213,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
             edge_bgn_vec, edge_fin_vec, edge_type_vec)
 
         target_scaf_to_edge = self.target_7_scaf_to_edge
-        self.assertEqual(actual_scaf_to_edge, target_scaf_to_edge)
+        assert actual_scaf_to_edge == target_scaf_to_edge
 
     # 8
     def test_get_scaf_nick_pos(self):
@@ -229,7 +225,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
             edges, route_real, edge_length_vec)
 
         target_scaf_nick_pos = self.target_8_scaf_nick_pos
-        self.assertEqual(actual_scaf_nick_pos, target_scaf_nick_pos)
+        assert actual_scaf_nick_pos == target_scaf_nick_pos
 
     def test_adj_scaf_nick_pos(self):
         num_bases = len(self.target_6_edge_type_vec)
@@ -240,7 +236,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
             scaf_to_edge, scaf_nick_pos, num_bases)
 
         target_scaf_to_edge = self.target_8_scaf_to_edge
-        self.assertEqual(actual_scaf_to_edge_adj, target_scaf_to_edge)
+        assert actual_scaf_to_edge_adj == target_scaf_to_edge
 
     # 9
     def test_assign_staples_wChoices(self):
@@ -257,7 +253,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
             num_bases, num_vert, singleXOs)
 
         target_staples = self.target_9_staples
-        self.assertEqual(actual_staples, target_staples)
+        assert actual_staples == target_staples
 
     # 10
     def test_gen_stap_seq(self):
@@ -277,11 +273,10 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         target_stap_list = self.target_10_stap_list
         target_named_stap_seq_list = self.target_10_named_stap_seq_list
 
-        self.assertEqual(actual_stap_seq, target_stap_seq)
-        self.assertEqual(actual_stap_seq_list, target_stap_seq_list)
-        self.assertEqual(actual_stap_list, target_stap_list)
-        self.assertEqual(actual_named_stap_seq_list,
-                         target_named_stap_seq_list)
+        assert actual_stap_seq == target_stap_seq
+        assert actual_stap_seq_list == target_stap_seq_list
+        assert actual_stap_list == target_stap_list
+        assert actual_named_stap_seq_list == target_named_stap_seq_list
 
     # 11
     def test_calc_buff(self):
@@ -292,7 +287,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         actual_buff_nt = calc_buff(faces, num_vert, coordinates, d, wDX)
         target_buff_nt = self.target_11_buff_nt
 
-        self.assertEqual(actual_buff_nt, target_buff_nt)
+        assert actual_buff_nt == target_buff_nt
 
     def test_gen_FE_norms(self):
         faces = self.target_0_faces
@@ -304,7 +299,7 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
             coordinates, faces, edges, vert_to_face)
         target_edge_norms = self.target_11_edge_norms
 
-        self.assertTrue(np.allclose(actual_edge_norms, target_edge_norms))
+        assert np.allclose(actual_edge_norms, target_edge_norms)
 
     def test_DnaInfo_init(self):
         scaf_to_edge = self.target_8_scaf_to_edge
@@ -325,22 +320,22 @@ class TestIntegrationsUsing01Tetrahedron(TestCase):
         # assertions for dnaGenom:
         actual_dNode = actual_dnaInfo.dnaGeom.dNode
         target_dNode = target_dnaInfo['dnaGeom']['dNode']
-        self.assertTrue(np.allclose(actual_dNode, target_dNode))
+        assert np.allclose(actual_dNode, target_dNode)
 
         actual_id_nt = actual_dnaInfo.dnaGeom.id_nt
         target_id_nt = target_dnaInfo['dnaGeom']['id_nt']
-        self.assertTrue(np.allclose(actual_id_nt, target_id_nt))
+        assert np.allclose(actual_id_nt, target_id_nt)
 
         actual_triad = actual_dnaInfo.dnaGeom.triad
         target_triad = target_dnaInfo['dnaGeom']['triad']
-        self.assertTrue(np.allclose(actual_triad, target_triad))
+        assert np.allclose(actual_triad, target_triad)
 
         # assertions for dnaInfo:
         actual_dnaTop = actual_dnaInfo.dnaTop
         target_dnaTop = target_dnaInfo['dnaTop']
         # for row in target_dnaTop:
         #     print row
-        self.assertEqual(len(actual_dnaTop), len(target_dnaTop))
+        assert len(actual_dnaTop) == len(target_dnaTop)
         for actual, target in zip(actual_dnaTop, target_dnaTop):
             # TODO: write __eq__ opposite into DnaTop to clean this up?
-            self.assertEqual(str(actual), str(target))
+            assert str(actual) == str(target)

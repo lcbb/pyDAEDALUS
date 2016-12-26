@@ -23,7 +23,9 @@ Additionally, pass in the `--suppress_console_output` if you want to not have th
 All files saved into Results includes both shape name and `min_len_nt` in the filename to avoid undesired filename collisions.
 
 # Tests
-Currently using Python's built in `unittest` package.  All tests import into `test.py`, so calling the
- * Simply run the tests file to run all tests: `python test.py`
- * To run a test class, specify the test class name as the first arg to `test.py`: `python test.py TestIntegrationsUsing01Tetrahedron`
- * To run a single test, additionally specify the function name like this: `python test.py TestIntegrationsUsing01Tetrahedron.test_split_edge`
+Testing uses [`py.test`](http://docs.pytest.org/en/latest/usage.html).  Ways to run tests manually include:
+ * Simply run `make test`.  This leverages `Makefile` to run tests with the right syntax.
+ * Run all tests by directly calling pytest: `py.test`
+ * Run all tests and drop into a [`bpython`](https://bpython-interpreter.org/)-enabled debugger at failure: `py.test --bpdb`
+ * To run a test class or stand-alone function: `py.test tests/test_dx_cage_design.py::test_ply_input_for_05_icosahedron`
+ * To run a single function within a test class: `py.test tests/test_dx_cage_design.py::TestIntegrationsUsing01Tetrahedron::test_generate_spanning_tree`
