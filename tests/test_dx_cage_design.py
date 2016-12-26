@@ -1,6 +1,5 @@
 import networkx as nx
 import numpy as np
-from mock.mock import patch
 from networkx.algorithms.isomorphism.isomorph import is_isomorphic
 
 from Automated_Design.adj_scaf_nick_pos import adj_scaf_nick_pos
