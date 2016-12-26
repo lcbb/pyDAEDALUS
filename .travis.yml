@@ -5,8 +5,14 @@ python:
 # command to install dependencies
 install:
   - pip install -r requirements.txt
+  - pip install coveralls
 
 # command to run tests
-script: make test
+script:
+  - make coverage
 
-sudo: required
+sudo:
+  - required
+
+after_success:
+  - coveralls
