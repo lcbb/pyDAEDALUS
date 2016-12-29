@@ -39,7 +39,7 @@ def ply_as_filename_to_input(fname_no_ply, min_len_nt=31):
 
 
 # TODO: clean up the almost-redundant `fname_no_ply` and `f`:
-def ply_to_input(fname_no_ply, f, min_len_nt):
+def ply_to_input(fname_no_ply, f, min_len_nt, plot=True):
 
     file_name = fname_no_ply + '_' + str(min_len_nt)
 
@@ -178,9 +178,10 @@ def ply_to_input(fname_no_ply, f, min_len_nt):
     else:
         singleXOs = 1
 
-    plot_edge_length_distributions(fname_no_ply,
-                                   scale_edge_length_PLY,
-                                   rounded_edge_length_PLY)
+    if plot:
+        plot_edge_length_distributions(fname_no_ply,
+                                       scale_edge_length_PLY,
+                                       rounded_edge_length_PLY)
 
     coordinates = np.array(coordinates)
     # faces = np.array(faces)

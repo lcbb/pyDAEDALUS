@@ -2,4 +2,7 @@ lint:
 	flake8
 
 test:
-	python test.py
+	py.test
+
+coverage:
+	py.test --cov=Automated_Design tests/
