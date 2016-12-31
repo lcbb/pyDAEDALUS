@@ -24,7 +24,6 @@ from tests.target_parsers import load_mat_file, load_graph_from_mat, \
 from tests.utils import open_string_as_file
 
 
-
 def test_ply_input_for_01_tetrahedron():
     f = open_string_as_file(ply_file_01_tetrahedron)
     coordinates, edges, faces, edge_length_vec, file_name, \
