@@ -11,14 +11,22 @@ Your 3D models can be input using the Polygon File Format (.ply).
 1. `pip -r requirements` in this project's root.
 
 # Usage
+At the abosolute minimum, you need is to call `demo_daedalus.py` and tell it what ply file to run.  For example, running pyDAEDALUS on the included ply file `05_icosahedron` can be done with the command:  
+`python demo_daedalus.py --fname_no_ply=PLY_Files/05_icosahedron` 
 
-`python demo_daedalus.py` to run with everything set to default.
-`python demo_daedalus.py --help` to see what options are available, including their default values.
-`python demo_daedalus.py --display_plots` to run everything as default, and also display plots to your screen (plots will still be saved to disk as well).
-`python demo_daedalus.py --fname_no_ply=PLY_Files/05_icosahedron` to run program on `05_icosahedron` file within folder `PLY_files`.  Note filename unless specified is relative to project root and the format has to match your OS (this example uses Linux filename structure).
-`python demo_daedalus.py --fname_no_ply=PLY_Files/05_icosahedron --display_plots` to both run on given shape and to display plots to your screen.
+You can also run a batch of ply files at a time by specifying an input foldername rather than a single ply file:  
+`python demo_daedalus.py --input_foldername=PLY_Files`
 
-Additionally, pass in the `--suppress_console_output` if you want to not have things printed to your console at runtime.
+Adding the flag `--display_plots` asks the program, in addition to saving the plots to your output folder, to print them to screen.  For example:  
+`python demo_daedalus.py --fname_no_ply=PLY_Files/37_enneagonal_trapezohedron --display_plots`
+
+Additional options include:
+ * `--results_foldername=yourfoldername` where 'yourfoldername' is the name of the folder you want to save this command's results in.  Folder will be created if it doesn't already exist.
+ * `--suppress_console_output` (flag) if you want to not have things printed to your console at runtime. (always suppressed when running a batch)
+ * `--reset_results_folder` (flag) if you want to erase all data within your output folder before running the current command.
+
+You can find the complete list of arguments with descriptions with `python demo_daedalus.py --help`.
+
 
 All files saved into Results includes both shape name and `min_len_nt` in the filename to avoid undesired filename collisions.
 

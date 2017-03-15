@@ -1,9 +1,8 @@
 from os import path
 
-from Automated_Design.constants import RESULTS_FOLDERNAME
 
 
-def csv_staples(full_file_name, named_stap_seq_list):
+def csv_staples(full_file_name, named_stap_seq_list, results_foldername):
     """
     # Convert staple list to .csv file
     # Inputs: full_file_name = string containing full name of file
@@ -20,7 +19,7 @@ def csv_staples(full_file_name, named_stap_seq_list):
     ###########################################################################
     """
 
-    full_filename = path.join(RESULTS_FOLDERNAME,
+    full_filename = path.join(results_foldername,
                               'staples_' + full_file_name + '.csv')
     fid = open(full_filename, 'w')
 

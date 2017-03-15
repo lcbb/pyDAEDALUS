@@ -7,7 +7,7 @@ from Automated_Design.adj_scaf_nick_pos import adj_scaf_nick_pos, \
     get_scaf_nick_pos
 from Automated_Design.assign_scaf_to_edge import assign_scaf_to_edge
 from Automated_Design.assign_staples_wChoices import assign_staples_wChoices
-from Automated_Design.constants import SCAF_SEQ, RESULTS_FOLDERNAME
+from Automated_Design.constants import SCAF_SEQ
 from Automated_Design.csv_staples import csv_staples
 from Automated_Design.dna_info import DnaInfo
 from Automated_Design.enum_scaf_bases_DX import enum_scaf_bases_DX
@@ -24,7 +24,7 @@ from gen_vert_to_face import gen_vert_to_face
 
 def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
                    staple_name, singleXOs, scaf_seq, scaf_name,
-                   print_to_console=True):
+                   results_foldername, print_to_console=True):
     """
     Creates scaffold routing and staple placement of a DX-based DNA origami
     nano cage.
@@ -107,7 +107,7 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     # graph_with_spanning_tree_marked = edge_type_mat   # TODO: this rename
 
     schlegel_filename = file_name_without_containing_folder + '_schlegel.png'
-    full_schlegel_filename = path.join(RESULTS_FOLDERNAME, schlegel_filename)
+    full_schlegel_filename = path.join(results_foldername, schlegel_filename)
 
     gen_schlegel(edges, coordinates, faces,
                  schlegel_filename=full_schlegel_filename,
@@ -195,12 +195,12 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
 
     # ... as a 3d plot
     plot_filename = full_file_name + '.png'
-    full_plot_filename = path.join(RESULTS_FOLDERNAME, plot_filename)
+    full_plot_filename = path.join(results_foldername, plot_filename)
     dnaInfo.plot_3d_model(full_plot_filename)
 
     # as pickle dumps.
     pickled_dna_info_filename = 'dnaInfo_' + full_file_name + '.pickle'
-    full_pickled_dna_info_filename = path.join(RESULTS_FOLDERNAME,
+    full_pickled_dna_info_filename = path.join(results_foldername,
                                                pickled_dna_info_filename)
     pickle.dump(dnaInfo, open(full_pickled_dna_info_filename, 'w'))
 
@@ -214,13 +214,13 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
                        'faces': faces,
                        'edge_length_vec': edge_length_vec}
     route_info_dump_filename = 'routeInfo_' + full_file_name + '.pickle'
-    full_route_info_filename = path.join(RESULTS_FOLDERNAME,
+    full_route_info_filename = path.join(results_foldername,
                                          route_info_dump_filename)
     pickle.dump(route_info_dump, open(full_route_info_filename, 'w'))
 
     # as cando file
     cando_filename = full_file_name + '.cndo'
-    full_cando_filename = path.join(RESULTS_FOLDERNAME, cando_filename)
+    full_cando_filename = path.join(results_foldername, cando_filename)
     dnaInfo.save_dna_info_to_cando_file(full_cando_filename)
 
     # And also save staple sequences
@@ -230,9 +230,9 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     else:
         if print_to_console:
             print('Real staples\n')
-        csv_staples(full_file_name, named_stap_seq_list)
+        csv_staples(full_file_name, named_stap_seq_list, results_foldername)
 
-    seq_filename = path.join(RESULTS_FOLDERNAME,
+    seq_filename = path.join(results_foldername,
                              'seq_{}.txt'.format(full_file_name))
     seqtoText(scaf_to_edge, edges, dnaInfo, file_name, scaf_name,
               singleXOs, seq_filename)

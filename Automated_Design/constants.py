@@ -10,4 +10,3 @@ WHITE = tuple(np.array([255, 255, 255], dtype=np.float) / 255)
 BLU = tuple(np.array([0, 114, 178], dtype=np.float) / 255)
 ORANG = tuple(np.array([230, 159, 0], dtype=np.float) / 255)
 
-RESULTS_FOLDERNAME = 'Results'

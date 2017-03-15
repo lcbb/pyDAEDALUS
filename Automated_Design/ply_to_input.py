@@ -4,7 +4,7 @@ import numpy as np
 from Automated_Design.plotters import plot_edge_length_distributions
 
 
-def ply_as_filename_to_input(fname_no_ply, min_len_nt=31):
+def ply_as_filename_to_input(fname_no_ply, results_foldername, min_len_nt=31):
     """
     Converts PLY file into design variables for DX_cage_design input
     Inputs: fname_no_ply = string containing name of PLY file without '.ply'
@@ -35,11 +35,11 @@ def ply_as_filename_to_input(fname_no_ply, min_len_nt=31):
     fname = fname_no_ply + '.ply'
     assert path.isfile(fname)
     f = open(fname)
-    return ply_to_input(fname_no_ply, f, min_len_nt)
+    return ply_to_input(fname_no_ply, f, min_len_nt, results_foldername)
 
 
 # TODO: clean up the almost-redundant `fname_no_ply` and `f`:
-def ply_to_input(fname_no_ply, f, min_len_nt, plot=True):
+def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername=None):
 
     file_name = fname_no_ply + '_' + str(min_len_nt)
 
@@ -178,10 +178,11 @@ def ply_to_input(fname_no_ply, f, min_len_nt, plot=True):
     else:
         singleXOs = 1
 
-    if plot:
+    if results_foldername:
         plot_edge_length_distributions(fname_no_ply,
                                        scale_edge_length_PLY,
-                                       rounded_edge_length_PLY)
+                                       rounded_edge_length_PLY,
+                                       results_foldername)
 
     coordinates = np.array(coordinates)
     # faces = np.array(faces)
