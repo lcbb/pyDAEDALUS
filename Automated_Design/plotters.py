@@ -11,7 +11,12 @@ def plot_edge_length_distributions(shape_name,
     bins_for_hist = range(min_len_nt, max(rounded_edge_length_PLY) + 3, 1)
     bins_for_plotting = [x - 0.25 for x in bins_for_hist[:-1]]
 
-    fig_31 = plt.figure(0, figsize=(8, 6))
+    # TODO: if there are too many bins (400-ish or more), then things get
+    # weird.  You can drastically increase the resolution to see what's going
+    # on.  Adding a bit more buffer on the left side of the graph helps, too.
+    # See sample shape 37_enneagonal_trapezohedron.ply as an example.
+
+    fig_31 = plt.figure(0, figsize=(16, 8))
     fig_31.clf()
     y31 = np.histogram(scale_edge_length_PLY, bins=bins_for_hist)[0]
     plt.bar(bins_for_plotting, y31, width=0.5)
@@ -22,7 +27,7 @@ def plot_edge_length_distributions(shape_name,
     plt.ylabel('Number of edges')
     plt.xticks(bins_for_hist)
 
-    fig_32 = plt.figure(1, figsize=(8, 6))
+    fig_32 = plt.figure(1, figsize=(16, 8))
     fig_32.clf()
     y32 = np.histogram(rounded_edge_length_PLY, bins=bins_for_hist)[0]
     bins_a = [x - 0.125 for x in bins_for_plotting]
