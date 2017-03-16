@@ -25,7 +25,7 @@ def plot_edge_length_distributions(shape_name,
     plt.title('Minimum edge length {} bp'.format(min_len_nt))
     plt.xlabel('Edge length (bp)')
     plt.ylabel('Number of edges')
-    plt.xticks(bins_for_hist)
+    # plt.xticks(bins_for_hist)
 
     fig_32 = plt.figure(1, figsize=(16, 8))
     fig_32.clf()
@@ -40,7 +40,7 @@ def plot_edge_length_distributions(shape_name,
     plt.title('Edges rounded to nearest 10.5 bp')
     plt.xlabel('Edge length (bp)')
     plt.ylabel('Number of edges')
-    plt.xticks(bins_for_hist)
+    # plt.xticks(bins_for_hist)
 
     shape_name_with_len = shape_name + '_{}_'.format(min_len_nt)
     base_filename = path.join(results_foldername, shape_name_with_len)
