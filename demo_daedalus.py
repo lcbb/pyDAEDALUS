@@ -26,7 +26,7 @@ def create_directory(directory, reset=True):
 #TODO: make sure it "just works" when only supplying one input -the folder or filename.
 
 @click.command()
-@click.option('--fname_no_ply', default=None,
+@click.option('--input_filename', default=None,
               help='Ply filename to read from without the .ply.  Please only'
                    'supply a filename or a folder name')
 @click.option('--input_foldername', default=None,
@@ -47,17 +47,17 @@ def create_directory(directory, reset=True):
               for a single file.  This option idgnored and console output is
               always suppressed when converting a batch.
               """)
-def run_demo_from_command_line(fname_no_ply, input_foldername,
+def run_demo_from_command_line(input_filename, input_foldername,
                                results_foldername, reset_results_folder,
                                min_len_nt, display_plots,
                                suppress_console_output):
 
     # make sure input parameters make sense:
-    if fname_no_ply and input_foldername:
+    if input_filename and input_foldername:
         # Both an input filename and an input foldername were specified.
         raise Exception("Please only supply a foldername or a filename to "
                         "specify your input. Supplying both is ambiguous.")
-    if (fname_no_ply is None) and (input_foldername is None):
+    if (input_filename is None) and (input_foldername is None):
         # Neither an input filename or an input foldername were specified.
         raise Exception("Please supply a foldername or a filename to specify"
                         "your input.")
@@ -74,8 +74,8 @@ def run_demo_from_command_line(fname_no_ply, input_foldername,
         print_to_console = False
         run_batch(input_foldername, min_len_nt, display_plots,
                   print_to_console, results_foldername)
-    elif fname_no_ply:
-        run_single_file(fname_no_ply, min_len_nt, results_foldername,
+    elif input_filename:
+        run_single_file(input_filename, min_len_nt, results_foldername,
                         display_plots, print_to_console)
 
     else:
@@ -84,12 +84,12 @@ def run_demo_from_command_line(fname_no_ply, input_foldername,
                         "report including a copy of the paramters you "
                         "entered.")
 
-def run_single_file(fname_no_ply, min_len_nt, results_foldername,
+def run_single_file(input_filename, min_len_nt, results_foldername,
                     display_plots=False, print_to_console=True):
 
     coordinates, edges, faces, edge_length_vec, file_name, \
         staple_name, singleXOs = ply_as_filename_to_input(
-            fname_no_ply, results_foldername, min_len_nt)
+            input_filename, results_foldername, min_len_nt)
 
     scaf_seq = []  # Using default scaffold sequence
     scaf_name = []  # Using default scaffold name
@@ -106,9 +106,8 @@ def run_batch(input_foldername, min_len_nt, display_plots, print_to_console,
               results_foldername):
     ply_filenames = grab_all_ply_filenames_from_directory(input_foldername)
 
-    for filename in tqdm([f for f in ply_filenames if f[-4:] == '.ply']):
-        fname_no_ply = filename[:-4]
-        run_single_file(fname_no_ply, min_len_nt, results_foldername,
+    for input_filename in tqdm([f for f in ply_filenames if f[-4:] == '.ply']):
+        run_single_file(input_filename, min_len_nt, results_foldername,
                         display_plots=display_plots,
                         print_to_console=print_to_console)
 

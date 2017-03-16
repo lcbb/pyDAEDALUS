@@ -11,14 +11,15 @@ Your 3D models can be input using the Polygon File Format (.ply).
 1. `pip -r requirements` in this project's root.
 
 # Usage
-At the abosolute minimum, you need is to call `demo_daedalus.py` and tell it what ply file to run.  For example, running pyDAEDALUS on the included ply file `05_icosahedron` can be done with the command:  
-`python demo_daedalus.py --fname_no_ply=PLY_Files/05_icosahedron` 
+At the minimum when calling `demo_daedalus.py`, you need to tell it what ply file to run.  For example, running pyDAEDALUS on the included ply file `05_icosahedron.ply` can be done with the command:  
+`python demo_daedalus.py --input_filename=PLY_Files/05_icosahedron.ply`
+ Note including the `.ply` extension is optional.  So the following command would be equivalent: `python demo_daedalus.py --input_filename=PLY_Files/05_icosahedron`
 
 You can also run a batch of ply files at a time by specifying an input foldername rather than a single ply file:  
 `python demo_daedalus.py --input_foldername=PLY_Files`
 
 Adding the flag `--display_plots` asks the program, in addition to saving the plots to your output folder, to print them to screen.  For example:  
-`python demo_daedalus.py --fname_no_ply=PLY_Files/37_enneagonal_trapezohedron --display_plots`
+`python demo_daedalus.py --input_filename=PLY_Files/37_enneagonal_trapezohedron.ply --display_plots`
 
 Additional options include:
  * `--results_foldername=yourfoldername` where 'yourfoldername' is the name of the folder you want to save this command's results in.  Folder will be created if it doesn't already exist.

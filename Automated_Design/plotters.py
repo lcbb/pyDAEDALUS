@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from os import path
 
 
-def plot_edge_length_distributions(fname_no_ply,
+def plot_edge_length_distributions(shape_name,
                                    scale_edge_length_PLY,
                                    rounded_edge_length_PLY,
                                    results_foldername):
@@ -37,7 +37,6 @@ def plot_edge_length_distributions(fname_no_ply,
     plt.ylabel('Number of edges')
     plt.xticks(bins_for_hist)
 
-    shape_name = path.basename(path.normpath(fname_no_ply))
     shape_name_with_len = shape_name + '_{}_'.format(min_len_nt)
     base_filename = path.join(results_foldername, shape_name_with_len)
     fig_31.savefig(base_filename + 'min_edge_length_dist.png',

@@ -4,10 +4,11 @@ import numpy as np
 from Automated_Design.plotters import plot_edge_length_distributions
 
 
-def ply_as_filename_to_input(fname_no_ply, results_foldername, min_len_nt=31):
+def ply_as_filename_to_input(input_filename, results_foldername, min_len_nt=31):
     """
     Converts PLY file into design variables for DX_cage_design input
-    Inputs: fname_no_ply = string containing name of PLY file without '.ply'
+    Inputs: input_filename = string containing name of PLY file.  Optionally
+            omit the '.ply' extension.
             min_len_nt = the number of nucleotides long the smallest edge
                will have. Each edge must be a multiple of 10.5 bp, min 31 bp.
     Outputs: coordinates = Vx3 matrix of spatial coordinates of vertices,
@@ -32,16 +33,22 @@ def ply_as_filename_to_input(fname_no_ply, results_foldername, min_len_nt=31):
     this license is available at https://opensource.org/licenses/GPL-2.0
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     """
-    fname = fname_no_ply + '.ply'
-    assert path.isfile(fname)
-    f = open(fname)
-    return ply_to_input(fname_no_ply, f, min_len_nt, results_foldername)
+    if input_filename[-4:] == '.ply':
+        fname_no_ply = input_filename[:-4]
+        full_filename = input_filename
+    else:
+        fname_no_ply = input_filename
+        full_filename = input_filename + '.ply'
+    assert path.isfile(full_filename)
+
+    f = open(full_filename)
+    shape_name = path.basename(path.normpath(fname_no_ply))
+    return ply_to_input(shape_name, f, min_len_nt, results_foldername)
 
 
-# TODO: clean up the almost-redundant `fname_no_ply` and `f`:
-def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername=None):
+def ply_to_input(shape_name, f, min_len_nt, results_foldername=None):
 
-    file_name = fname_no_ply + '_' + str(min_len_nt)
+    file_name = shape_name + '_' + str(min_len_nt)
 
     def extract_number_from_keyword_in_ply_file(filestream, keyword):
         # TODO: make regular expression?
@@ -179,7 +186,7 @@ def ply_to_input(fname_no_ply, f, min_len_nt, results_foldername=None):
         singleXOs = 1
 
     if results_foldername:
-        plot_edge_length_distributions(fname_no_ply,
+        plot_edge_length_distributions(shape_name,
                                        scale_edge_length_PLY,
                                        rounded_edge_length_PLY,
                                        results_foldername)
