@@ -106,6 +106,8 @@ def run_batch(input_foldername, min_len_nt, display_plots, print_to_console,
               results_foldername):
     ply_filenames = grab_all_ply_filenames_from_directory(input_foldername)
 
+    assert len(ply_filenames) > 0, "No Ply files found in given foldername."
+
     for input_filename in tqdm([f for f in ply_filenames if f[-4:] == '.ply']):
         run_single_file(input_filename, min_len_nt, results_foldername,
                         display_plots=display_plots,
