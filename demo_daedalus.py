@@ -23,8 +23,6 @@ def create_directory(directory, reset=True):
         makedirs(directory)
 
 
-#TODO: make sure it "just works" when only supplying one input -the folder or filename.
-
 @click.command()
 @click.option('--input_filename', default=None,
               help='Ply filename to read from without the .ply.  Please only'
@@ -84,6 +82,7 @@ def run_demo_from_command_line(input_filename, input_foldername,
                         "report including a copy of the paramters you "
                         "entered.")
 
+
 def run_single_file(input_filename, min_len_nt, results_foldername,
                     display_plots=False, print_to_console=True):
 
@@ -101,6 +100,7 @@ def run_single_file(input_filename, min_len_nt, results_foldername,
     if display_plots:
         from matplotlib import pyplot as plt
         plt.show()
+
 
 def run_batch(input_foldername, min_len_nt, display_plots, print_to_console,
               results_foldername):

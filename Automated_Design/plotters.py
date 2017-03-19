@@ -24,7 +24,6 @@ def plot_edge_length_distributions(shape_name,
     bin_offset = float(bin_width)/2
     width_multiplier = (1 + (max_len_nt - min_len_nt) / 75)
 
-
     fig_31 = plt.figure(0, figsize=(16, 8))
     fig_31.clf()
     y31 = np.histogram(scale_edge_length_PLY, bins=bins_for_hist)[0]

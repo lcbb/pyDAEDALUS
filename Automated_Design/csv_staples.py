@@ -1,7 +1,6 @@
 from os import path
 
 
-
 def csv_staples(full_file_name, named_stap_seq_list, results_foldername):
     """
     # Convert staple list to .csv file

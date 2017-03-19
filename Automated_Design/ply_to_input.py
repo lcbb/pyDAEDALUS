@@ -4,7 +4,8 @@ import numpy as np
 from Automated_Design.plotters import plot_edge_length_distributions
 
 
-def ply_as_filename_to_input(input_filename, results_foldername, min_len_nt=31):
+def ply_as_filename_to_input(input_filename, results_foldername,
+                             min_len_nt=31):
     """
     Converts PLY file into design variables for DX_cage_design input
     Inputs: input_filename = string containing name of PLY file.  Optionally
