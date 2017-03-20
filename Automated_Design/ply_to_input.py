@@ -4,36 +4,7 @@ import numpy as np
 from Automated_Design.plotters import plot_edge_length_distributions
 
 
-def ply_as_filename_to_input(input_filename, results_foldername,
-                             min_len_nt=31):
-    """
-    Converts PLY file into design variables for DX_cage_design input
-    Inputs: input_filename = string containing name of PLY file.  Optionally
-            omit the '.ply' extension.
-            min_len_nt = the number of nucleotides long the smallest edge
-               will have. Each edge must be a multiple of 10.5 bp, min 31 bp.
-    Outputs: coordinates = Vx3 matrix of spatial coordinates of vertices,
-               V = number of vertices
-             edges = Ex2 matrix where each row corresponds to one edge,
-               denoting the vertices being connected. 1st column > 2nd column
-             faces = Fx2 cell matrix, where F is the number of faces.
-               The first column details how many vertices the face has
-               The second column details the vertex IDs of the face
-             edge_length_vec = column vector of edge lengths
-             file_name = string to name structure
-             staple_name = string to name staples to order (can be same as
-               file_name if length is not an issue)
-             singleXOs = 1 if single crossover vertex staples should be used,
-               0 if double crossover vertex staples should be used.
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    by Sakul Ratanalert, MIT, Bathe Lab, 2016
-
-    Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-    M.I.T. hereby makes following copyrightable material available to the
-    public under GNU General Public License, version 2 (GPL-2.0). A copy of
-    this license is available at https://opensource.org/licenses/GPL-2.0
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    """
+def extract_file_reader_and_shape_name_from_input_filename(input_filename):
     if input_filename[-4:] == '.ply':
         fname_no_ply = input_filename[:-4]
         full_filename = input_filename
@@ -44,16 +15,60 @@ def ply_as_filename_to_input(input_filename, results_foldername,
 
     f = open(full_filename)
     shape_name = path.basename(path.normpath(fname_no_ply))
-    return ply_to_input(shape_name, f, min_len_nt, results_foldername)
+    return f, shape_name
 
 
-def ply_to_input(shape_name, f, min_len_nt, results_foldername=None):
+def ply_to_input(input_filename, results_foldername=None, min_len_nt=31):
+    """
 
-    file_name = shape_name + '_' + str(min_len_nt)
+    Converts PLY file into design variables for DX_cage_design input.
+
+    This function parses the ply-formatted file pointed to by the given
+    `input_filename`.  First, it directly reads in all shape data.  Second,
+    it parses out some meta-variables to be used for scaffold creaction.
+    Optionally, it also creates plots for edge length distributions.
+
+    Parameters
+    ----------
+    input_filename : str
+        The filename pointing to your ply-formatted file you wish to read in.
+        Optionally omit the '.ply' extension.
+    results_foldername : str, optional
+        The foldername pointing to where you want the edge length distributions
+        saved.  Set to a value that resolves to false when cast to bool (None,
+        False, '', ...) or leave at default value to not create or save plots.
+    min_len_nt : int, optional
+        The number of nucleotides long the smallest edge will have. Each edge
+        must be a multiple of 10.5 bp, min 31 bp.
+
+    Returns
+    -------
+    coordinates
+        Vx3 matrix of spatial coordinates of vertices, V = number of vertices
+    edges
+        Ex2 matrix where each row corresponds to one edge, denoting the
+        vertices being connected. 1st column > 2nd column
+    faces
+        Fx2 cell matrix, where F is the number of faces.  The first column
+        details how many vertices the face has.  The second column details the
+        vertex IDs of the face.
+    edge_length_vec
+        Column vector of edge lengths
+    structure_name
+        String to name structure
+    staple_name
+        String to name staples to order (can be same as file_name if length is
+        not an issue)
+    singleXOs
+        `1` if single crossover vertex staples should be used,
+        `0` if double crossover vertex staples should be used.
+    """
+
+
+    f, shape_name = extract_file_reader_and_shape_name_from_input_filename(
+        input_filename)
 
     def extract_number_from_keyword_in_ply_file(filestream, keyword):
-        # TODO: make regular expression?
-
         # Eat (read through) all lines up to and including line with `keyword`:
         line = ''
         while keyword not in line:
@@ -179,7 +194,8 @@ def ply_to_input(shape_name, f, min_len_nt, results_foldername=None):
     edge_length_vec = rounded_edge_length_PLY
 
     # Other parameters
-    staple_name = file_name  # set short name as file name by default
+    structure_name = shape_name + '_' + str(min_len_nt)
+    staple_name = structure_name
 
     if min_len_nt < 42:
         singleXOs = 0
@@ -187,7 +203,7 @@ def ply_to_input(shape_name, f, min_len_nt, results_foldername=None):
         singleXOs = 1
 
     if results_foldername:
-        plot_edge_length_distributions(shape_name,
+        plot_edge_length_distributions(structure_name,
                                        scale_edge_length_PLY,
                                        rounded_edge_length_PLY,
                                        results_foldername)
@@ -195,5 +211,5 @@ def ply_to_input(shape_name, f, min_len_nt, results_foldername=None):
     coordinates = np.array(coordinates)
     # faces = np.array(faces)
 
-    return [coordinates, edges, faces, edge_length_vec, file_name,
+    return [coordinates, edges, faces, edge_length_vec, structure_name,
             staple_name, singleXOs]

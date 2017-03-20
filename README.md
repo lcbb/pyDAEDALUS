@@ -36,5 +36,5 @@ Testing uses [`py.test`](http://docs.pytest.org/en/latest/usage.html).  Ways to 
  * Simply run `make test`.  This leverages `Makefile` to run tests with the right syntax.
  * Run all tests by directly calling pytest: `py.test`
  * Run all tests and drop into a [`bpython`](https://bpython-interpreter.org/)-enabled debugger at failure: `py.test --bpdb`
- * To run a test class or stand-alone function: `py.test tests/test_dx_cage_design.py::test_ply_input_for_05_icosahedron`
- * To run a single function within a test class: `py.test tests/test_dx_cage_design.py::TestIntegrationsUsing01Tetrahedron::test_generate_spanning_tree`
+ * To run a test class or stand-alone function: `py.test tests/test_ply_to_input.py::test_ply_input_for_05_icosahedron`
+ * To run a single function within a test class: `py.test tests/test_ply_to_input.py::TestIntegrationsUsing01Tetrahedron::test_generate_spanning_tree`
