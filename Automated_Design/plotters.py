@@ -16,10 +16,12 @@ def plot_edge_length_distributions(shape_name,
     # with a very large difference between the largest edge lengths and the
     # smallest edge lengths.  The general idea is you accept the possibility
     # of overlapping bins (if there happen to be a few very similarly lengthed
-    # edges) to make the bins unfaithfully larger (that is, large enough to
+    # edges) and make the bins unfaithfully larger (that is, large enough to
     # see on the graph).  This is all because the actual-width (as opposed to
     # the width chosen to show the bins as) of the bins is important to keep
-    # at 1.
+    # at 1, but you still want to be able to see the bins rather than an
+    # empty graph
+    
     bin_width = 0.25  # for rounded bins, so half of non-rounded bins
     bin_offset = float(bin_width)/2
     width_multiplier = (1 + (max_len_nt - min_len_nt) / 75)
