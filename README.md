@@ -42,3 +42,9 @@ Testing uses [`py.test`](http://docs.pytest.org/en/latest/usage.html).  Ways to 
  Testing coverage done with `pytest-cov` package.  Manually run coverage report with:
  * `py.test --cov=Automated_Design tests/` to run coverage on folder `Automated_Design` using all tests found in `tests` folder.
  * `py.test --cov-report html --cov-report term --cov=Automated_Design tests/` to run coverage report as above, but with also generating a line-by-line report formatted as html (viewable in your browser by opening the created files)
+
+For convenience, `Makefile` is used to add several command shortcuts to do common testing operations:
+* `make` to run both linting and tests (linting is only ran if tests pass)
+* `make test` to run only tests.
+* `make lint` to run only linting.
+* `make coverage` to run coverage report.  The report is returned as both top level statistics to terminal and a line-by-line report saved into folder `htmlcov` as html files.
