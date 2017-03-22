@@ -38,3 +38,7 @@ Testing uses [`py.test`](http://docs.pytest.org/en/latest/usage.html).  Ways to 
  * Run all tests and drop into a [`bpython`](https://bpython-interpreter.org/)-enabled debugger at failure: `py.test --bpdb`
  * To run a test class or stand-alone function: `py.test tests/test_ply_to_input.py::test_ply_input_for_05_icosahedron`
  * To run a single function within a test class: `py.test tests/test_ply_to_input.py::TestIntegrationsUsing01Tetrahedron::test_generate_spanning_tree`
+ 
+ Testing coverage done with `pytest-cov` package.  Manually run coverage report with:
+ * `py.test --cov=Automated_Design tests/` to run coverage on folder `Automated_Design` using all tests found in `tests` folder.
+ * `py.test --cov-report html --cov-report term --cov=Automated_Design tests/` to run coverage report as above, but with also generating a line-by-line report formatted as html (viewable in your browser by opening the created files)
