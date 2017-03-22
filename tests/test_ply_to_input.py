@@ -1,11 +1,66 @@
 from StringIO import StringIO
+from os import path
 
-from mock import patch, MagicMock
+from mock import patch, MagicMock, mock_open
 
-from Automated_Design.ply_to_input import ply_to_input
+from Automated_Design.ply_to_input import ply_to_input, \
+    extract_file_reader_and_shape_name_from_input_filename
 
 
-# TODO: Add test for extract_file_reader_and_shape_name_from_input_filename()
+def get_first_call_first_param(mock):
+    return mock.call_args[0][0]
+
+
+class TestExtractFileReaderAndShapeNameFromInputFilename:
+    def setup_method(self, method):
+        # Always mock out `open()` so you don't actually hit the file system.
+        # You also need to mock out `path.is_file()` to both have it not
+        # really check for a file and to be able to declare its intended
+        # resolution.
+
+        self.open_patcher = patch('__builtin__.open', mock_open())
+        self.open_mock = self.open_patcher.start()
+
+        self.is_filename_patcher = patch(
+            'os.path.isfile', new=MagicMock(return_value=True))
+        self.is_filename_mock = self.is_filename_patcher.start()
+
+    def teardown_method(self, method):
+        self.open_patcher.stop()
+        self.is_filename_patcher.stop()
+
+    # Test the part that optionally adds the .ply extension:
+    def test_filename_with_ply_works(self):
+        f, shape_name = extract_file_reader_and_shape_name_from_input_filename(
+            'some_file')
+
+        # Assert the file being opened has exactly one .ply at the end
+        filename = get_first_call_first_param(self.is_filename_mock)
+        assert filename[-4:] == '.ply'
+
+        # Assert the shape name has no .ply
+        assert shape_name[-4:] != '.ply'
+
+    def test_filename_without_dot_ply_works(self):
+        f, shape_name = extract_file_reader_and_shape_name_from_input_filename(
+            'some_file.ply')
+
+        # Assert the file being opened has exactly one .ply at the end
+        filename = get_first_call_first_param(self.is_filename_mock)
+        assert filename[-4:] == '.ply'
+
+        # Assert the shape name has no .ply
+        assert shape_name[-4:] != '.ply'
+
+    # Test the part that takes the `.ply`-less filename and also removes the
+    # preceding folder structure to give just the shape name.
+    def test_shape_name_is_extracted_from_filename_within_folders(self):
+        filename = path.join('folder1', 'folder2', 'some_shape.ply')
+
+        f, shape_name = extract_file_reader_and_shape_name_from_input_filename(
+            filename)
+
+        assert shape_name == 'some_shape'
 
 
 def open_string_as_file(string):
@@ -18,7 +73,6 @@ def open_string_as_file(string):
 class TestPlyImportOnTetrahedron:
     @classmethod
     def setup_class(cls):
-        print("starting class: {} execution".format(cls.__name__))
         cls.ply_file_01_tetrahedron = """
             ply
             format ascii 1.0
