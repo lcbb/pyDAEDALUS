@@ -47,14 +47,15 @@ class TestPlyImportOnTetrahedron:
         # indefinitely.
         f = open_string_as_file(self.ply_file_01_tetrahedron)
 
-        self.extract_file_and_reader_mock = patch(
+        self.extract_file_and_reader_patcher = patch(
             'Automated_Design.ply_to_input'
             '.extract_file_reader_and_shape_name_from_input_filename',
             new=MagicMock(return_value=[f, self.shape_name]))
-        self.extract_file_and_reader_mock.start()
+        self.extract_file_and_reader_mock = \
+            self.extract_file_and_reader_patcher.start()
 
     def teardown_method(self, method):
-        self.extract_file_and_reader_mock.stop()
+        self.extract_file_and_reader_patcher.stop()
 
     def test_list_lengths_are_correct(self):
         coordinates, edges, faces, edge_length_vec, file_name, staple_name, \
@@ -109,7 +110,6 @@ class TestPlyImportOnIcosahedron:
     """
     @classmethod
     def setup_class(cls):
-        print("starting class: {} execution".format(cls.__name__))
         cls.ply_file_05_icosahedron = """
             ply
             format ascii 1.0
