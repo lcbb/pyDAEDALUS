@@ -5,35 +5,7 @@ from Automated_Design.constants import VERMILLION, REDPURPLE, SKYBLUE, WHITE
 from Automated_Design.util import generate_graph
 
 
-def gen_schlegel(edges, coordinates, faces, schlegel_filename,
-                 edge_type_mat=None):
-    """
-    Plots vertices and edges in Schlegel diagram, tracing scaffold path in
-    colored lines
-    Inputs: edges = Ex2 matrix where each row corresponds to one edge,
-              denoting the vertices being connected. 1st column > 2nd column
-              E = number of edges
-            coordinates = Vx3 matrix of spatial coordinates of vertices,
-              V = number of vertices
-            faces = Fx2 cell matrix, where F is the number of faces.
-                The first column details how many vertices the face has
-                The second column details the vertex IDs of the face
-            edge_type_mat = sparse matrix where
-      1 is non-spanning tree edge: DX edge with 1 scaffold crossover
-      2 is spanning tree edge: DX edge with 0 scaffold crossovers
-    Output: figure of vertices and edges in Schlegel diagram and coordinates
-    of projected vertices (xycoord, Vx2 matrix).  Saved into folder
-    `results_filename` if defined, else it's shown on screen
-    ##########################################################################
-    by Sakul Ratanalert, MIT, Bathe Lab, 2016
-
-    Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-    M.I.T. hereby makes following copyrightable material available to the
-    public under GNU General Public License, version 2 (GPL-2.0). A copy of
-    this license is available at https:##opensource.org#licenses#GPL-2.0
-    ##########################################################################
-    """
-
+def create_2d_mapping(edges, coordinates, faces, edge_type_mat=None):
     # Choose Biggest Face:
     big_face = max(faces, key=len)
 
@@ -43,14 +15,14 @@ def gen_schlegel(edges, coordinates, faces, schlegel_filename,
 
     # If edge_type_mat isn't specified, generate it.
     if edge_type_mat is None:
-        edge_type_mat = generate_graph(num_vert=num_vert, edges=edges,)
+        edge_type_mat = generate_graph(num_vert=num_vert, edges=edges, )
 
     # Initialize xycoord
     xycoord = np.zeros(shape=(num_vert, 2))
     num_repeat = 10 * num_vert  # number of iterations to calculate xycoord
 
     # Set big face on unit circle
-    angle = 2.*np.pi/num_face_vert
+    angle = 2. * np.pi / num_face_vert
 
     for i in range(num_face_vert):  # for each vertex in big face
         xycoord[big_face[i]] = [np.cos(angle * i), np.sin(angle * i)]
@@ -80,11 +52,15 @@ def gen_schlegel(edges, coordinates, faces, schlegel_filename,
                 num_nbr = len(find_vert_col)
                 midpt = np.array(
                     [sum(nbr_coord[:, 0]), sum(nbr_coord[:, 1])]
-                    ) / num_nbr
+                ) / num_nbr
 
                 # # Store as new xycoord for vert_ID
                 xycoord[vert_ID, :] = midpt
+    return xycoord
 
+
+def plot_schlegel(edges, edge_type_mat, xycoord,
+                  schlegel_filename):  # pragma: no cover
     f = plt.figure(2, figsize=(8, 8))
     f.clf()
     plt.xlim((-1.2, 1.2))
@@ -123,5 +99,39 @@ def gen_schlegel(edges, coordinates, faces, schlegel_filename,
                  horizontalalignment='center', verticalalignment='center')
 
     plt.savefig(schlegel_filename, bbox_inches='tight')
+
+
+
+def gen_schlegel(edges, coordinates, faces, schlegel_filename,
+                 edge_type_mat=None):    # pragma: no cover
+    """
+    Plots vertices and edges in Schlegel diagram, tracing scaffold path in
+    colored lines
+    Inputs: edges = Ex2 matrix where each row corresponds to one edge,
+              denoting the vertices being connected. 1st column > 2nd column
+              E = number of edges
+            coordinates = Vx3 matrix of spatial coordinates of vertices,
+              V = number of vertices
+            faces = Fx2 cell matrix, where F is the number of faces.
+                The first column details how many vertices the face has
+                The second column details the vertex IDs of the face
+            edge_type_mat = sparse matrix where
+      1 is non-spanning tree edge: DX edge with 1 scaffold crossover
+      2 is spanning tree edge: DX edge with 0 scaffold crossovers
+    Output: figure of vertices and edges in Schlegel diagram and coordinates
+    of projected vertices (xycoord, Vx2 matrix).
+    ##########################################################################
+    by Sakul Ratanalert, MIT, Bathe Lab, 2016
+
+    Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
+    M.I.T. hereby makes following copyrightable material available to the
+    public under GNU General Public License, version 2 (GPL-2.0). A copy of
+    this license is available at https:##opensource.org#licenses#GPL-2.0
+    ##########################################################################
+    """
+
+    xycoord = create_2d_mapping(edges, coordinates, faces, edge_type_mat)
+
+    plot_schlegel(edges, edge_type_mat, xycoord, schlegel_filename)
 
     return xycoord
