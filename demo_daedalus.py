@@ -4,7 +4,7 @@ from os import listdir, path, makedirs
 import click
 from tqdm import tqdm
 
-from Automated_Design.ply_to_input import ply_as_filename_to_input
+from Automated_Design.ply_to_input import ply_to_input
 from Automated_Design.DX_cage_design import DX_cage_design
 
 
@@ -87,7 +87,7 @@ def run_single_file(input_filename, min_len_nt, results_foldername,
                     display_plots=False, print_to_console=True):
 
     coordinates, edges, faces, edge_length_vec, file_name, \
-        staple_name, singleXOs = ply_as_filename_to_input(
+        staple_name, singleXOs = ply_to_input(
             input_filename, results_foldername, min_len_nt)
 
     scaf_seq = []  # Using default scaffold sequence
