@@ -7,10 +7,7 @@ def generate_graph(num_vert, edges, edge_length_vec):
     for n in range(num_vert):
         graph.add_node(n)
     for edge, length in zip(edges, edge_length_vec):
-        if edge_length_vec:
-            graph.add_edge(edge[0], edge[1], length=float(length))
-        else:
-            graph.add_edge(edge[0], edge[1])
+        graph.add_edge(edge[0], edge[1], length=float(length))
         # TODO: verify the length property is not used as 'weight' in
         # spanning tree alg.
 
