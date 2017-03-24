@@ -38,5 +38,6 @@ def find(iterable, val):
     if type(iterable) == np.ndarray:
         iterable = [list(item) for item in iterable]
     if type(val) == np.ndarray:
-        val == list(val)
+        val = list(val)
+
     return [i for i in range(len(iterable)) if iterable[i] == val]
