@@ -103,28 +103,37 @@ def gen_schlegel(edges, coordinates, faces, schlegel_filename,
                  edge_type_graph=None):    # pragma: no cover
     """
     Plots vertices and edges in Schlegel diagram, tracing scaffold path in
-    colored lines
-    Inputs: edges = Ex2 matrix where each row corresponds to one edge,
-              denoting the vertices being connected. 1st column > 2nd column
-              E = number of edges
-            coordinates = Vx3 matrix of spatial coordinates of vertices,
-              V = number of vertices
-            faces = Fx2 cell matrix, where F is the number of faces.
-                The first column details how many vertices the face has
-                The second column details the vertex IDs of the face
-            edge_type_graph = graph where
-      1 is non-spanning tree edge: DX edge with 1 scaffold crossover
-      2 is spanning tree edge: DX edge with 0 scaffold crossovers
-    Output: figure of vertices and edges in Schlegel diagram and coordinates
-    of projected vertices (xycoord, Vx2 matrix).
-    ##########################################################################
-    by Sakul Ratanalert, MIT, Bathe Lab, 2016
+    colored lines.
 
-    Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-    M.I.T. hereby makes following copyrightable material available to the
-    public under GNU General Public License, version 2 (GPL-2.0). A copy of
-    this license is available at https:##opensource.org#licenses#GPL-2.0
-    ##########################################################################
+    The three dimensional structure is mapped onto a 2d surface.  This new
+    surface is visualized, saved, and optionally displayed to screen.  Edges
+    that are a part of the previously calculated spanning tree (that is, the
+    scaffold path) as marked in `edge_type_graph` are highlighted a different
+    color.
+
+    Parameters
+    ----------
+    edges : numpy.ndarray
+        Ex2 matrix where each row corresponds to one edge, denoting the
+        vertices being connected. 1st column > 2nd column; E = number of edges
+    coordinates : numpy.ndarray
+        Vx3 matrix of spatial coordinates of vertices; V = number of vertices.
+    faces : list
+        Fx2 cell matrix, where F is the number of faces.  The first column
+        details how many vertices the face has.  The second column details the
+        vertex IDs of the face.
+    schlegel_filename : str
+        Filename pointing at where to save the generated plot.
+    edge_type_graph : networkx.classes.graph.Graph
+        A graph the links have the 'type' property.  That property can have one
+        of two values:
+            - 1 is non-spanning tree edge: DX edge with 1 scaffold crossover
+            - 2 is spanning tree edge: DX edge with 0 scaffold crossovers
+
+    Returns
+    -------
+    xycoords
+        The 2d mapping used to plot the figure.
     """
 
     xycoord = create_2d_mapping(edges, coordinates, faces, edge_type_graph)
