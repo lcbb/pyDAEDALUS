@@ -46,7 +46,7 @@ class DnaTop(object):
 
 def calc_buff(faces, num_vert, coordinates, d, wDX):
     """
-    Calculates buffer distance between edge of DX tile and center of vertex
+    Calculates buffer distance between edge of DX tile and center of vertex.
 
     Parameters
     ----------
@@ -121,26 +121,30 @@ def calc_buff(faces, num_vert, coordinates, d, wDX):
 
 def gen_FE_norms(coordinates, faces, edges, vert_to_face):
     """
-    Generate vectors normal to Faces and Edges
-    Inputs: coordinates = Vx3 matrix of spatial coordinates of vertices,
-              V = number of vertices
-            faces = Fx2 cell matrix, where F is the number of faces.
-              The first column details how many vertices the face has
-              The second column details the vertex IDs of the face
-            edges = Ex2 matrix where each row corresponds to one edge,
-              denoting the vertices being connected. 1st column > 2nd column
-            vert_to_face = Vx1 cell array, each row has a row vector listing
-              the face IDs the particular vertex belongs to
-    Outputs: face_norms = Fx3 matrix containing outward normal for each face
-             edge_norms = Ex3 matrix containing outward normal for each edge
-    ##########################################################################
-    by Sakul Ratanalert, MIT, Bathe Lab, 2016
+    Generate vectors normal to Faces and Edges.
 
-    Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-    M.I.T. hereby makes following copyrightable material available to the
-    public under GNU General Public License, version 2 (GPL-2.0). A copy of
-    this license is available at https://opensource.org/licenses/GPL-2.0
-    ##########################################################################
+    Parameters
+    ----------
+    coordinates : numpy.ndarray
+        Vx3 array of spatial coordinates of vertices,
+        V = number of vertices
+    faces : list
+        Fx2 list, where F is the number of faces.
+        The first column details how many vertices the face has.
+        The second column details the vertex IDs of the face.
+    edges : numpy.ndarray
+        Ex2 array where each row corresponds to one edge,
+        denoting the vertices being connected. 1st column > 2nd column
+    vert_to_face : list
+        V-long list, each row containing a list of the face IDs the
+        particular vertex belongs to.
+
+    Returns
+    -------
+    face_norms
+        Fx3 matrix containing outward normal for each face.
+    edge_norms
+        Ex3 matrix containing outward normal for each edge.
     """
 
     # Initialize
