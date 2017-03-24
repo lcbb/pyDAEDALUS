@@ -264,7 +264,7 @@ def plot_edge_length_distributions(shape_name,
 
     plt.xlim((min_len_nt - width_multiplier,
               max_len_nt + 1.5 * width_multiplier))
-    plt.ylim((0, max(max(y31) + 1, 1)))
+    plt.ylim((0, max(max(max(y31), max(y32)) + 1, 1)))
     plt.title('Edges rounded to nearest 10.5 bp')
     plt.xlabel('Edge length (bp)')
     plt.ylabel('Number of edges')
