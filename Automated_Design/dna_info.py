@@ -47,24 +47,27 @@ class DnaTop(object):
 def calc_buff(faces, num_vert, coordinates, d, wDX):
     """
     Calculates buffer distance between edge of DX tile and center of vertex
-    Inputs: faces = Fx2 cell matrix, where F is the number of faces.
-              The first column details how many vertices the face has
-              The second column details the vertex IDs of the face
-            num_vert = number of vertices, V
-            coordinates = Vx3 matrix of spatial coordinates of vertices,
-              V = number of vertices
-            d = distance between two nucleotides, in angstroms
-            wDX = width of DX tile, in angstroms
-    Output: buff_nt = distance, in nucleotides, between edge of DX arm and
-               vertex coordinate
-    ##########################################################################
-    by Sakul Ratanalert, MIT, Bathe Lab, 2016
 
-    Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-    M.I.T. hereby makes following copyrightable material available to the
-    public under GNU General Public License, version 2 (GPL-2.0). A copy of
-    this license is available at https://opensource.org/licenses/GPL-2.0
-    ##########################################################################
+    Parameters
+    ----------
+    faces : list
+        Fx2 cell matrix, where F is the number of faces.
+        The first column details how many vertices the face has
+        The second column details the vertex IDs of the face
+    num_vert : int
+        number of vertices, V
+    coordinates : numpy.ndarray
+        Vx3 matrix of spatial coordinates of vertices,
+        V = number of vertices
+    d : float
+        distance between two nucleotides, in angstroms
+    wDX : int
+        width of DX tile, in angstroms
+
+    Returns
+    -------
+    buff_nt
+        distance, in nucleotides, between edge of DX arm and vertex coordinate
     """
 
     vert_angles = [[] for i in range(num_vert)]
