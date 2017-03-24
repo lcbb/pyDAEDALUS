@@ -157,6 +157,62 @@ class TestPlyImportOnTetrahedron:
         assert plotter_mock.call_count == 1
 
 
+class TestPlyImportOnTetrahedronWithUnusedVertices:
+    @classmethod
+    def setup_class(cls):
+        # This is a tetrahedron with the 4th vertex becoming the 5th and
+        # the added 4th vertex is left unused in the faces given.
+        cls.ply_file_01_tetrahedron = """
+            ply
+            format ascii 1.0
+            element vertex 5
+            property float32 x
+            property float32 y
+            property float32 z
+            element face 4
+            property list uint8 int32 vertex_indices
+            end_header
+            0.000000 0.000000 0.612372
+            -0.288675 -0.500000 -0.204124
+            -0.288675 0.500000 -0.204124
+            1137. 113.7 11.37
+            0.577350 0.000000 -0.204124
+            3 0 2 1
+            3 0 1 4
+            3 0 4 2
+            3 1 2 4
+        """
+        cls.shape_name = '01_tetrahedron'
+
+    def setup_method(self, method):
+        f = open_string_as_file(self.ply_file_01_tetrahedron)
+
+        self.extract_file_and_reader_patcher = patch(
+            'Automated_Design.ply_to_input'
+            '.extract_file_reader_and_shape_name_from_input_filename',
+            new=MagicMock(return_value=[f, self.shape_name]))
+        self.extract_file_and_reader_mock = \
+            self.extract_file_and_reader_patcher.start()
+
+    def teardown_method(self, method):
+        self.extract_file_and_reader_patcher.stop()
+
+    def test_unused_vertex_is_removed(self):
+        coordinates, edges, faces, edge_length_vec, file_name, staple_name, \
+            singleXOs = ply_to_input("01_tetrahedron", '', min_len_nt=52)
+
+        # Note there are 5 coordinates in the starting file:
+        assert len(coordinates) == 4
+
+        assert len(faces) == 4  # Shouldn't have changed
+
+        # Started as coordinates[4]:
+        assert list(coordinates[3]) == [0.577350, 0.000000, -0.204124]
+
+        # Started as [1, 2, 4]
+        assert faces[3] == [1, 2, 3]
+
+
 class TestPlyImportOnIcosahedron:
     """
     This is here to make sure a larger file still generally works, though
