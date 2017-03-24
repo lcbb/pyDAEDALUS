@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from Automated_Design.constants import VERMILLION, REDPURPLE, SKYBLUE, WHITE
 
 
-def create_2d_mapping(edges, coordinates, faces, edge_type_graph=None):
+def create_2d_mapping(edges, coordinates, faces):
     # Choose Biggest Face:
     big_face = max(faces, key=len)
 
@@ -136,7 +136,7 @@ def gen_schlegel(edges, coordinates, faces, schlegel_filename,
         The 2d mapping used to plot the figure.
     """
 
-    xycoord = create_2d_mapping(edges, coordinates, faces, edge_type_graph)
+    xycoord = create_2d_mapping(edges, coordinates, faces)
 
     plot_schlegel(edges, edge_type_graph, xycoord, schlegel_filename)
 
