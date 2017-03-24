@@ -111,7 +111,7 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
 
     gen_schlegel(edges, coordinates, faces,
                  schlegel_filename=full_schlegel_filename,
-                 edge_type_mat=edge_type_mat)
+                 graph_with_edge_type=edge_type_mat)
 
     edge_type_mat = edge_type_mat.to_directed()
     # MST in networkx requires an undirected graph?

@@ -2,7 +2,7 @@ import networkx as nx
 import numpy as np
 
 
-def generate_graph(num_vert, edges, edge_length_vec=None):
+def generate_graph(num_vert, edges, edge_length_vec):
     graph = nx.Graph()
     for n in range(num_vert):
         graph.add_node(n)
