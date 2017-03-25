@@ -198,54 +198,64 @@ class DnaInfo(object):
         """
         Generate file to sent to CanDo for rendering and finite element
         simulation.
-        Inputs: scaf_to_edge = Ex2 cell array, where each row corresponds to
-                   one edge, 1st column is duplex from low ID to high ID
-                   vertex, 2nd column is from high to low. Each element is a
-                   row vector containing the scaffold base IDs in order on that
-                   duplex.
-                scaf_seq = string of scaffold, length may be longer than
-                   required. First nucleotide will be placed at index 1
-                stap_list = columnar cell array, each cell contains string of
-                   scaffold indices that staple bases correspond to
-                stap_seq_list = same as stap_list but with sequence instead of
-                   index information
-                coordinates = Vx3 matrix of spatial coordinates of vertices
-                edges = Ex2 matrix where each row corresponds to one edge,
-                   denoting the vertices being connected. 1st column > 2nd
-                   column
-                num_edges = number of edges, E
-                edge_length_vec = row vector of edge types, corresponding to
-                   edge_length_mat_full
-                fig = figure number for scaffold routing display
-        Output: dnaInfo = structure that describes sequence, topology, and
-        geometry of a programmed DNA assembly. Two substuctures:
-                   dnaTop(n) = structure with info of nucleotide n. Fields:
-                      id = identification number
-                      up = id of nucleotide upstream (towards 5') (-1 if N/A)
-                      down = id of nucleotide downstream (towards 3') (-1 if
-                      N/A)
-                      across = id of base paired nucleotide (-1 if N/A)
-                      seq = identity of base (char A,T,C,G)
-                   dnaGeom = structure with geometric info of base pairs.
-                       Arrays:
-                      dNode = n_bp x 3 matrix of spatial location
-                      triad = 3 x 3 x n_bp matrix of spatial orientation
-                      id_nt = n_bp x 2 matrix of nucleotides that compose base
-                         pair
-                      Note that single stranded nucleotides are ignored here.
+
+        Note that single stranded nucleotides are ignored here.
         Note: Helicity of the nucleotides has not been implemented. The
         orientation is correct at each scaffold and staple crossover, but not
         necessarily in between. CanDo pre-mechanical model calculates the
         correct orientation of these nucleotides.
         (see CanDo for more detailed information)
-        #######################################################################
-        by Sakul Ratanalert, MIT, Bathe Lab, 2016
 
-        Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-        M.I.T. hereby makes following copyrightable material available to the
-        public under GNU General Public License, version 2 (GPL-2.0). A copy of
-        this license is available at https://opensource.org/licenses/GPL-2.0
-        #######################################################################
+        Parameters
+        ----------
+        scaf_to_edge : list
+            Ex2 cell array, where each row corresponds to
+            one edge, 1st column is duplex from low ID to high ID
+            vertex, 2nd column is from high to low. Each element is a
+            row vector containing the scaffold base IDs in order on that
+            duplex.
+        scaf_seq : str
+            string of scaffold, length may be longer than
+            required. First nucleotide will be placed at index 1
+        stap_list : list
+            columnar cell array, each cell contains string of
+            scaffold indices that staple bases correspond to
+        stap_seq_list : list
+            same as stap_list but with sequence instead of
+            index information
+        coordinates : numpy.ndarray
+            Vx3 matrix of spatial coordinates of vertices
+        edges : numpy.ndarray
+            Ex2 matrix where each row corresponds to one edge,
+            denoting the vertices being connected. 1st column > 2nd
+            column
+        edge_length_vec : list
+            row vector of edge types, corresponding to
+            edge_length_mat_full
+        faces : list
+            blah blah
+        vert_to_face : list
+        fig :
+            figure number for scaffold routing display
+
+
+        Returns
+        -------
+        dnaInfo
+            Structure that describes sequence, topology, and geometry of a
+            programmed DNA assembly.
+            Two substuctures:
+            dnaTop(n) = structure with info of nucleotide n. Fields:
+                id = identification number
+                up = id of nucleotide upstream (towards 5') (-1 if N/A)
+                down = id of nucleotide downstream (towards 3') (-1 if
+                N/A)
+                across = id of base paired nucleotide (-1 if N/A)
+                seq = identity of base (char A,T,C,G)
+            dnaGeom = structure with geometric info of base pairs.
+                dNode = n_bp x 3 matrix of spatial location
+                triad = 3 x 3 x n_bp matrix of spatial orientation
+                id_nt = n_bp x 2 matrix of nucleotides that compose base pair
         """
         stap_seq_list = deepcopy(stap_seq_list)
         stap_list = deepcopy(stap_list)
