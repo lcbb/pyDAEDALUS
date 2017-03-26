@@ -28,36 +28,44 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     """
     Creates scaffold routing and staple placement of a DX-based DNA origami
     nano cage.
-    Inputs: coordinates = Vx3 matrix of spatial coordinates of vertices,
-              V = number of vertices
-            edges = Ex2 matrix where each row corresponds to one edge,
-              denoting the vertices being connected. 1st column > 2nd column
-            faces = F cell matrix, where F is the number of faces.
-              The second column details the vertex IDs of the face
-            edge_length_vec = column vector of edge lengths
-            file_name = string to name structure
-            staple_name = string to name staples to order (can be same as
-              file_name if length is not an issue)
-            singleXOs = 1 if single crossover vertex staples should be used,
-              0 if double crossover vertex staples should be used.
-            scaf_seq = string containing the sequence of the scaffold. If
-              using default, input [].
-            scaf_name = string containing the name of the scaffold. If using
-              default, input [].
-    Outputs: dnaInfo = Matlab file containing all spatial and routing
-               information.
-             routeInfo = Matlab file containing key variables, for debugging
-             seq_..._.txt = text file to visualize each edge's sequences and
-               nick/crossover information
-             staples_..._.xlsx = Excel spreadsheet containing staple seqs
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    by Sakul Ratanalert, MIT, Bathe Lab, 2016
 
-    Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-    M.I.T. hereby makes following copyrightable material available to the
-    public under GNU General Public License, version 2 (GPL-2.0). A copy of
-    this license is available at https://opensource.org/licenses/GPL-2.0
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    The inputs can all be thought of as all the data from a ply file plus a
+    few settings specific to how it will be converted to the cage design.
+    Processing happens across 11 steps culminating in a fully built model
+    as represented by the DnaInfo object.
+
+    Parameters
+    ----------
+    coordinates :
+        Vx3 matrix of spatial coordinates of vertices, V = number of vertices
+    edges :
+        Ex2 matrix where each row corresponds to one edge, denoting the
+        vertices being connected. 1st column > 2nd column
+    faces :
+        F cell matrix, where F is the number of faces.  The second column
+        details the vertex IDs of the face
+    edge_length_vec :
+        column vector of edge lengths
+    file_name :
+        string to name structure
+    staple_name :
+        string to name staples to order (can be same as file_name if length is
+        not an issue)
+    singleXOs :
+        1 if single crossover vertex staples should be used,
+        0 if double crossover vertex staples should be used.
+    scaf_seq :
+        string containing the sequence of the scaffold. If using default,
+        input [].
+    scaf_name :
+        string containing the name of the scaffold. If using default, input [].
+
+    Returns
+    -------
+    full_filename
+        The name used to identify all files (distributions, shape
+        visualizations, raw data output) saved into resutls folder as belonging
+        to this particular combination of input shape and selected parameters.
     """
 
     # Determine the minimum length scaffold fragment to use.
