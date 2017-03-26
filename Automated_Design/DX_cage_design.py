@@ -163,7 +163,7 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
         # still been defined above?
 
     [stap_seq, stap_seq_list, stap_list,
-     named_stap_seq_list] = gen_stap_seq(staples, num_edges, scaf_seq,
+     named_stap_seq_list] = gen_stap_seq(staples, scaf_seq,
                                          staple_name, scaf_name,
                                          len_scaf_used)
 

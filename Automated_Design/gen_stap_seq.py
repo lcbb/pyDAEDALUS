@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def gen_stap_seq(staples, num_edges, scaf_seq, staple_name, scaf_name,
+def gen_stap_seq(staples, scaf_seq, staple_name, scaf_name,
                  len_scaf_used):
     # Generate staple sequences from scaffold sequence
     # Inputs: staples = cell array with E rows, each cell contains row vector.

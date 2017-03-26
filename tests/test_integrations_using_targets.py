@@ -234,14 +234,13 @@ class TestIntegrationsUsing01Tetrahedron:
     # 10
     def test_gen_stap_seq(self):
         staples = self.target_9_staples
-        num_edges = len(self.target_0_edges)
         len_scaf_used = 2*sum(self.target_0_edge_length_vec)
         scaf_seq = self.target_0_scaf_seq
         staple_name = self.target_0_staple_name
         scaf_name = self.target_0_scaf_name
         actual_stap_seq, actual_stap_seq_list, \
             actual_stap_list, actual_named_stap_seq_list \
-            = gen_stap_seq(staples, num_edges, scaf_seq,
+            = gen_stap_seq(staples, scaf_seq,
                            staple_name, scaf_name, len_scaf_used)
 
         target_stap_seq = self.target_10_stap_seq
