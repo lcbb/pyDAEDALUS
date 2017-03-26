@@ -3,8 +3,6 @@ import numpy as np
 
 def gen_stap_seq(staples, scaf_seq, staple_name, scaf_name,
                  len_scaf_used):
-    print map(type, [staples[0], scaf_seq, staple_name, scaf_name,
-                 len_scaf_used])
     """
     Generate staple sequences from scaffold sequence.
 
