@@ -42,7 +42,7 @@ def create_directory(directory, reset=True):
               screen.""")
 @click.option('--suppress_console_output', default=False, is_flag=True,
               help="""Set to False is you want to disable logging to console
-              for a single file.  This option idgnored and console output is
+              for a single file.  This option is ignored and console output is
               always suppressed when converting a batch.
               """)
 def run_demo_from_command_line(input_filename, input_foldername,
