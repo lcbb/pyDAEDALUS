@@ -534,7 +534,25 @@ class DnaInfo(object):
     def get_turn_angle_for_pos_scaf_nick_pos(num_nt):
         return 2 * np.pi * (int(np.floor(num_nt / 10.5)) + 0.5) / (num_nt + 1)
 
-    def plot_3d_model(self, filename):
+    def plot_3d_model(self, filename, scale=1.0):
+        """
+        Visualize the current model by drawing it in a 3d plot.
+
+        Parameters
+        ----------
+        filename : str
+            Where the generated visualization will be saved.
+        scale : float
+            Determines how thin or thick the lines and markers should be.
+        Generally, a value of `1.0` works well for most figures.  You may want
+        to decrease this to 0.5 (making all line and markers half
+        as large/thick) or smaller if you're working with very large/complex
+        shapes.
+
+        Returns
+        -------
+        None
+        """
         import matplotlib.pyplot as plt
         from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
 
@@ -550,7 +568,7 @@ class DnaInfo(object):
                    marker='o',  # marker shape
                    color=VERMILLION,  # marker color
                    edgecolor=VERMILLION,
-                   s=200)  # marker size
+                   s=200.*scale)  # marker size
 
         # Plot positions of each nucleotide as a line
         first_d = [dNode[0] for dNode in self.dnaGeom.dNode]
@@ -559,7 +577,7 @@ class DnaInfo(object):
         ax.plot(first_d, second_d, third_d,
                 '-',
                 color=BLU,
-                linewidth=5)
+                linewidth=5.*scale)
 
         first_d = [loc[0] for loc in self.scaled_coordinates]
         second_d = [loc[1] for loc in self.scaled_coordinates]
@@ -577,7 +595,7 @@ class DnaInfo(object):
                    marker='s',
                    color=ORANG,
                    edgecolor=ORANG,
-                   s=500)
+                   s=500.*scale)
         # Plot 3' end (purple circle)
         ax.scatter([self.dnaGeom.dNode[-1][0]],
                    [self.dnaGeom.dNode[-1][1]],
@@ -585,7 +603,7 @@ class DnaInfo(object):
                    marker='o',
                    color=REDPURPLE,
                    edgecolor=REDPURPLE,
-                   s=400)  # 'LineWidth',4,
+                   s=400.*scale)
 
         ax.set_xlabel('Angstroms', fontdict={'size': 16})
         ax.set_ylabel('Angstroms', fontdict={'size': 16})
