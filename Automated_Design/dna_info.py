@@ -233,10 +233,12 @@ class DnaInfo(object):
             row vector of edge types, corresponding to
             edge_length_mat_full
         faces : list
-            blah blah
+            List of lists.  The first dimension represents the face.  The
+            second dimension holds the index all nodes creating that face.
         vert_to_face : list
-        fig :
-            figure number for scaffold routing display
+            List of lists.  The first dimension represents the node.  The
+            second dimension holds the index of all faces that node is a part
+            of.
 
 
         Returns
