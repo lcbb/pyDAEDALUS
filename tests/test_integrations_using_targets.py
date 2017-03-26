@@ -23,14 +23,14 @@ from tests.target_parsers import load_mat_file, load_graph_from_mat, \
 
 class TestIntegrationsUsing01Tetrahedron:
     """
-        Walk through whole chain of processing using the 01_tetrahedron as the
+    Walk through whole chain of processing using the 01_tetrahedron as the
     example comparing to what the actual output from the matlab version were.
 
-        All contained tests follow the pattern:
-            - Import original state.
-            - Run function to test, catching actual outputs
-            - Import target state.
-            - Make assertions comparing target to actual.
+    All contained tests follow the pattern:
+        - Import original state.
+        - Run function to test, catching actual outputs
+        - Import target state.
+        - Make assertions comparing target to actual.
     """
 
     target_0_edges = load_edges_from_mat('0_edges.mat')
