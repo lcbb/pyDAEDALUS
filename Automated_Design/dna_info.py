@@ -534,7 +534,7 @@ class DnaInfo(object):
     def get_turn_angle_for_pos_scaf_nick_pos(num_nt):
         return 2 * np.pi * (int(np.floor(num_nt / 10.5)) + 0.5) / (num_nt + 1)
 
-    def plot_3d_model(self, filename, scale=1.0):
+    def plot_3d_model(self, filename, scale=1.0):  # pragma: no cover
         """
         Visualize the current model by drawing it in a 3d plot.
 
