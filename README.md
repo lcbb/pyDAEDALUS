@@ -39,9 +39,15 @@ Testing uses [`py.test`](http://docs.pytest.org/en/latest/usage.html).  Ways to 
  * To run a test class or stand-alone function: `py.test tests/test_ply_to_input.py::test_ply_input_for_05_icosahedron`
  * To run a single function within a test class: `py.test tests/test_ply_to_input.py::TestIntegrationsUsing01Tetrahedron::test_generate_spanning_tree`
  
+## Coverage
+
  Testing coverage done with `pytest-cov` package.  Manually run coverage report with:
  * `py.test --cov=Automated_Design tests/` to run coverage on folder `Automated_Design` using all tests found in `tests` folder.
  * `py.test --cov-report html --cov-report term --cov=Automated_Design tests/` to run coverage report as above, but with also generating a line-by-line report formatted as html (viewable in your browser by opening the created files)
+
+The only code deliberately excluded from tests plotting functions (e.g., `ply_to_input.plot_edge_length_distributions`) and functions that simply write raw internal data to disk (e.g., `csv_staples`).  All such functions are marked to not be included in the coverage report by adding the comment `  # pragma: no cover` on the same line as the function definition.
+
+## Makefile
 
 For convenience, `Makefile` is used to add several command shortcuts to do common testing operations:
 * `make` to run both linting and tests (linting is only ran if tests pass)
