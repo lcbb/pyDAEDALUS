@@ -2,7 +2,7 @@
 
 Your 3D models can be input using the Polygon File Format (.ply).
 
-[![Build Status](https://travis-ci.org/TheGrimmScientist/pyDAEDALUS.svg?branch=master)](https://travis-ci.org/TheGrimmScientist/pyDAEDALUS) [![Coverage Status](https://coveralls.io/repos/github/TheGrimmScientist/pyDAEDALUS/badge.svg?branch=master)](https://coveralls.io/github/TheGrimmScientist/pyDAEDALUS?branch=master) [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://raw.githubusercontent.com/lcbb/pyDAEDALUS/master/LICENSE)
+[![Build Status](https://travis-ci.org/TheGrimmScientist/pyDAEDALUS.svg?branch=master)](https://travis-ci.org/TheGrimmScientist/pyDAEDALUS) [![Coverage Status](https://coveralls.io/repos/github/TheGrimmScientist/pyDAEDALUS/badge.svg?branch=master)](https://coveralls.io/github/TheGrimmScientist/pyDAEDALUS?branch=master) [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://raw.githubusercontent.com/lcbb/pyDAEDALUS/master/LICENSE.txt)
 
 # Installation
 
