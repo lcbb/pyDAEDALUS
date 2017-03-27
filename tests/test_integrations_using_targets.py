@@ -112,10 +112,9 @@ class TestIntegrationsUsing01Tetrahedron:
     def test_split_edge(self):
         edge_type_mat = self.target_2_edge_type_mat.to_directed()
         # TODO:  Figure out where `.to_directed` transition needs to happen!
-        num_vert = len(edge_type_mat.nodes())
 
         actual_edge_type_mat_wHalfs, actual_pseudo_vert = split_edge(
-            edge_type_mat, num_vert)
+            edge_type_mat)
 
         target_edge_type_mat_wHalfs = self.target_3_edge_type_mat_wHalfs
         target_pseudo_vert = self.target_3_pseudo_vert

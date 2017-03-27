@@ -1,5 +1,4 @@
-# TODO: num_vert not needed...
-def split_edge(edge_type_mat, num_vert):
+def split_edge(edge_type_mat):
     """
     Add two nodes for each nontree edge to implement scaffold crossovers.
     Added nodes (pseudo-vertices) have a reference vertex (one of the V real
@@ -12,8 +11,6 @@ def split_edge(edge_type_mat, num_vert):
         sparse matrix where
             1 is non-spanning tree edge: DX edge with 1 scaffold crossover
             2 is spanning tree edge: DX edge with 0 scaffold crossovers
-    num_vert : int
-        number of vertices, V
     Returns
     -------
     edge_type_mat_wHalfs

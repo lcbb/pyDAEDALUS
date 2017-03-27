@@ -127,7 +127,7 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
 
     # 3. Add nodes to edges ##################################################
     # Add two nodes to each nontree edge to implement scaffold crossovers
-    edge_type_mat_wHalfs, pseudo_vert = split_edge(edge_type_mat, num_vert)
+    edge_type_mat_wHalfs, pseudo_vert = split_edge(edge_type_mat)
     # graph_with_edges_split = edge_type_mat_wHalfs  # TODO: this rename
 
     # 4. Add nodes to vertices ###############################################
