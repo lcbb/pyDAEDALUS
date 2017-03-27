@@ -45,7 +45,7 @@ Testing uses [`py.test`](http://docs.pytest.org/en/latest/usage.html).  Ways to 
  * `py.test --cov=Automated_Design tests/` to run coverage on folder `Automated_Design` using all tests found in `tests` folder.
  * `py.test --cov-report html --cov-report term --cov=Automated_Design tests/` to run coverage report as above, but with also generating a line-by-line report formatted as html (viewable in your browser by opening the created files)
 
-The only code deliberately excluded from tests plotting functions (e.g., `ply_to_input.plot_edge_length_distributions`) and functions that simply write raw internal data to disk (e.g., `csv_staples`).  All such functions are marked to not be included in the coverage report by adding the comment `  # pragma: no cover` on the same line as the function definition.
+The only code deliberately excluded from tests are plotting functions (e.g., `ply_to_input.plot_edge_length_distributions`) and functions that simply write raw internal data to disk (e.g., `csv_staples`).  All such functions are marked to not be included in the coverage report by adding the comment `  # pragma: no cover` on the same line as the function definition.
 
 ## Makefile
 
