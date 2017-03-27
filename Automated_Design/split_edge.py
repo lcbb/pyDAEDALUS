@@ -5,23 +5,25 @@ def split_edge(edge_type_mat, num_vert):
     Added nodes (pseudo-vertices) have a reference vertex (one of the V real
     vertices) to maintain relative spatial coordinates among all
     vertices.
-    Inputs: edge_type_mat = sparse matrix where
-      1 is non-spanning tree edge: DX edge with 1 scaffold crossover
-      2 is spanning tree edge: DX edge with 0 scaffold crossovers
-            num_vert = number of vertices, V
-    Outputs: edge_type_mat_wHalfs = VxV sparse matrix where
-     -1 is half of a non-spanning tree edge (one side of scaffold crossover)
-      2 is spanning tree edge: DX edge with 0 scaffold crossovers
-             pseudo_vert = row vector where value j at index i indicate that
-               vertex i corresponds to vertex j, one of the V real vertices
-    ##########################################################################
-    by Sakul Ratanalert, MIT, Bathe Lab, 2016
 
-    Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-    M.I.T. hereby makes following copyrightable material available to the
-    public under GNU General Public License, version 2 (GPL-2.0). A copy of
-    this license is available at https://opensource.org/licenses/GPL-2.0
-    ##########################################################################
+    Parameters
+    ----------
+    edge_type_mat : networkx.classes.digraph.DiGraph
+        sparse matrix where
+            1 is non-spanning tree edge: DX edge with 1 scaffold crossover
+            2 is spanning tree edge: DX edge with 0 scaffold crossovers
+    num_vert : int
+        number of vertices, V
+    Returns
+    -------
+    edge_type_mat_wHalfs
+        VxV sparse matrix where
+            -1 is half of a non-spanning tree edge (one side of scaffold
+            crossover)
+            2 is spanning tree edge: DX edge with 0 scaffold crossovers
+    pseudo_vert
+        row vector where value j at index i indicate that vertex i corresponds
+        to vertex j, one of the V real vertices
     """
     # # Initialize output variables. These will be augmented from input vars
     edge_type_mat_wHalfs = edge_type_mat.copy()
