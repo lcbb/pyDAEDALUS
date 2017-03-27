@@ -9,49 +9,28 @@ from Automated_Design.assign_staples_wChoices import assign_staples_wChoices
 from Automated_Design.designate_edge_type import designate_edge_type
 from Automated_Design.enum_scaf_bases_DX import enum_scaf_bases_DX
 from Automated_Design.gen_stap_seq import gen_stap_seq
-from Automated_Design.ply_to_input import ply_to_input
 from Automated_Design.set_routing_direction import set_routing_direction
 from Automated_Design.split_edge import split_edge
 from Automated_Design.split_vert import split_vert
 from Automated_Design.dna_info import DnaInfo, calc_buff, d, wDX, gen_FE_norms
-from tests.sample_data import ply_file_01_tetrahedron, ply_file_05_icosahedron
 from tests.target_parsers import load_mat_file, load_graph_from_mat, \
     load_pseudonodes_from_mat, load_1d_list_from_mat, load_single_value, \
     load_edges_from_mat, load_faces_from_mat, load_vert_to_face_from_mat, \
     load_scaf_to_edge_from_mat, load_staples_from_mat, load_stap_seq_file, \
     load_stap_seq_list_file, load_stap_list_file, \
     load_named_stap_seq_list_file, load_dna_info
-from tests.utils import open_string_as_file
-
-
-def test_ply_input_for_01_tetrahedron():
-    f = open_string_as_file(ply_file_01_tetrahedron)
-    coordinates, edges, faces, edge_length_vec, file_name, \
-        staple_name, singleXOs = ply_to_input(
-            "01_tetrahedron", f, min_len_nt=52, plot=False)
-    assert len(coordinates) == 4
-    assert len(faces) == 4
-
-
-def test_ply_input_for_05_icosahedron():
-    f = open_string_as_file(ply_file_05_icosahedron)
-    coordinates, edges, faces, edge_length_vec, file_name, \
-        staple_name, singleXOs = ply_to_input(
-            "05_tetrahedron", f, min_len_nt=52, plot=False)
-    assert len(coordinates) == 12
-    assert len(faces) == 20
 
 
 class TestIntegrationsUsing01Tetrahedron:
     """
-        Walk through whole chain of processing using the 01_tetrahedron as the
+    Walk through whole chain of processing using the 01_tetrahedron as the
     example comparing to what the actual output from the matlab version were.
 
-        All contained tests follow the pattern:
-            - Import original state.
-            - Run function to test, catching actual outputs
-            - Import target state.
-            - Make assertions comparing target to actual.
+    All contained tests follow the pattern:
+        - Import original state.
+        - Run function to test, catching actual outputs
+        - Import target state.
+        - Make assertions comparing target to actual.
     """
 
     target_0_edges = load_edges_from_mat('0_edges.mat')
@@ -133,10 +112,9 @@ class TestIntegrationsUsing01Tetrahedron:
     def test_split_edge(self):
         edge_type_mat = self.target_2_edge_type_mat.to_directed()
         # TODO:  Figure out where `.to_directed` transition needs to happen!
-        num_vert = len(edge_type_mat.nodes())
 
         actual_edge_type_mat_wHalfs, actual_pseudo_vert = split_edge(
-            edge_type_mat, num_vert)
+            edge_type_mat)
 
         target_edge_type_mat_wHalfs = self.target_3_edge_type_mat_wHalfs
         target_pseudo_vert = self.target_3_pseudo_vert
@@ -255,14 +233,13 @@ class TestIntegrationsUsing01Tetrahedron:
     # 10
     def test_gen_stap_seq(self):
         staples = self.target_9_staples
-        num_edges = len(self.target_0_edges)
         len_scaf_used = 2*sum(self.target_0_edge_length_vec)
         scaf_seq = self.target_0_scaf_seq
         staple_name = self.target_0_staple_name
         scaf_name = self.target_0_scaf_name
         actual_stap_seq, actual_stap_seq_list, \
             actual_stap_list, actual_named_stap_seq_list \
-            = gen_stap_seq(staples, num_edges, scaf_seq,
+            = gen_stap_seq(staples, scaf_seq,
                            staple_name, scaf_name, len_scaf_used)
 
         target_stap_seq = self.target_10_stap_seq

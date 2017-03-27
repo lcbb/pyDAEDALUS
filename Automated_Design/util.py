@@ -2,15 +2,12 @@ import networkx as nx
 import numpy as np
 
 
-def generate_graph(num_vert, edges, edge_length_vec=None):
+def generate_graph(num_vert, edges, edge_length_vec):
     graph = nx.Graph()
     for n in range(num_vert):
         graph.add_node(n)
     for edge, length in zip(edges, edge_length_vec):
-        if edge_length_vec:
-            graph.add_edge(edge[0], edge[1], length=float(length))
-        else:
-            graph.add_edge(edge[0], edge[1])
+        graph.add_edge(edge[0], edge[1], length=float(length))
         # TODO: verify the length property is not used as 'weight' in
         # spanning tree alg.
 
@@ -41,5 +38,6 @@ def find(iterable, val):
     if type(iterable) == np.ndarray:
         iterable = [list(item) for item in iterable]
     if type(val) == np.ndarray:
-        val == list(val)
+        val = list(val)
+
     return [i for i in range(len(iterable)) if iterable[i] == val]

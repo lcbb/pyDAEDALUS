@@ -2,32 +2,37 @@ from datetime import datetime
 
 
 def seqtoText(scaf_to_edge, edges, dnaInfo, file_name, scaf_name, singleXOs,
-              full_file_name):
+              full_file_name):  # pragma: no cover
     """
     Generate text file to visualize each edge's sequences and nick/crossover
-    information
-    Inputs: scaf_to_edge = Ex2 cell array, where each row corresponds to one
-               edge, 1st column is duplex from low ID to high ID vertex,
-               2nd column is from high to low. Each element is a row vector
-               containing the scaffold base IDs in order on that duplex.
-            edges = Ex2 matrix where each row corresponds to one edge,
-               denoting the vertices being connected. 1st column > 2nd column
-            dnaInfo = MATLAB file containing all spatial and routing info
-            file_name = name of structure
-            scaf_name = name of scaffold
-            singleXOs = 1 if single crossover vertex staples should be used,
-               0 if double crossover vertex staples should be used.
-            full_file_name = file_name with more information
-    Output: Text file to visualize each edge's sequences and nick/crossover
-              information
-    ##########################################################################
-    by Sakul Ratanalert, MIT, Bathe Lab, 2016
+    information.  The result can be physically printed and used to visualize
+    each edge's sequences and nick/crossover information.
 
-    Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-    M.I.T. hereby makes following copyrightable material available to the
-    public under GNU General Public License, version 2 (GPL-2.0). A copy of
-    this license is available at https://opensource.org/licenses/GPL-2.0
-    ##########################################################################
+    Parameters
+    ----------
+    scaf_to_edge : list
+        Ex2 list, where each row corresponds to one edge, 1st column is duplex
+        from low ID to high ID vertex, 2nd column is from high to low. Each
+        element is a row vector containing the scaffold base IDs in order on
+        that duplex.
+    edges : numpy.ndarray
+        Ex2 array where each row corresponds to one edge, denoting the vertices
+        being connected. 1st column > 2nd column
+    dnaInfo : Automated_Design.dna_info.DnaInfo
+        Structure containing all spatial and routing info
+    file_name : str
+        name of structure
+    scaf_name : str
+        name of scaffold
+    singleXOs : int
+        1 if single crossover vertex staples should be used,
+        0 if double crossover vertex staples should be used.
+    full_file_name : str
+        file_name with more information
+
+    Returns
+    -------
+    None
     """
 
     # TODO: Add bit about 0-indexing!!

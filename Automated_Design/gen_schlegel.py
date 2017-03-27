@@ -2,38 +2,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from Automated_Design.constants import VERMILLION, REDPURPLE, SKYBLUE, WHITE
-from Automated_Design.util import generate_graph
 
 
-def gen_schlegel(edges, coordinates, faces, schlegel_filename,
-                 edge_type_mat=None):
-    """
-    Plots vertices and edges in Schlegel diagram, tracing scaffold path in
-    colored lines
-    Inputs: edges = Ex2 matrix where each row corresponds to one edge,
-              denoting the vertices being connected. 1st column > 2nd column
-              E = number of edges
-            coordinates = Vx3 matrix of spatial coordinates of vertices,
-              V = number of vertices
-            faces = Fx2 cell matrix, where F is the number of faces.
-                The first column details how many vertices the face has
-                The second column details the vertex IDs of the face
-            edge_type_mat = sparse matrix where
-      1 is non-spanning tree edge: DX edge with 1 scaffold crossover
-      2 is spanning tree edge: DX edge with 0 scaffold crossovers
-    Output: figure of vertices and edges in Schlegel diagram and coordinates
-    of projected vertices (xycoord, Vx2 matrix).  Saved into folder
-    `results_filename` if defined, else it's shown on screen
-    ##########################################################################
-    by Sakul Ratanalert, MIT, Bathe Lab, 2016
-
-    Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-    M.I.T. hereby makes following copyrightable material available to the
-    public under GNU General Public License, version 2 (GPL-2.0). A copy of
-    this license is available at https:##opensource.org#licenses#GPL-2.0
-    ##########################################################################
-    """
-
+def create_2d_mapping(edges, coordinates, faces):
     # Choose Biggest Face:
     big_face = max(faces, key=len)
 
@@ -41,16 +12,12 @@ def gen_schlegel(edges, coordinates, faces, schlegel_filename,
     num_face_vert = len(big_face)
     num_vert = len(coordinates)
 
-    # If edge_type_mat isn't specified, generate it.
-    if edge_type_mat is None:
-        edge_type_mat = generate_graph(num_vert=num_vert, edges=edges,)
-
     # Initialize xycoord
     xycoord = np.zeros(shape=(num_vert, 2))
     num_repeat = 10 * num_vert  # number of iterations to calculate xycoord
 
     # Set big face on unit circle
-    angle = 2.*np.pi/num_face_vert
+    angle = 2. * np.pi / num_face_vert
 
     for i in range(num_face_vert):  # for each vertex in big face
         xycoord[big_face[i]] = [np.cos(angle * i), np.sin(angle * i)]
@@ -80,11 +47,15 @@ def gen_schlegel(edges, coordinates, faces, schlegel_filename,
                 num_nbr = len(find_vert_col)
                 midpt = np.array(
                     [sum(nbr_coord[:, 0]), sum(nbr_coord[:, 1])]
-                    ) / num_nbr
+                ) / num_nbr
 
                 # # Store as new xycoord for vert_ID
                 xycoord[vert_ID, :] = midpt
+    return xycoord
 
+
+def plot_schlegel(edges, edge_type_graph, xycoord,
+                  schlegel_filename):  # pragma: no cover
     f = plt.figure(2, figsize=(8, 8))
     f.clf()
     plt.xlim((-1.2, 1.2))
@@ -106,11 +77,14 @@ def gen_schlegel(edges, coordinates, faces, schlegel_filename,
         x_vec = [x_bgn, x_fin]
         y_vec = [y_bgn, y_fin]
 
-        # TODO rename `edge_type_mat` to something that involves `graph`
-        if edge_type_mat.edge[edge_bgn][edge_fin]['type'] == 2:
-            plt.plot(x_vec, y_vec, linestyle='-', color=REDPURPLE, linewidth=8)
-        else:  # if this is a non-tree edge:
+        # Only check the edge type if `edge_type_graph` is not None.  If it is
+        # None, default to coloring edges the same as if all edges weren't a
+        # part of the spanning tree.
+        if edge_type_graph is not None \
+                and (edge_type_graph.edge[edge_bgn][edge_fin]['type'] == 1):
             plt.plot(x_vec, y_vec, linestyle='-', color=SKYBLUE, linewidth=5)
+        else:  # if this is a non-tree edge:
+            plt.plot(x_vec, y_vec, linestyle='-', color=REDPURPLE, linewidth=8)
 
     # Plot nodes:
     plt.plot(xycoord[:, 0], xycoord[:, 1], 'o',
@@ -123,5 +97,47 @@ def gen_schlegel(edges, coordinates, faces, schlegel_filename,
                  horizontalalignment='center', verticalalignment='center')
 
     plt.savefig(schlegel_filename, bbox_inches='tight')
+
+
+def gen_schlegel(edges, coordinates, faces, schlegel_filename,
+                 edge_type_graph=None):    # pragma: no cover
+    """
+    Plots vertices and edges in Schlegel diagram, tracing scaffold path in
+    colored lines.
+
+    The three dimensional structure is mapped onto a 2d surface.  This new
+    surface is visualized, saved, and optionally displayed to screen.  Edges
+    that are a part of the previously calculated spanning tree (that is, the
+    scaffold path) as marked in `edge_type_graph` are highlighted a different
+    color.
+
+    Parameters
+    ----------
+    edges : numpy.ndarray
+        Ex2 matrix where each row corresponds to one edge, denoting the
+        vertices being connected. 1st column > 2nd column; E = number of edges
+    coordinates : numpy.ndarray
+        Vx3 matrix of spatial coordinates of vertices; V = number of vertices.
+    faces : list
+        Fx2 cell matrix, where F is the number of faces.  The first column
+        details how many vertices the face has.  The second column details the
+        vertex IDs of the face.
+    schlegel_filename : str
+        Filename pointing at where to save the generated plot.
+    edge_type_graph : networkx.classes.graph.Graph
+        A graph the links have the 'type' property.  That property can have one
+        of two values:
+            - 1 is non-spanning tree edge: DX edge with 1 scaffold crossover
+            - 2 is spanning tree edge: DX edge with 0 scaffold crossovers
+
+    Returns
+    -------
+    xycoords
+        The 2d mapping used to plot the figure.
+    """
+
+    xycoord = create_2d_mapping(edges, coordinates, faces)
+
+    plot_schlegel(edges, edge_type_graph, xycoord, schlegel_filename)
 
     return xycoord

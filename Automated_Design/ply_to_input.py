@@ -1,51 +1,73 @@
 from os import path
 import numpy as np
 
-from Automated_Design.plotters import plot_edge_length_distributions
+from matplotlib import pyplot as plt
 
 
-def ply_as_filename_to_input(fname_no_ply, min_len_nt=31):
+def extract_file_reader_and_shape_name_from_input_filename(input_filename):
+    if input_filename[-4:] == '.ply':
+        fname_no_ply = input_filename[:-4]
+        full_filename = input_filename
+    else:
+        fname_no_ply = input_filename
+        full_filename = input_filename + '.ply'
+    assert path.isfile(full_filename)
+
+    f = open(full_filename)
+    shape_name = path.basename(path.normpath(fname_no_ply))
+    return f, shape_name
+
+
+def ply_to_input(input_filename, results_foldername=None, min_len_nt=31):
     """
-    Converts PLY file into design variables for DX_cage_design input
-    Inputs: fname_no_ply = string containing name of PLY file without '.ply'
-            min_len_nt = the number of nucleotides long the smallest edge
-               will have. Each edge must be a multiple of 10.5 bp, min 31 bp.
-    Outputs: coordinates = Vx3 matrix of spatial coordinates of vertices,
-               V = number of vertices
-             edges = Ex2 matrix where each row corresponds to one edge,
-               denoting the vertices being connected. 1st column > 2nd column
-             faces = Fx2 cell matrix, where F is the number of faces.
-               The first column details how many vertices the face has
-               The second column details the vertex IDs of the face
-             edge_length_vec = column vector of edge lengths
-             file_name = string to name structure
-             staple_name = string to name staples to order (can be same as
-               file_name if length is not an issue)
-             singleXOs = 1 if single crossover vertex staples should be used,
-               0 if double crossover vertex staples should be used.
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    by Sakul Ratanalert, MIT, Bathe Lab, 2016
 
-    Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-    M.I.T. hereby makes following copyrightable material available to the
-    public under GNU General Public License, version 2 (GPL-2.0). A copy of
-    this license is available at https://opensource.org/licenses/GPL-2.0
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Converts PLY file into design variables for DX_cage_design input.
+
+    This function parses the ply-formatted file pointed to by the given
+    `input_filename`.  First, it directly reads in all shape data.  Second,
+    it parses out some meta-variables to be used for scaffold creaction.
+    Optionally, it also creates plots for edge length distributions.
+
+    Parameters
+    ----------
+    input_filename : str
+        The filename pointing to your ply-formatted file you wish to read in.
+        Optionally omit the '.ply' extension.
+    results_foldername : str, optional
+        The foldername pointing to where you want the edge length distributions
+        saved.  Set to a value that resolves to false when cast to bool (None,
+        False, '', ...) or leave at default value to not create or save plots.
+    min_len_nt : int, optional
+        The number of nucleotides long the smallest edge will have. Each edge
+        must be a multiple of 10.5 bp, min 31 bp.
+
+    Returns
+    -------
+    coordinates
+        Vx3 matrix of spatial coordinates of vertices, V = number of vertices
+    edges
+        Ex2 matrix where each row corresponds to one edge, denoting the
+        vertices being connected. 1st column > 2nd column
+    faces
+        Fx2 cell matrix, where F is the number of faces.  The first column
+        details how many vertices the face has.  The second column details the
+        vertex IDs of the face.
+    edge_length_vec
+        Column vector of edge lengths
+    structure_name
+        String to name structure
+    staple_name
+        String to name staples to order (can be same as file_name if length is
+        not an issue)
+    singleXOs
+        `1` if single crossover vertex staples should be used,
+        `0` if double crossover vertex staples should be used.
     """
-    fname = fname_no_ply + '.ply'
-    assert path.isfile(fname)
-    f = open(fname)
-    return ply_to_input(fname_no_ply, f, min_len_nt)
 
-
-# TODO: clean up the almost-redundant `fname_no_ply` and `f`:
-def ply_to_input(fname_no_ply, f, min_len_nt, plot=True):
-
-    file_name = fname_no_ply + '_' + str(min_len_nt)
+    f, shape_name = extract_file_reader_and_shape_name_from_input_filename(
+        input_filename)
 
     def extract_number_from_keyword_in_ply_file(filestream, keyword):
-        # TODO: make regular expression?
-
         # Eat (read through) all lines up to and including line with `keyword`:
         line = ''
         while keyword not in line:
@@ -171,20 +193,86 @@ def ply_to_input(fname_no_ply, f, min_len_nt, plot=True):
     edge_length_vec = rounded_edge_length_PLY
 
     # Other parameters
-    staple_name = file_name  # set short name as file name by default
+    structure_name = shape_name + '_' + str(min_len_nt)
+    staple_name = structure_name
 
     if min_len_nt < 42:
         singleXOs = 0
     else:
         singleXOs = 1
 
-    if plot:
-        plot_edge_length_distributions(fname_no_ply,
+    if results_foldername:
+        plot_edge_length_distributions(structure_name,
                                        scale_edge_length_PLY,
-                                       rounded_edge_length_PLY)
+                                       rounded_edge_length_PLY,
+                                       results_foldername)
 
     coordinates = np.array(coordinates)
     # faces = np.array(faces)
 
-    return [coordinates, edges, faces, edge_length_vec, file_name,
+    return [coordinates, edges, faces, edge_length_vec, structure_name,
             staple_name, singleXOs]
+
+
+# note: this function is note covered under tests since I don't know how to
+# meaningfully test this primarily-aesthetics-oriented function.
+def plot_edge_length_distributions(shape_name,
+                                   scale_edge_length_PLY,
+                                   rounded_edge_length_PLY,
+                                   results_foldername):  # pragma: no cover
+    min_len_nt = min(rounded_edge_length_PLY)
+    max_len_nt = max(rounded_edge_length_PLY)
+    bins_for_hist = range(min_len_nt, max_len_nt + 3, 1)
+    bins_for_plotting = [x - 0.25 for x in bins_for_hist[:-1]]
+
+    # Everything pertaining to `width_multiplier` is to help with the shapes
+    # with a very large difference between the largest edge lengths and the
+    # smallest edge lengths.  The general idea is you accept the possibility
+    # of overlapping bins (if there happen to be a few very similarly lengthed
+    # edges) and make the bins unfaithfully larger (that is, large enough to
+    # see on the graph).  This is all because the actual-width (as opposed to
+    # the width chosen to show the bins as) of the bins is important to keep
+    # at 1, but you still want to be able to see the bins rather than an
+    # empty graph
+
+    bin_width = 0.25  # for rounded bins, so half of non-rounded bins
+    bin_offset = float(bin_width)/2
+    width_multiplier = (1 + (max_len_nt - min_len_nt) / 75)
+
+    fig_31 = plt.figure(0, figsize=(16, 8))
+    fig_31.clf()
+    y31 = np.histogram(scale_edge_length_PLY, bins=bins_for_hist)[0]
+    plt.bar([x + bin_width for x in bins_for_plotting],
+            y31, width=2 * bin_width * width_multiplier)
+    plt.xlim((min_len_nt - width_multiplier,
+              max_len_nt + 1.5 * width_multiplier))
+    plt.ylim((0, max(y31) + 1))
+    plt.title('Minimum edge length {} bp'.format(min_len_nt))
+    plt.xlabel('Edge length (bp)')
+    plt.ylabel('Number of edges')
+    # plt.xticks(bins_for_hist)
+
+    fig_32 = plt.figure(1, figsize=(16, 8))
+    fig_32.clf()
+    y32 = np.histogram(rounded_edge_length_PLY, bins=bins_for_hist)[0]
+    bins_a = [x - (bin_offset * width_multiplier)
+              for x in bins_for_plotting]
+    bins_b = [x + bin_width + (bin_offset * width_multiplier)
+              for x in bins_for_plotting]
+    plt.bar(bins_a, y31, width=bin_width * width_multiplier, color='b')
+    plt.bar(bins_b, y32, width=bin_width * width_multiplier, color='r')
+
+    plt.xlim((min_len_nt - width_multiplier,
+              max_len_nt + 1.5 * width_multiplier))
+    plt.ylim((0, max(max(max(y31), max(y32)) + 1, 1)))
+    plt.title('Edges rounded to nearest 10.5 bp')
+    plt.xlabel('Edge length (bp)')
+    plt.ylabel('Number of edges')
+    # plt.xticks(bins_for_hist)
+
+    shape_name_with_len = shape_name + '_{}_'.format(min_len_nt)
+    base_filename = path.join(results_foldername, shape_name_with_len)
+    fig_31.savefig(base_filename + 'min_edge_length_dist.png',
+                   bbox_inches='tight')
+    fig_32.savefig(base_filename + 'edges_rounded_to_10_5.png',
+                   bbox_inches='tight')

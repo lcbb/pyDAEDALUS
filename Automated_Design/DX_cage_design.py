@@ -7,7 +7,7 @@ from Automated_Design.adj_scaf_nick_pos import adj_scaf_nick_pos, \
     get_scaf_nick_pos
 from Automated_Design.assign_scaf_to_edge import assign_scaf_to_edge
 from Automated_Design.assign_staples_wChoices import assign_staples_wChoices
-from Automated_Design.constants import SCAF_SEQ, RESULTS_FOLDERNAME
+from Automated_Design.constants import SCAF_SEQ
 from Automated_Design.csv_staples import csv_staples
 from Automated_Design.dna_info import DnaInfo
 from Automated_Design.enum_scaf_bases_DX import enum_scaf_bases_DX
@@ -24,40 +24,48 @@ from gen_vert_to_face import gen_vert_to_face
 
 def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
                    staple_name, singleXOs, scaf_seq, scaf_name,
-                   print_to_console=True):
+                   results_foldername, print_to_console=True):
     """
     Creates scaffold routing and staple placement of a DX-based DNA origami
     nano cage.
-    Inputs: coordinates = Vx3 matrix of spatial coordinates of vertices,
-              V = number of vertices
-            edges = Ex2 matrix where each row corresponds to one edge,
-              denoting the vertices being connected. 1st column > 2nd column
-            faces = F cell matrix, where F is the number of faces.
-              The second column details the vertex IDs of the face
-            edge_length_vec = column vector of edge lengths
-            file_name = string to name structure
-            staple_name = string to name staples to order (can be same as
-              file_name if length is not an issue)
-            singleXOs = 1 if single crossover vertex staples should be used,
-              0 if double crossover vertex staples should be used.
-            scaf_seq = string containing the sequence of the scaffold. If
-              using default, input [].
-            scaf_name = string containing the name of the scaffold. If using
-              default, input [].
-    Outputs: dnaInfo = Matlab file containing all spatial and routing
-               information.
-             routeInfo = Matlab file containing key variables, for debugging
-             seq_..._.txt = text file to visualize each edge's sequences and
-               nick/crossover information
-             staples_..._.xlsx = Excel spreadsheet containing staple seqs
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    by Sakul Ratanalert, MIT, Bathe Lab, 2016
 
-    Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-    M.I.T. hereby makes following copyrightable material available to the
-    public under GNU General Public License, version 2 (GPL-2.0). A copy of
-    this license is available at https://opensource.org/licenses/GPL-2.0
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    The inputs can all be thought of as all the data from a ply file plus a
+    few settings specific to how it will be converted to the cage design.
+    Processing happens across 11 steps culminating in a fully built model
+    as represented by the DnaInfo object.
+
+    Parameters
+    ----------
+    coordinates :
+        Vx3 matrix of spatial coordinates of vertices, V = number of vertices
+    edges :
+        Ex2 matrix where each row corresponds to one edge, denoting the
+        vertices being connected. 1st column > 2nd column
+    faces :
+        F cell matrix, where F is the number of faces.  The second column
+        details the vertex IDs of the face
+    edge_length_vec :
+        column vector of edge lengths
+    file_name :
+        string to name structure
+    staple_name :
+        string to name staples to order (can be same as file_name if length is
+        not an issue)
+    singleXOs :
+        1 if single crossover vertex staples should be used,
+        0 if double crossover vertex staples should be used.
+    scaf_seq :
+        string containing the sequence of the scaffold. If using default,
+        input [].
+    scaf_name :
+        string containing the name of the scaffold. If using default, input [].
+
+    Returns
+    -------
+    full_filename
+        The name used to identify all files (distributions, shape
+        visualizations, raw data output) saved into resutls folder as belonging
+        to this particular combination of input shape and selected parameters.
     """
 
     # Determine the minimum length scaffold fragment to use.
@@ -107,11 +115,11 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     # graph_with_spanning_tree_marked = edge_type_mat   # TODO: this rename
 
     schlegel_filename = file_name_without_containing_folder + '_schlegel.png'
-    full_schlegel_filename = path.join(RESULTS_FOLDERNAME, schlegel_filename)
+    full_schlegel_filename = path.join(results_foldername, schlegel_filename)
 
     gen_schlegel(edges, coordinates, faces,
                  schlegel_filename=full_schlegel_filename,
-                 edge_type_mat=edge_type_mat)
+                 edge_type_graph=edge_type_mat)
 
     edge_type_mat = edge_type_mat.to_directed()
     # MST in networkx requires an undirected graph?
@@ -119,7 +127,7 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
 
     # 3. Add nodes to edges ##################################################
     # Add two nodes to each nontree edge to implement scaffold crossovers
-    edge_type_mat_wHalfs, pseudo_vert = split_edge(edge_type_mat, num_vert)
+    edge_type_mat_wHalfs, pseudo_vert = split_edge(edge_type_mat)
     # graph_with_edges_split = edge_type_mat_wHalfs  # TODO: this rename
 
     # 4. Add nodes to vertices ###############################################
@@ -163,7 +171,7 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
         # still been defined above?
 
     [stap_seq, stap_seq_list, stap_list,
-     named_stap_seq_list] = gen_stap_seq(staples, num_edges, scaf_seq,
+     named_stap_seq_list] = gen_stap_seq(staples, scaf_seq,
                                          staple_name, scaf_name,
                                          len_scaf_used)
 
@@ -195,12 +203,12 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
 
     # ... as a 3d plot
     plot_filename = full_file_name + '.png'
-    full_plot_filename = path.join(RESULTS_FOLDERNAME, plot_filename)
+    full_plot_filename = path.join(results_foldername, plot_filename)
     dnaInfo.plot_3d_model(full_plot_filename)
 
     # as pickle dumps.
     pickled_dna_info_filename = 'dnaInfo_' + full_file_name + '.pickle'
-    full_pickled_dna_info_filename = path.join(RESULTS_FOLDERNAME,
+    full_pickled_dna_info_filename = path.join(results_foldername,
                                                pickled_dna_info_filename)
     pickle.dump(dnaInfo, open(full_pickled_dna_info_filename, 'w'))
 
@@ -214,13 +222,13 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
                        'faces': faces,
                        'edge_length_vec': edge_length_vec}
     route_info_dump_filename = 'routeInfo_' + full_file_name + '.pickle'
-    full_route_info_filename = path.join(RESULTS_FOLDERNAME,
+    full_route_info_filename = path.join(results_foldername,
                                          route_info_dump_filename)
     pickle.dump(route_info_dump, open(full_route_info_filename, 'w'))
 
     # as cando file
     cando_filename = full_file_name + '.cndo'
-    full_cando_filename = path.join(RESULTS_FOLDERNAME, cando_filename)
+    full_cando_filename = path.join(results_foldername, cando_filename)
     dnaInfo.save_dna_info_to_cando_file(full_cando_filename)
 
     # And also save staple sequences
@@ -230,9 +238,9 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     else:
         if print_to_console:
             print('Real staples\n')
-        csv_staples(full_file_name, named_stap_seq_list)
+        csv_staples(full_file_name, named_stap_seq_list, results_foldername)
 
-    seq_filename = path.join(RESULTS_FOLDERNAME,
+    seq_filename = path.join(results_foldername,
                              'seq_{}.txt'.format(full_file_name))
     seqtoText(scaf_to_edge, edges, dnaInfo, file_name, scaf_name,
               singleXOs, seq_filename)

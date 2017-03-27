@@ -46,25 +46,28 @@ class DnaTop(object):
 
 def calc_buff(faces, num_vert, coordinates, d, wDX):
     """
-    Calculates buffer distance between edge of DX tile and center of vertex
-    Inputs: faces = Fx2 cell matrix, where F is the number of faces.
-              The first column details how many vertices the face has
-              The second column details the vertex IDs of the face
-            num_vert = number of vertices, V
-            coordinates = Vx3 matrix of spatial coordinates of vertices,
-              V = number of vertices
-            d = distance between two nucleotides, in angstroms
-            wDX = width of DX tile, in angstroms
-    Output: buff_nt = distance, in nucleotides, between edge of DX arm and
-               vertex coordinate
-    ##########################################################################
-    by Sakul Ratanalert, MIT, Bathe Lab, 2016
+    Calculates buffer distance between edge of DX tile and center of vertex.
 
-    Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-    M.I.T. hereby makes following copyrightable material available to the
-    public under GNU General Public License, version 2 (GPL-2.0). A copy of
-    this license is available at https://opensource.org/licenses/GPL-2.0
-    ##########################################################################
+    Parameters
+    ----------
+    faces : list
+        Fx2 cell matrix, where F is the number of faces.
+        The first column details how many vertices the face has
+        The second column details the vertex IDs of the face
+    num_vert : int
+        number of vertices, V
+    coordinates : numpy.ndarray
+        Vx3 matrix of spatial coordinates of vertices,
+        V = number of vertices
+    d : float
+        distance between two nucleotides, in angstroms
+    wDX : int
+        width of DX tile, in angstroms
+
+    Returns
+    -------
+    buff_nt
+        distance, in nucleotides, between edge of DX arm and vertex coordinate
     """
 
     vert_angles = [[] for i in range(num_vert)]
@@ -118,26 +121,30 @@ def calc_buff(faces, num_vert, coordinates, d, wDX):
 
 def gen_FE_norms(coordinates, faces, edges, vert_to_face):
     """
-    Generate vectors normal to Faces and Edges
-    Inputs: coordinates = Vx3 matrix of spatial coordinates of vertices,
-              V = number of vertices
-            faces = Fx2 cell matrix, where F is the number of faces.
-              The first column details how many vertices the face has
-              The second column details the vertex IDs of the face
-            edges = Ex2 matrix where each row corresponds to one edge,
-              denoting the vertices being connected. 1st column > 2nd column
-            vert_to_face = Vx1 cell array, each row has a row vector listing
-              the face IDs the particular vertex belongs to
-    Outputs: face_norms = Fx3 matrix containing outward normal for each face
-             edge_norms = Ex3 matrix containing outward normal for each edge
-    ##########################################################################
-    by Sakul Ratanalert, MIT, Bathe Lab, 2016
+    Generate vectors normal to Faces and Edges.
 
-    Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-    M.I.T. hereby makes following copyrightable material available to the
-    public under GNU General Public License, version 2 (GPL-2.0). A copy of
-    this license is available at https://opensource.org/licenses/GPL-2.0
-    ##########################################################################
+    Parameters
+    ----------
+    coordinates : numpy.ndarray
+        Vx3 array of spatial coordinates of vertices,
+        V = number of vertices
+    faces : list
+        Fx2 list, where F is the number of faces.
+        The first column details how many vertices the face has.
+        The second column details the vertex IDs of the face.
+    edges : numpy.ndarray
+        Ex2 array where each row corresponds to one edge,
+        denoting the vertices being connected. 1st column > 2nd column
+    vert_to_face : list
+        V-long list, each row containing a list of the face IDs the
+        particular vertex belongs to.
+
+    Returns
+    -------
+    face_norms
+        Fx3 matrix containing outward normal for each face.
+    edge_norms
+        Ex3 matrix containing outward normal for each edge.
     """
 
     # Initialize
@@ -191,54 +198,66 @@ class DnaInfo(object):
         """
         Generate file to sent to CanDo for rendering and finite element
         simulation.
-        Inputs: scaf_to_edge = Ex2 cell array, where each row corresponds to
-                   one edge, 1st column is duplex from low ID to high ID
-                   vertex, 2nd column is from high to low. Each element is a
-                   row vector containing the scaffold base IDs in order on that
-                   duplex.
-                scaf_seq = string of scaffold, length may be longer than
-                   required. First nucleotide will be placed at index 1
-                stap_list = columnar cell array, each cell contains string of
-                   scaffold indices that staple bases correspond to
-                stap_seq_list = same as stap_list but with sequence instead of
-                   index information
-                coordinates = Vx3 matrix of spatial coordinates of vertices
-                edges = Ex2 matrix where each row corresponds to one edge,
-                   denoting the vertices being connected. 1st column > 2nd
-                   column
-                num_edges = number of edges, E
-                edge_length_vec = row vector of edge types, corresponding to
-                   edge_length_mat_full
-                fig = figure number for scaffold routing display
-        Output: dnaInfo = structure that describes sequence, topology, and
-        geometry of a programmed DNA assembly. Two substuctures:
-                   dnaTop(n) = structure with info of nucleotide n. Fields:
-                      id = identification number
-                      up = id of nucleotide upstream (towards 5') (-1 if N/A)
-                      down = id of nucleotide downstream (towards 3') (-1 if
-                      N/A)
-                      across = id of base paired nucleotide (-1 if N/A)
-                      seq = identity of base (char A,T,C,G)
-                   dnaGeom = structure with geometric info of base pairs.
-                       Arrays:
-                      dNode = n_bp x 3 matrix of spatial location
-                      triad = 3 x 3 x n_bp matrix of spatial orientation
-                      id_nt = n_bp x 2 matrix of nucleotides that compose base
-                         pair
-                      Note that single stranded nucleotides are ignored here.
+
+        Note that single stranded nucleotides are ignored here.
         Note: Helicity of the nucleotides has not been implemented. The
         orientation is correct at each scaffold and staple crossover, but not
         necessarily in between. CanDo pre-mechanical model calculates the
         correct orientation of these nucleotides.
         (see CanDo for more detailed information)
-        #######################################################################
-        by Sakul Ratanalert, MIT, Bathe Lab, 2016
 
-        Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-        M.I.T. hereby makes following copyrightable material available to the
-        public under GNU General Public License, version 2 (GPL-2.0). A copy of
-        this license is available at https://opensource.org/licenses/GPL-2.0
-        #######################################################################
+        Parameters
+        ----------
+        scaf_to_edge : list
+            Ex2 cell array, where each row corresponds to
+            one edge, 1st column is duplex from low ID to high ID
+            vertex, 2nd column is from high to low. Each element is a
+            row vector containing the scaffold base IDs in order on that
+            duplex.
+        scaf_seq : str
+            string of scaffold, length may be longer than
+            required. First nucleotide will be placed at index 1
+        stap_list : list
+            columnar cell array, each cell contains string of
+            scaffold indices that staple bases correspond to
+        stap_seq_list : list
+            same as stap_list but with sequence instead of
+            index information
+        coordinates : numpy.ndarray
+            Vx3 matrix of spatial coordinates of vertices
+        edges : numpy.ndarray
+            Ex2 matrix where each row corresponds to one edge,
+            denoting the vertices being connected. 1st column > 2nd
+            column
+        edge_length_vec : list
+            row vector of edge types, corresponding to
+            edge_length_mat_full
+        faces : list
+            List of lists.  The first dimension represents the face.  The
+            second dimension holds the index all nodes creating that face.
+        vert_to_face : list
+            List of lists.  The first dimension represents the node.  The
+            second dimension holds the index of all faces that node is a part
+            of.
+
+
+        Returns
+        -------
+        dnaInfo
+            Structure that describes sequence, topology, and geometry of a
+            programmed DNA assembly.
+            Two substuctures:
+            dnaTop(n) = structure with info of nucleotide n. Fields:
+                id = identification number
+                up = id of nucleotide upstream (towards 5') (-1 if N/A)
+                down = id of nucleotide downstream (towards 3') (-1 if
+                N/A)
+                across = id of base paired nucleotide (-1 if N/A)
+                seq = identity of base (char A,T,C,G)
+            dnaGeom = structure with geometric info of base pairs.
+                dNode = n_bp x 3 matrix of spatial location
+                triad = 3 x 3 x n_bp matrix of spatial orientation
+                id_nt = n_bp x 2 matrix of nucleotides that compose base pair
         """
         stap_seq_list = deepcopy(stap_seq_list)
         stap_list = deepcopy(stap_list)
@@ -517,7 +536,25 @@ class DnaInfo(object):
     def get_turn_angle_for_pos_scaf_nick_pos(num_nt):
         return 2 * np.pi * (int(np.floor(num_nt / 10.5)) + 0.5) / (num_nt + 1)
 
-    def plot_3d_model(self, filename):
+    def plot_3d_model(self, filename, scale=1.0):  # pragma: no cover
+        """
+        Visualize the current model by drawing it in a 3d plot.
+
+        Parameters
+        ----------
+        filename : str
+            Where the generated visualization will be saved.
+        scale : float
+            Determines how thin or thick the lines and markers should be.
+        Generally, a value of `1.0` works well for most figures.  You may want
+        to decrease this to 0.5 (making all line and markers half
+        as large/thick) or smaller if you're working with very large/complex
+        shapes.
+
+        Returns
+        -------
+        None
+        """
         import matplotlib.pyplot as plt
         from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
 
@@ -533,7 +570,7 @@ class DnaInfo(object):
                    marker='o',  # marker shape
                    color=VERMILLION,  # marker color
                    edgecolor=VERMILLION,
-                   s=200)  # marker size
+                   s=200.*scale)  # marker size
 
         # Plot positions of each nucleotide as a line
         first_d = [dNode[0] for dNode in self.dnaGeom.dNode]
@@ -542,7 +579,7 @@ class DnaInfo(object):
         ax.plot(first_d, second_d, third_d,
                 '-',
                 color=BLU,
-                linewidth=5)
+                linewidth=5.*scale)
 
         first_d = [loc[0] for loc in self.scaled_coordinates]
         second_d = [loc[1] for loc in self.scaled_coordinates]
@@ -560,7 +597,7 @@ class DnaInfo(object):
                    marker='s',
                    color=ORANG,
                    edgecolor=ORANG,
-                   s=500)
+                   s=500.*scale)
         # Plot 3' end (purple circle)
         ax.scatter([self.dnaGeom.dNode[-1][0]],
                    [self.dnaGeom.dNode[-1][1]],
@@ -568,7 +605,7 @@ class DnaInfo(object):
                    marker='o',
                    color=REDPURPLE,
                    edgecolor=REDPURPLE,
-                   s=400)  # 'LineWidth',4,
+                   s=400.*scale)
 
         ax.set_xlabel('Angstroms', fontdict={'size': 16})
         ax.set_ylabel('Angstroms', fontdict={'size': 16})

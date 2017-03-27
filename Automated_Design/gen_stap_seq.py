@@ -1,35 +1,43 @@
 import numpy as np
 
 
-def gen_stap_seq(staples, num_edges, scaf_seq, staple_name, scaf_name,
+def gen_stap_seq(staples, scaf_seq, staple_name, scaf_name,
                  len_scaf_used):
-    # Generate staple sequences from scaffold sequence
-    # Inputs: staples = cell array with E rows, each cell contains row vector.
-    #     Some cells may be empty as fragments are combined into full staples.
-    #     Columns 1-6 contain vertex staples, while 7+ contain edge staples.
-    #         num_edges = number of edges, E
-    #         scaf_seq = string of scaffold, length may be longer than
-    #            required. First nucleotide will be placed at index 1
-    #         short_name = string to name staples, may be same as file_name
-    #         scaf_name = name of scaffold (string)
-    #         len_scaf_used = length of scaffold used, = 2*sum(edge_length_vec)
-    # Outputs: stap_seq = cell array same dimensions as staples, each cell
-    #             containts string of staple's sequence
-    #          stap_seq_list = stap_seq arranged in a 1-column cell array
-    #          stap_list = staples arranged in the same 1-column cell array
-    #          named_stap_seq_list = cell array with second column identical to
-    #             stap_seq_list, first column contains string of staple name
-    ###########################################################################
-    # by Sakul Ratanalert, MIT, Bathe Lab, 2016
-    #
-    # Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-    # M.I.T. hereby makes following copyrightable material available to the
-    # public under GNU General Public License, version 2 (GPL-2.0). A copy of
-    # this license is available at https://opensource.org/licenses/GPL-2.0
-    ###########################################################################
+    """
+    Generate staple sequences from scaffold sequence.
+
+    Parameters
+    ----------
+    staples : list
+        List with E rows, each row contains another list.  Some sub-lists may
+        be empty as fragments are combined into full staples.  Columns 0-5
+        contain vertex staples, while 6+ contain edge staples.
+    scaf_seq : str
+        String of scaffold, length may be longer than
+       required. First nucleotide will be placed at index 1
+    short_name : str
+        string to name staples, may be same as file_name
+    scaf_name : str
+        name of scaffold (string)
+    len_scaf_used : int
+        length of scaffold used, = 2*sum(edge_length_vec)
+
+    Returns
+    -------
+    stap_seq
+        List same dimensions as staples, each cell contains string of
+        staple's sequence
+    stap_seq_list
+        stap_seq arranged in a 1-column list
+    stap_list
+        staples arranged in the same 1-column list
+    named_stap_seq_list
+        List with second column identical to stap_seq_list, first column
+        contains string of staple name
+    """
 
     # # Initialize outputs
-    num_edges = len(staples)  # TODO: Remove num_edges from arg list
+    num_edges = len(staples)
 
     stap_seq = []
     stap_seq_list = []

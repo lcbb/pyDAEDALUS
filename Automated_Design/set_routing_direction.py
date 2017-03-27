@@ -57,29 +57,37 @@ def set_routing_direction(edge_type_mat_allNodes, num_vert, pseudo_vert,
                           faces, vert_to_face):
     """
     Sets routing direction for traversing scaffold route path
-    Inputs: edge_type_mat_allNodes = sparse matrix where
-     -1 is half of a non-spanning tree edge (one side of scaffold crossover)
-      2 is spanning tree edge: DX edge with 0 scaffold crossovers
-            num_vert = number of vertices, V
-            pseudo_vert = row vector where value j at index i indicate that
-               vertex i corresponds to vertex j, one of the V real vertices
-            coordinates = Vx3 matrix of spatial coordinates of vertices
-    Outputs: route_real = row vector of vertices listed in visitation order
-                (only real vertex IDs)
-             route_vals = row vector of edge types, where the value at index
-                j in route_vals is the edge type of the edge between the
-                vertices route_real(j:j+1), wrapping around at end
-    ##########################################################################
-    by Sakul Ratanalert, MIT, Bathe Lab, 2016
 
-    Copyright 2016. Massachusetts Institute of Technology. Rights Reserved.
-    M.I.T. hereby makes following copyrightable material available to the
-    public under GNU General Public License, version 2 (GPL-2.0). A copy of
-    this license is available at https://opensource.org/licenses/GPL-2.0
-    ##########################################################################
+    Parameters
+    ----------
+    edge_type_mat_allNodes : networkx.classes.digraph.DiGraph
+        Network representation including link types.  Link types have the
+        following possible values:
+            -1 is half of a non-spanning tree edge (one side of scaffold
+            crossover)
+            2 is spanning tree edge: DX edge with 0 scaffold crossovers
+    num_vert : int
+        number of vertices, V
+    pseudo_vert : list
+        row vector where value j at index i indicate that
+        vertex i corresponds to vertex j, one of the V real vertices
+    faces : list
+        List of lists.  The first dimension represents the face.  The
+        second dimension holds the index all nodes creating that face.
+    vert_to_face : list
+        List of lists.  The first dimension represents the node.  The
+        second dimension holds the index of all faces that node is a part of.
+
+    Returns
+    -------
+    route_real
+        row vector of vertices listed in visitation order (only real vertex
+        IDs)
+    route_vals
+        row vector of edge types, where the value at index j in route_vals is
+        the edge type of the edge between the vertices route_real(j:j+1),
+        wrapping around at end
     """
-    # TODO: Add to test coverage: At least including both branches of
-    # direction being right/wrong.
 
     # Choose a starting connected node (arbitrary start position).
     # Vertices #1-#V (V = number of vertices) are no longer connected in the
