@@ -8,17 +8,18 @@ Your 3D models can be input using the Polygon File Format (.ply).
 
 1. Clone this repo
 1. (optional) Set up a virtualenv.
-1. `pip -r requirements` in this project's root.
+1. `pip install -r requirements` in this project's root.
+1. (optional) Also run `pip install -r dev_requirements` to give you the libraries used for testing / code development.
 
 # Usage
-At the minimum when calling `demo_daedalus.py`, you need to tell it what ply file to run.  For example, running pyDAEDALUS on the included ply file `05_icosahedron.ply` can be done with the command:  
+At the minimum when calling `demo_daedalus.py`, you need to tell it what ply file to run.  For example, running pyDAEDALUS on the included ply file `05_icosahedron.ply` can be done with the command:
 `python demo_daedalus.py --input_filename=PLY_Files/05_icosahedron.ply`
  Note including the `.ply` extension is optional.  So the following command would be equivalent: `python demo_daedalus.py --input_filename=PLY_Files/05_icosahedron`
 
-You can also run a batch of ply files at a time by specifying an input foldername rather than a single ply file:  
+You can also run a batch of ply files at a time by specifying an input foldername rather than a single ply file:
 `python demo_daedalus.py --input_foldername=PLY_Files`
 
-Adding the flag `--display_plots` asks the program, in addition to saving the plots to your output folder, to print them to screen.  For example:  
+Adding the flag `--display_plots` asks the program, in addition to saving the plots to your output folder, to print them to screen.  For example:
 `python demo_daedalus.py --input_filename=PLY_Files/37_enneagonal_trapezohedron.ply --display_plots`
 
 Additional options include:
@@ -32,6 +33,7 @@ You can find the complete list of arguments with descriptions with `python demo_
 All files saved into Results includes both shape name and `min_len_nt` in the filename to avoid undesired filename collisions.
 
 # Tests
+Be sure to have installed dev_requirements.txt if you plan on running tests.  Or at the very least, install `pytest`.
 Testing uses [`py.test`](http://docs.pytest.org/en/latest/usage.html).  Ways to run tests manually include:
  * Simply run `make test`.  This leverages `Makefile` to run tests with the right syntax.
  * Run all tests by directly calling pytest: `py.test`
