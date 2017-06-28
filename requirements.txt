@@ -7,7 +7,3 @@ mpmath>=0.19
 mock>=2.0.0
 tqdm>=4.9.0
 flake8>=3.2.0
-pytest>=3.0.5
-bpython>=0.16
-pytest-bpdb>=0.1.4
-pytest-cov>=2.4.0
