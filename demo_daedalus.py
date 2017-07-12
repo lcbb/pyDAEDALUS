@@ -30,6 +30,9 @@ def create_directory(directory, reset=True):
 @click.option('--input_foldername', default=None,
               help='Foldername containing PLY files to be rendered.  Please '
                    'only supply a folder name or a filename.')
+@click.option('--scaffold_filename', default=None,
+              help='Plaintext file to read the scaffold sequence from. File'
+                   'name will also serve as scaffold name')
 @click.option('--results_foldername', default='Results',
               help='Foldername to save all results.')
 @click.option('--reset_results_folder', default=False, is_flag=True,
@@ -48,8 +51,7 @@ def create_directory(directory, reset=True):
 def run_demo_from_command_line(input_filename, input_foldername,
                                results_foldername, reset_results_folder,
                                min_len_nt, display_plots,
-                               suppress_console_output):
-
+                               suppress_console_output, scaffold_filename):
     # make sure input parameters make sense:
     if input_filename and input_foldername:
         # Both an input filename and an input foldername were specified.
@@ -71,27 +73,37 @@ def run_demo_from_command_line(input_filename, input_foldername,
         # When running as batch, don't print to console (it gets messy).
         print_to_console = False
         run_batch(input_foldername, min_len_nt, display_plots,
+                  scaffold_filename,
                   print_to_console, results_foldername)
     elif input_filename:
         run_single_file(input_filename, min_len_nt, results_foldername,
+                        scaffold_filename,
                         display_plots, print_to_console)
 
     else:
         # It was already asserted only one of (foldername, filename) exist.
         raise Exception("Program should never reach here.  Please file a bug "
-                        "report including a copy of the paramters you "
+                        "report including a copy of the parameters you "
                         "entered.")
 
 
 def run_single_file(input_filename, min_len_nt, results_foldername,
+                    scaffold_filename,
                     display_plots=False, print_to_console=True):
-
     coordinates, edges, faces, edge_length_vec, file_name, \
-        staple_name, singleXOs = ply_to_input(
-            input_filename, results_foldername, min_len_nt)
+    staple_name, singleXOs = ply_to_input(
+        input_filename, results_foldername, min_len_nt)
 
-    scaf_seq = []  # Using default scaffold sequence
-    scaf_name = []  # Using default scaffold name
+    if scaffold_filename is not None:
+        scaf_object = open(scaffold_filename, 'r')
+        scaf_seq = scaf_object.read()
+        # extension_cutoff = scaffold_filename.rindex('.')
+        # scaf_name = scaffold_filename[:extension_cutoff]
+        scaf_name = scaffold_filename
+    else:
+        scaf_seq = []  # Using default scaffold sequence
+        scaf_name = []  # Using default scaffold name
+
     full_file_name = DX_cage_design(  # noqa: F841
         coordinates, edges, faces, edge_length_vec, file_name,
         staple_name, singleXOs, scaf_seq, scaf_name, results_foldername,
@@ -99,17 +111,19 @@ def run_single_file(input_filename, min_len_nt, results_foldername,
 
     if display_plots:
         from matplotlib import pyplot as plt
+        plt.ion()
         plt.show()
 
 
 def run_batch(input_foldername, min_len_nt, display_plots, print_to_console,
-              results_foldername):
+              results_foldername, scaffold_filename):
     ply_filenames = grab_all_ply_filenames_from_directory(input_foldername)
 
     assert len(ply_filenames) > 0, "No Ply files found in given foldername."
 
     for input_filename in tqdm([f for f in ply_filenames if f[-4:] == '.ply']):
         run_single_file(input_filename, min_len_nt, results_foldername,
+                        scaffold_filename,
                         display_plots=display_plots,
                         print_to_console=print_to_console)
 
