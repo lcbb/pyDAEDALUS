@@ -100,6 +100,8 @@ def run_single_file(input_filename, min_len_nt, results_foldername,
         scaf_seq = scaf_object.read()
         # extension_cutoff = scaffold_filename.rindex('.')
         # scaf_name = scaffold_filename[:extension_cutoff]
+
+        # https://stackoverflow.com/a/8384788/1224255
         scaf_name = ntpath.basename(scaffold_filename)
     else:
         scaf_seq = []  # Using default scaffold sequence
