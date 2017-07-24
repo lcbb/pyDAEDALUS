@@ -99,6 +99,7 @@ def run_single_file(input_filename, min_len_nt, results_foldername,
 
     if display_plots:
         from matplotlib import pyplot as plt
+        plt.ion()
         plt.show()
 
 

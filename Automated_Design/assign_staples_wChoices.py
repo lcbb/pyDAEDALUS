@@ -7,9 +7,8 @@ def generate_spanning_21_bp_staples(num_21_staps, scaf_bot_cut, scaf_top_cut):
     staple_list = []
     for i in range(num_21_staps):
         a = (21 * i)
-        a = a if a > 0 else None  # TODO: test when `a` doesn't equal 0
         b = 21 * (i + 1)
-        temp_stap = scaf_bot_cut[a:b] + scaf_top_cut[b-1:a:-1]
+        temp_stap = scaf_bot_cut[a:b] + list(reversed(scaf_top_cut[a:b]))
         # Adjust nick to center on bottom strand (5' 10 21 11 3' split)
         reordered_temp_stap = temp_stap[11:] + temp_stap[0:11]
         staple_list.append(reordered_temp_stap)
@@ -121,18 +120,9 @@ Output: staples = cell array with E rows, each cell contains row vector.
                 # # Detect scaffold crossover location
                 # If scaffold crossover 5/6 away from center:
                 if len_cut == 21*num_21staps:
-                    if len_cut % 2 == 0:  # even
-                        cutoff = int(len_cut / 2 - 5)
-                    else:  # odd
-                        cutoff = int(len_cut / 2 - 5.5)
+                    cutoff = (len_cut - 10) / 2 # Note: b/c integer division, the even/odd cases are redundant
                 else:  # scaffold crossover 0/1 away from center
-                    if len_cut % 2 == 0:  # even
-                        cutoff = int(len_cut / 2)
-                    else:  # odd
-                        cutoff = int(len_cut / 2 - 0.5)
-
-                cutoff += 1  # cutoff is currently last number on left, but
-                # slicing notation takes everything less than given number.
+                    cutoff = len_cut / 2 # Note: b/c integer division, the even/odd cases are redundant
 
                 # # Split top scaffold strand in two
                 scaf_top_cut_left = scaf_top_cut[:cutoff]
@@ -204,7 +194,7 @@ Output: staples = cell array with E rows, each cell contains row vector.
                 # # Add the extra staple if necessary, should go closest to
                 # vertex:
                 if len_extra_stap > 0:  # if an extra staple is required
-                    temp_stap = scaf_top_cut_left_noSCS[len_extra_stap::-1] +\
+                    temp_stap = scaf_top_cut_left_noSCS[len_extra_stap-1::-1] +\
                         scaf_bot_cut_left_noSCS[:len_extra_stap]
                     staples[edge_ID].append(temp_stap)
 
@@ -231,8 +221,8 @@ Output: staples = cell array with E rows, each cell contains row vector.
                 # # Add the extra staple if necessary, should go closest to
                 # vertex
                 if len_extra_stap > 0:  # if an extra staple is required
-                    temp_stap = scaf_bot_cut_rght_noSCS[len_extra_stap:] + \
-                        scaf_top_cut_rght_noSCS[-1:len_extra_stap:-1]
+                    temp_stap = scaf_bot_cut_rght_noSCS[-len_extra_stap:] + \
+                        scaf_top_cut_rght_noSCS[-1:-len_extra_stap-1:-1]
                     staples[edge_ID].append(temp_stap)
 
     # # Add polyTs after all preliminary staples generated

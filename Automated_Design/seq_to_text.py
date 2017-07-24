@@ -76,7 +76,7 @@ def seqtoText(scaf_to_edge, edges, dnaInfo, file_name, scaf_name, singleXOs,
         ))
 
         # Cut off first of scaf_right and invert scaf_left
-        scaf_right = scaf_right[1:-1]
+        scaf_right = scaf_right[1:]
         scaf_left = scaf_left[-1::-1]
 
         for nt_ID in range(len(scaf_right)):
