@@ -1,6 +1,6 @@
 numpy>=1.11.1
 matplotlib>=1.5.1
-networkx=1.11
+networkx==1.11
 scipy>=0.18.0
 click>=6.6
 mpmath>=0.19
