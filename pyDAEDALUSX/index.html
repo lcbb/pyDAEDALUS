@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>pyDAEDALUS-X</title>
+    <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+  </head>
+  <body>
+    <form action="#" id="ipcForm2">
+      <fieldset>
+        <legend style="color:blue;">pyDAEDALUS-X</legend>
+        <table>
+          <tr>
+            <td>Project name:</td>
+            <td><input type="text" name="projName" id="projName" value="" required></td>
+          </tr>
+          <tr>
+            <td valign="top">Helical form:</td>
+            <td>
+              <select name="helicalForm" id="helicalForm">
+                <option value="Bform">B-form (DNA default)</option>
+                <option value="Aform">A-form (RNA default)</option>
+                <!-- <option value="Hybrid">Hybrid-form</option>
+                <option value="Twisted">Alternative wound A-form</option> -->
+              </select>
+              <p id="DXimg"><img src="./images/DX_Bform.png" height="80"></p>
+            </td>
+          </tr>
+          <tr>
+            <td>Helical turns:</td>
+            <td><input type="number" id="helicalTurns" name="helicalTurns" min="4" max="20" required></td>
+          </tr>
+          <tr>
+            <td><input type="button" value="Select PLY" id="select-ply"></td>
+            <td id="plyTable"></td>
+          </tr>
+          <tr>
+            <td><input type="button" value="Select Sequence" id="select-seq"></td>
+            <td id="seqTable"></td>
+          </tr>
+        </table>
+        <br><hr><br>
+        <input id="submit" type="submit" value="submit">
+        <input type="reset" value="reset">
+      </fieldset>
+    </form>
+    <p id="response"></p>
+    <script src='renderFile.js'></script>
+    <script src="js/three.min.js"></script>
+    <script>window.$ = window.jQuery = require('./js/jquery-3.4.1.min.js');</script>
+    <script src="js/jquery.xmlrpc.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "pyDAEDALUSX",
+  "productName": "pyDAEDALUSX",
+  "version": "0.1.0",
+  "description": "Python DAEDALUS for RNA or DNA routing with a GUI",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Sakul Ratanalert, Tyson Shepherd",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^7.1.1",
+    "electron-packager": "^14.1.0",
+    "electron-rebuild": "^1.8.6"
+  }
+}
