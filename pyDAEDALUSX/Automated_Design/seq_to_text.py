@@ -73,16 +73,16 @@ def seqtoText(scaf_to_edge, edges, dnaInfo, file_name, scaf_name, singleXOs,
         fid.write("         3'5' 3'5' \n")
         if Aform: # A-form
 			# Invert scaf_left
-			scaf_right = scaf_right[0:]
-			scaf_left = scaf_left[-1::-1]
+            scaf_right = scaf_right[0:]
+            scaf_left = scaf_left[-1::-1]
         else: # B-form
-			fid.write('              | | {} {}\n'.format(
+            fid.write('              | | {} {}\n'.format(
 				dnaInfo.dnaTop[scaf_right[0]].seq, scaf_right[0]
 			))
 
 			# Cut off first of scaf_right and invert scaf_left
-			scaf_right = scaf_right[1:]
-			scaf_left = scaf_left[-1::-1]
+            scaf_right = scaf_right[1:]
+            scaf_left = scaf_left[-1::-1]
 
         for nt_ID in range(len(scaf_right)):
             # Left nucleotides

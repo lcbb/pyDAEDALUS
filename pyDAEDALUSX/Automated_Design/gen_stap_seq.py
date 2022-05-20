@@ -57,8 +57,14 @@ def gen_stap_seq(staples, scaf_seq, staple_name, scaf_name,
                     seq += 'A'
                 elif scaf_seq[nt_ID] == 'G':
                     seq += 'C'
-                else:  # scaf_seq_shift[nt_ID] == 'C':
+                elif scaf_seq[nt_ID] == 'C':
                     seq += 'G'
+                elif scaf_seq[nt_ID] == 'U': # in case user inputs RNA seq
+                    seq += 'A'
+                else:
+                    # Error -- unrecognized nucleotide in scaffold sequence
+                    assert False, 'Unrecognized nucleotide in scaffold sequence'
+                
             staps_for_this_edge.append(seq)
 
             if seq:  # if seq exists (may have been blank)

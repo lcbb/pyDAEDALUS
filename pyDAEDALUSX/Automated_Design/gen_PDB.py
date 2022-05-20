@@ -3,6 +3,27 @@ import numpy as np
 import os
 from PDB_loader import *
 
+'''
+Contents
+--------
+    I. cndo_to_dnainfo
+    II. writePDBresidue
+        1. Single-model PDB with alphanumeric chains
+        2. Multi-model PDB file with chains = 'A'
+        3. Single-model PDB with chains = 'A' and iterative segid
+    III. Matrix transformation functions
+    IV. Large number encoding functions
+        1. base36encode
+        2. hybrid36encode
+    V. pdbgen Function
+-------
+    
+'''
+
+# I. cndo_to_dnainfo
+# This function converts a .cndo data structure to a useable input
+# for the main pdbgen function
+
 def cndo_to_dnainfo(filename, inputdir):
 
     f = open(inputdir + '/' + filename + '.cndo', 'r')
@@ -76,16 +97,18 @@ def cndo_to_dnainfo(filename, inputdir):
 # Function for writing a PDB file atom-by-atom
 # Requires current chain, resnum, restype
 
-def writePDBresidue(filename, chain, chainnum, resnum, atomnum, mmatomnum, restype, refatoms, basecrds, pN):
+# II. writePDBresidue
+
+def writePDBresidue(filename, chain, chainnum, resnum, atomnum, mmatomnum, restype, refatoms, basecrds, pN, fpdb, fmm, fseg):
 
     segatomnum = atomnum
 
     # This function will append coordinates to a PDB file residue by residue
     # 1. Single-model PDB with alphanumeric chains
 
-    pdbOut=filename+'.pdb'
-    fOut=str(os.path.join(pN, pdbOut))
-    f = open(fOut, 'a')
+#    pdbOut=filename+'.pdb'
+#    fOut=str(os.path.join(pN, pdbOut))
+#    f = open(fOut, 'a')
 
     # Check that file lengths are consistent
     if len(refatoms) != len(basecrds[:,0]):
@@ -99,62 +122,67 @@ def writePDBresidue(filename, chain, chainnum, resnum, atomnum, mmatomnum, resty
     #
     for i in range(len(refatoms)):
         # Data type: Record Name: Cols 1 - 6
-        f.write('{0:<6s}'.format('ATOM'))
+        fpdb.write('{0:<6s}'.format('ATOM'))
         # Data type: Atom serial number: Cols 7 - 11
         if atomnum < 100000:
-            f.write('{0:>5d}'.format(int(atomnum)))
+            fpdb.write('{0:>5d}'.format(int(atomnum)))
         else:
-            f.write('*****')
-        f.write(' ') # <-- One blank space
+            hybatomnum = hybrid36encode(atomnum,5)
+            fpdb.write('{0:>5s}'.format(str(hybatomnum)))
+            #f.write('*****')
+        fpdb.write(' ') # <-- One blank space
         # Data type: Atom name: Cols 13 - 16
         # This one is complicated and depends on size of string
         if len(str(refatoms[i])) == 1:
-            f.write(' ' + '{0:>1s}'.format(str(refatoms[i])) + '  ')
+            fpdb.write(' ' + '{0:>1s}'.format(str(refatoms[i])) + '  ')
             element = str(refatoms[i])
         elif len(str(refatoms[i])) == 2:
-            f.write(' ' + '{0:>2s}'.format(str(refatoms[i])) + ' ')
+            fpdb.write(' ' + '{0:>2s}'.format(str(refatoms[i])) + ' ')
             element = str(refatoms[i])[0]
         elif len(str(refatoms[i])) == 3:
-            f.write(' ' + '{0:>3s}'.format(str(refatoms[i])))
+            fpdb.write(' ' + '{0:>3s}'.format(str(refatoms[i])))
             element = str(refatoms[i])[0]
         elif len(str(refatoms[i])) == 4:
-            f.write('{0:>4s}'.format(str(refatoms[i])))
+            fpdb.write('{0:>4s}'.format(str(refatoms[i])))
             element = str(refatoms[i])[1]
         # Data type: Alternate location indicator: Col 17 <-- This is typically empty
-        f.write(' ')
+        fpdb.write(' ')
         # Data type: Residue name: Cols 18 - 20
-        f.write('{0:>3s}'.format(str(restype)))
+        fpdb.write('{0:>3s}'.format(str(restype)))
         # Data type: Chain identifier: Col 22 <-- Insert extra column 21
-        f.write('{0:>2s}'.format(str(chain)))
+        fpdb.write('{0:>2s}'.format(str(chain)))
         # Data type: Residue sequence number: Cols 23 - 26
         if resnum < 10000:
-            f.write('{0:>4d}'.format(int(resnum)))
+            fpdb.write('{0:>4d}'.format(int(resnum)))
         else:
-            f.write('****')
-        f.write('    ') # <-- Four blank spaces
+            hybresnum = hybrid36encode(resnum, 4)
+            fpdb.write('{0:>4s}'.format(str(hybresnum)))
+            #f.write('****')
+        fpdb.write('    ') # <-- Four blank spaces
         # Data type: X coordinates: Cols 31 - 38 (8.3)
-        f.write('{0:>8.3f}'.format(float(basecrds[i,0])))
+        fpdb.write('{0:>8.3f}'.format(float(basecrds[i,0])))
         # Data type: Y coordinates: Cols 39 - 46 (8.3)
-        f.write('{0:>8.3f}'.format(float(basecrds[i,1])))
+        fpdb.write('{0:>8.3f}'.format(float(basecrds[i,1])))
         # Data type: Z coordinates: Cols 47 - 54 (8.3)
-        f.write('{0:>8.3f}'.format(float(basecrds[i,2])))
+        fpdb.write('{0:>8.3f}'.format(float(basecrds[i,2])))
         # Data type: Occupancy: Cols 55 - 60 (6.2)
-        f.write('{0:>6.2f}'.format(float(1.0)))
+        fpdb.write('{0:>6.2f}'.format(float(1.0)))
         # Data type: Temperature factor: Cols 61 - 66 (6.2)
-        f.write('{0:>6.2f}'.format(float(0.0)))
-        f.write('          ') # <-- Ten blank spaces
+        fpdb.write('{0:>6.2f}'.format(float(0.0)))
+        fpdb.write('          ') # <-- Ten blank spaces
         # Data type: Element symbol: Cols 77 - 78
-        f.write('{0:>2s}'.format(str(element)))
+        fpdb.write('{0:>2s}'.format(str(element)))
         # Data type: Charge: Cols 79 - 80 <-- Currently leaving this blank
-        f.write('  \n') # <-- Move to next line
+        fpdb.write('  \n') # <-- Move to next line
 
         # Iterate atom number
         atomnum += 1
 
+    
     # 2. Multi-model PDB with chains = 'A'
-    pdbOut=filename+'-multimodel.pdb'
-    fOut=str(os.path.join(pN, pdbOut))
-    f = open(fOut, 'a')
+#    pdbOut=filename+'-multimodel.pdb'
+#    fOut=str(os.path.join(pN, pdbOut))
+#    fmm = open(fOut, 'a')
 
     element = ' '
     # Please see official PDB file format documentation for more information
@@ -162,65 +190,68 @@ def writePDBresidue(filename, chain, chainnum, resnum, atomnum, mmatomnum, resty
     #
     for i in range(len(refatoms)):
         # Data type: Record Name: Cols 1 - 6
-        f.write('{0:<6s}'.format('ATOM'))
+        fmm.write('{0:<6s}'.format('ATOM'))
         # Data type: Atom serial number: Cols 7 - 11
         if mmatomnum < 100000:
-            f.write('{0:>5d}'.format(int(mmatomnum)))
+            fmm.write('{0:>5d}'.format(int(mmatomnum)))
         else:
-            f.write('*****')
-        f.write(' ') # <-- One blank space
+            mmhybatomnum = hybrid36encode(mmatomnum, 5)
+            fmm.write('{0:>5s}'.format(str(mmhybatomnum)))
+            #f.write('*****')
+        fmm.write(' ') # <-- One blank space
         # Data type: Atom name: Cols 13 - 16
         # This one is complicated and depends on size of string
         if len(str(refatoms[i])) == 1:
-            f.write(' ' + '{0:>1s}'.format(str(refatoms[i])) + '  ')
+            fmm.write(' ' + '{0:>1s}'.format(str(refatoms[i])) + '  ')
             element = str(refatoms[i])
         elif len(str(refatoms[i])) == 2:
-            f.write(' ' + '{0:>2s}'.format(str(refatoms[i])) + ' ')
+            fmm.write(' ' + '{0:>2s}'.format(str(refatoms[i])) + ' ')
             element = str(refatoms[i])[0]
         elif len(str(refatoms[i])) == 3:
-            f.write(' ' + '{0:>3s}'.format(str(refatoms[i])))
+            fmm.write(' ' + '{0:>3s}'.format(str(refatoms[i])))
             element = str(refatoms[i])[0]
         elif len(str(refatoms[i])) == 4:
-            f.write('{0:>4s}'.format(str(refatoms[i])))
+            fmm.write('{0:>4s}'.format(str(refatoms[i])))
             element = str(refatoms[i])[1]
         # Data type: Alternate location indicator: Col 17 <-- This is typically empty
-        f.write(' ')
+        fmm.write(' ')
         # Data type: Residue name: Cols 18 - 20
-        f.write('{0:>3s}'.format(str(restype)))
+        fmm.write('{0:>3s}'.format(str(restype)))
         # Data type: Chain identifier: Col 22 <-- Insert extra column 21
         # For multi-model PDB, this is always 'A'
-        f.write('{0:>2s}'.format(str('A')))
+        fmm.write('{0:>2s}'.format(str('A')))
         # Data type: Residue sequence number: Cols 23 - 26
         if resnum < 10000:
-            f.write('{0:>4d}'.format(int(resnum)))
+            fmm.write('{0:>4d}'.format(int(resnum)))
         else:
-            f.write('****')
-        f.write('    ') # <-- Four blank spaces
+            hybresnum = hybrid36encode(resnum,4)
+            fmm.write('{0:>4s}'.format(str(hybresnum)))
+            #fmm.write('****')
+        fmm.write('    ') # <-- Four blank spaces
         # Data type: X coordinates: Cols 31 - 38 (8.3)
-        f.write('{0:>8.3f}'.format(float(basecrds[i,0])))
+        fmm.write('{0:>8.3f}'.format(float(basecrds[i,0])))
         # Data type: Y coordinates: Cols 39 - 46 (8.3)
-        f.write('{0:>8.3f}'.format(float(basecrds[i,1])))
+        fmm.write('{0:>8.3f}'.format(float(basecrds[i,1])))
         # Data type: Z coordinates: Cols 47 - 54 (8.3)
-        f.write('{0:>8.3f}'.format(float(basecrds[i,2])))
+        fmm.write('{0:>8.3f}'.format(float(basecrds[i,2])))
         # Data type: Occupancy: Cols 55 - 60 (6.2)
-        f.write('{0:>6.2f}'.format(float(1.0)))
+        fmm.write('{0:>6.2f}'.format(float(1.0)))
         # Data type: Temperature factor: Cols 61 - 66 (6.2)
-        f.write('{0:>6.2f}'.format(float(0.0)))
-        f.write('          ') # <-- Ten blank spaces
+        fmm.write('{0:>6.2f}'.format(float(0.0)))
+        fmm.write('          ') # <-- Ten blank spaces
         # Data type: Element symbol: Cols 77 - 78
-        f.write('{0:>2s}'.format(str(element)))
+        fmm.write('{0:>2s}'.format(str(element)))
         # Data type: Charge: Cols 79 - 80 <-- Currently leaving this blank
-        f.write('  \n') # <-- Move to next line
+        fmm.write('  \n') # <-- Move to next line
 
         # Iterate atom number
         mmatomnum += 1
 
-    f.close()
 
     # 3. Single-model PDB with chains = 'A' and iterative segid
-    pdbOut=filename+'-chseg.pdb'
-    fOut=str(os.path.join(pN, pdbOut))
-    f = open(fOut, 'a')
+#    pdbOut=filename+'-chseg.pdb'
+#    fOut=str(os.path.join(pN, pdbOut))
+#    fseg = open(fOut, 'a')
 
     element = ' '
     # Please see official PDB file format documentation for more information
@@ -228,62 +259,65 @@ def writePDBresidue(filename, chain, chainnum, resnum, atomnum, mmatomnum, resty
     #
     for i in range(len(refatoms)):
         # Data type: Record Name: Cols 1 - 6
-        f.write('{0:<6s}'.format('ATOM'))
+        fseg.write('{0:<6s}'.format('ATOM'))
         # Data type: Atom serial number: Cols 7 - 11
         if segatomnum < 100000:
-            f.write('{0:>5d}'.format(int(segatomnum)))
+            fseg.write('{0:>5d}'.format(int(segatomnum)))
         else:
-            f.write('*****')
-        f.write(' ') # <-- One blank space
+            hybatomnum = hybrid36encode(segatomnum, 5)
+            fseg.write('{0:>5s}'.format(str(hybatomnum)))
+            #f.write('*****')
+        fseg.write(' ') # <-- One blank space
         # Data type: Atom name: Cols 13 - 16
         # This one is complicated and depends on size of string
         if len(str(refatoms[i])) == 1:
-            f.write(' ' + '{0:>1s}'.format(str(refatoms[i])) + '  ')
+            fseg.write(' ' + '{0:>1s}'.format(str(refatoms[i])) + '  ')
             element = str(refatoms[i])
         elif len(str(refatoms[i])) == 2:
-            f.write(' ' + '{0:>2s}'.format(str(refatoms[i])) + ' ')
+            fseg.write(' ' + '{0:>2s}'.format(str(refatoms[i])) + ' ')
             element = str(refatoms[i])[0]
         elif len(str(refatoms[i])) == 3:
-            f.write(' ' + '{0:>3s}'.format(str(refatoms[i])))
+            fseg.write(' ' + '{0:>3s}'.format(str(refatoms[i])))
             element = str(refatoms[i])[0]
         elif len(str(refatoms[i])) == 4:
-            f.write('{0:>4s}'.format(str(refatoms[i])))
+            fseg.write('{0:>4s}'.format(str(refatoms[i])))
             element = str(refatoms[i])[1]
         # Data type: Alternate location indicator: Col 17 <-- This is typically empty
-        f.write(' ')
+        fseg.write(' ')
         # Data type: Residue name: Cols 18 - 20
-        f.write('{0:>3s}'.format(str(restype)))
+        fseg.write('{0:>3s}'.format(str(restype)))
         # Data type: Chain identifier: Col 22 <-- Insert extra column 21
         # Use chain 'A' here
-        f.write('{0:>2s}'.format(str('A')))
+        fseg.write('{0:>2s}'.format(str('A')))
         # Data type: Residue sequence number: Cols 23 - 26
         if resnum < 10000:
-            f.write('{0:>4d}'.format(int(resnum)))
+            fseg.write('{0:>4d}'.format(int(resnum)))
         else:
-            f.write('****')
-        f.write('    ') # <-- Four blank spaces
+            hybresnum = hybrid36encode(resnum, 4)
+            fseg.write('{0:>4s}'.format(str(hybresnum)))
+            #fseg.write('****')
+        fseg.write('    ') # <-- Four blank spaces
         # Data type: X coordinates: Cols 31 - 38 (8.3)
-        f.write('{0:>8.3f}'.format(float(basecrds[i,0])))
+        fseg.write('{0:>8.3f}'.format(float(basecrds[i,0])))
         # Data type: Y coordinates: Cols 39 - 46 (8.3)
-        f.write('{0:>8.3f}'.format(float(basecrds[i,1])))
+        fseg.write('{0:>8.3f}'.format(float(basecrds[i,1])))
         # Data type: Z coordinates: Cols 47 - 54 (8.3)
-        f.write('{0:>8.3f}'.format(float(basecrds[i,2])))
+        fseg.write('{0:>8.3f}'.format(float(basecrds[i,2])))
         # Data type: Occupancy: Cols 55 - 60 (6.2)
-        f.write('{0:>6.2f}'.format(float(1.0)))
+        fseg.write('{0:>6.2f}'.format(float(1.0)))
         # Data type: Temperature factor: Cols 61 - 66 (6.2)
-        f.write('{0:>6.2f}'.format(float(0.0)))
-        f.write('      ') # <-- Six blank spaces
+        fseg.write('{0:>6.2f}'.format(float(0.0)))
+        fseg.write('      ') # <-- Six blank spaces
         # Write SEGID here <-- This is a NAMD hack
-        f.write('{0:>4d}'.format(chainnum+1))
+        fseg.write('{0:>4d}'.format(chainnum+1))
         # Data type: Element symbol: Cols 77 - 78
-        f.write('{0:>2s}'.format(str(element)))
+        fseg.write('{0:>2s}'.format(str(element)))
         # Data type: Charge: Cols 79 - 80 <-- Currently leaving this blank
-        f.write('  \n') # <-- Move to next line
+        fseg.write('  \n') # <-- Move to next line
 
         # Iterate atom number
         segatomnum += 1
 
-    f.close()
 
     # 4. mmCIF atomic format for large structures
     #f = open('./' + filename + '.cif', 'a')
@@ -297,6 +331,8 @@ def writePDBresidue(filename, chain, chainnum, resnum, atomnum, mmatomnum, resty
     #for i in range(len(refatoms)):
 
     return atomnum, mmatomnum
+
+# III. Matrix transformation functions
 
 # Procedure same as in ProDy
 def getTransMat(mob, tar):
@@ -368,7 +404,42 @@ def axisangletoeul(angle, axis):
 
     return mat
 
-# PDBGen Function Definition
+# IV. Functions for encoding large numbers
+
+# 1. Function to encode a decimal using base36 notation
+def base36encode(number):
+
+    # 36-character alphabet for base-36 notation
+    alphab36 = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', \
+                'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', \
+                'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    base36 = ''
+
+    while number:
+        number, i  = divmod(number, 36)
+        base36 = alphab36[i] + base36
+
+    return base36
+
+# 2. Function to encode a decimal using hybrid36 notation
+def hybrid36encode(number,digits):
+
+    # 52-character alphabet for first digit of hybrid36 notation
+    alphahyb36 = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', \
+                  'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', \
+                  'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', \
+                  'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', \
+                  'w', 'x', 'y', 'z']
+
+    div, rem = divmod(number, 36 ** (digits - 1))
+    b36rem = base36encode(rem)
+    hybrem = alphahyb36[div]
+    # Need to check length of b36rem string
+    hyb36str = str(hybrem) + str(b36rem)
+
+    return hyb36str
+
+# V. PDBGen Function Definition
 def pdbgen(filename, hF, pN):
 
     # Open PDBGen logging file
@@ -387,6 +458,7 @@ def pdbgen(filename, hF, pN):
     resnum = 1
     chainnum = 0
     chlist = 'A'
+    cc = 0
     bdna = c_bdna()
     adna = c_adna()
     arna = c_arna()
@@ -520,6 +592,20 @@ def pdbgen(filename, hF, pN):
             #        print('...Error in routing info...\n')
             #        break
             #
+    
+    # Open PDB files for appending
+    fpdb_name = filename + '.pdb'
+    fpdbOut = str(os.path.join(pN, fpdb_name))
+    fpdb = open(fpdbOut, 'a')
+    
+    fmm_name = filename + '-multimodel.pdb'
+    fmmOut = str(os.path.join(pN,fmm_name))
+    fmm = open(fmmOut, 'a')
+    
+    fseg_name = filename + '-segid.pdb'
+    fsegOut = str(os.path.join(pN, fseg_name))
+    fseg = open(fsegOut, 'a')
+    
     ssfirst = 0 # ID of first nucleotide in ss region
     sslast = 0 # ID of last nucleotide in ss region
     sslength = 0 # Length of ss region
@@ -545,11 +631,9 @@ def pdbgen(filename, hF, pN):
         type = 0 # scaf = 1, stap = 2, ssdna = 3
 
         # Check if the base is 5'-end
-#        if baseup == -1:
+        if baseup == -1:
             # Multi-model PDB starts new model here
-#            f = open('./' + filename + '-multimodel.pdb', 'a')
-#            f.write('MODEL' + '{0:>9s}'.format(str(chainnum + 1)) + '\n')
-#            f.close()
+            fmm.write('MODEL' + '{0:>9s}'.format(str(chainnum + 1)) + '\n')
 
         #print sslength, sslast, baseid
 
@@ -1027,7 +1111,7 @@ def pdbgen(filename, hF, pN):
                 # Pass {filename, chain, residue number, atom number, residue type,
                 # atom types, base coords} to PDB writer
                 atomnum, mmatomnum = writePDBresidue(filename, chlist, chainnum, resnum, atomnum, \
-                                          mmatomnum, restype, refatoms, basecrds, pN)
+                                          mmatomnum, restype, refatoms, basecrds, pN, fpdb, fmm, fseg)
 
                 # Iterate residue indexing
                 resnum += 1
@@ -1216,16 +1300,21 @@ def pdbgen(filename, hF, pN):
         # Pass {filename, chain, residue number, atom number, residue type,
         # atom types, base coords} to PDB writer
         atomnum, mmatomnum = writePDBresidue(filename, chlist, chainnum, resnum, atomnum, \
-                                  mmatomnum, restype, refatoms, basecrds, pN)
+                                  mmatomnum, restype, refatoms, basecrds, pN, fpdb, fmm, fseg)
 
         # Iterate residue indexing
         resnum += 1
         if basedown == -1:
 
+            # Standard PDB end chain
+            fpdb.write('TER\n')
+            
             # Multi-model PDB ends model here
-#            f = open('./' + filename + '-multimodel.pdb', 'a')
-#            f.write('ENDMDL\n')
-#            f.close()
+            fmm.write('\TER\nENDMDL\n')
+
+            # Chain segment PDB end chain
+            fseg.write('TER\n')
+
 
             # Iterate chainnum and return mmatomnum to 1
             chainnum += 1
@@ -1235,6 +1324,15 @@ def pdbgen(filename, hF, pN):
             # Chainlist definition
             if chainnum < 62:
                 chlist = chainlist[chainnum]
+            elif chainnum == int(62 * (cc+1)): 
+                chlist = chainlist[chainnum - int(62*(cc+1))]
+                cc += 1
             else:
-                chlist = chainlist[chainnum - 62]
+                chlist = chainlist[chainnum - int(62*cc)]
+                
+    # close any open files
+    fpdb.close()
+    fmm.close()
+    fseg.close()
+    
     return 1

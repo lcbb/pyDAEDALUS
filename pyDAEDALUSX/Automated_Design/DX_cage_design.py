@@ -19,7 +19,7 @@ from Automated_Design.set_routing_direction import set_routing_direction
 from Automated_Design.split_edge import split_edge
 from Automated_Design.split_vert import split_vert
 from Automated_Design.util import generate_graph
-from designate_edge_type import designate_edge_type
+from Automated_Design.designate_edge_type import designate_edge_type
 from gen_schlegel import gen_schlegel
 from gen_vert_to_face import gen_vert_to_face
 
@@ -84,13 +84,13 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
             for i in range(2 * sum(edge_length_vec)):
                 roll = np.random.uniform()
                 if roll < 0.25:
-                    chosen_letter = 'a'
+                    chosen_letter = 'A'
                 elif roll < 0.50:
-                    chosen_letter = 't'
+                    chosen_letter = 'T'
                 elif roll < 0.75:
-                    chosen_letter = 'g'
+                    chosen_letter = 'G'
                 else:
-                    chosen_letter = 'c'
+                    chosen_letter = 'C'
                 scaf_seq += chosen_letter
 
             scaf_name = 'randomscaf'  # scaffold name
@@ -225,7 +225,7 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     pickled_dna_info_filename = 'dnaInfo_' + full_file_name + '.pickle'
     full_pickled_dna_info_filename = path.join(results_foldername,
                                                pickled_dna_info_filename)
-    pickle.dump(dnaInfo, open(full_pickled_dna_info_filename, 'w'))
+    pickle.dump(dnaInfo, open(full_pickled_dna_info_filename, 'wb'))
 
     route_info_dump = {'scaf_to_edge': scaf_to_edge,
                        'scaf_seq': scaf_seq,
@@ -239,7 +239,7 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     route_info_dump_filename = 'routeInfo_' + full_file_name + '.pickle'
     full_route_info_filename = path.join(results_foldername,
                                          route_info_dump_filename)
-    pickle.dump(route_info_dump, open(full_route_info_filename, 'w'))
+    pickle.dump(route_info_dump, open(full_route_info_filename, 'wb'))
 
     # as cando file
     cando_filename = full_file_name + '.cndo'
