@@ -447,10 +447,11 @@ def pdbgen(filename, hF, pN):
     # Specify A- or B-type Helix
     if hF==True:
         abtype='A'
-        natype='RNA'
+        natype=['RNA','DNA'] # [scaffold type, staple type]
+        # note: defaulting to RNA scaffold and DNA staples when A-form helix is specified
     elif hF==False:
         abtype='B'
-        natype='DNA'
+        natype=['DNA','DNA'] # [scaffold type, staple type]
 
     # Initialize PDB Generation Values
     atomnum = 1
@@ -880,7 +881,7 @@ def pdbgen(filename, hF, pN):
                 refcrds = []
                 refatoms = []
                 restype = ''
-                if typeup == 1 and abtype == 'B' and natype == 'DNA': # Scaffold strand
+                if typeup == 1 and abtype == 'B' and natype[typeup-1] == 'DNA': # Scaffold strand
                     if baseseq == 'A':
                         refcrds = bdna.Ascaf[:,3:6]
                         refatoms = bdna.Ascaf[:,0]
@@ -899,7 +900,7 @@ def pdbgen(filename, hF, pN):
                         restype = 'THY'
                     else:
                         print('...Error: No base sequence for scaffold strand...\n');
-                elif typeup == 2 and abtype == 'B' and natype == 'DNA': # Staple strand
+                elif typeup == 2 and abtype == 'B' and natype[typeup-1] == 'DNA': # Staple strand
                     if baseseq == 'A':
                         refcrds = bdna.Astap[:,3:6]
                         refatoms = bdna.Astap[:,0]
@@ -918,7 +919,7 @@ def pdbgen(filename, hF, pN):
                         restype = 'THY'
                     else:
                         print('...Error: No base sequence for staple strand...\n');
-                elif typeup == 1 and abtype == 'A' and natype == 'DNA': # Scaffold strand
+                elif typeup == 1 and abtype == 'A' and natype[typeup-1] == 'DNA': # Scaffold strand
                     if baseseq == 'A':
                         refcrds = adna.Ascaf[:,3:6]
                         refatoms = adna.Ascaf[:,0]
@@ -937,7 +938,7 @@ def pdbgen(filename, hF, pN):
                         restype = 'THY'
                     else:
                         print('...Error: No base sequence for scaffold strand...\n');
-                elif typeup == 2 and abtype == 'A' and natype == 'DNA': # Staple strand
+                elif typeup == 2 and abtype == 'A' and natype[typeup-1] == 'DNA': # Staple strand
                     if baseseq == 'A':
                         refcrds = adna.Astap[:,3:6]
                         refatoms = adna.Astap[:,0]
@@ -956,7 +957,7 @@ def pdbgen(filename, hF, pN):
                         restype = 'THY'
                     else:
                         print('...Error: No base sequence for staple strand...\n')
-                elif typeup == 1 and abtype == 'A' and natype == 'RNA': # Scaffold strand
+                elif typeup == 1 and abtype == 'A' and natype[typeup-1] == 'RNA': # Scaffold strand
                     if baseseq == 'A':
                         refcrds = arna.Ascaf[:,3:6]
                         refatoms = arna.Ascaf[:,0]
@@ -979,7 +980,7 @@ def pdbgen(filename, hF, pN):
                         restype = 'URA'
                     else:
                         print('...Error: No base sequence for scaffold strand...\n')
-                elif typeup == 2 and abtype == 'A' and natype == 'RNA': # Staple strand
+                elif typeup == 2 and abtype == 'A' and natype[typeup-1] == 'RNA': # Staple strand
                     if baseseq == 'A':
                         refcrds = arna.Astap[:,3:6]
                         refatoms = arna.Astap[:,0]
@@ -1121,7 +1122,7 @@ def pdbgen(filename, hF, pN):
         refatoms = []
         restype = ''
         #print type, baseseq
-        if type == 1 and abtype == 'B' and natype == 'DNA': # Scaffold strand
+        if type == 1 and abtype == 'B' and natype[type-1] == 'DNA': # Scaffold strand
             if baseseq == 'A':
                 refcrds = bdna.Ascaf[:,3:6]
                 refatoms = bdna.Ascaf[:,0]
@@ -1140,7 +1141,7 @@ def pdbgen(filename, hF, pN):
                 restype = 'THY'
             else:
                 print('...Error: No base sequence for scaffold strand...\n')
-        elif type == 2 and abtype == 'B' and natype == 'DNA': # Staple strand
+        elif type == 2 and abtype == 'B' and natype[type-1] == 'DNA': # Staple strand
             if baseseq == 'A':
                 refcrds = bdna.Astap[:,3:6]
                 refatoms = bdna.Astap[:,0]
@@ -1159,7 +1160,7 @@ def pdbgen(filename, hF, pN):
                 restype = 'THY'
             else:
                 print('...Error: No base sequence for staple strand...\n')
-        elif type == 1 and abtype == 'A' and natype == 'DNA': # Scaffold strand
+        elif type == 1 and abtype == 'A' and natype[type-1] == 'DNA': # Scaffold strand
             if baseseq == 'A':
                 refcrds = adna.Ascaf[:,3:6]
                 refatoms = adna.Ascaf[:,0]
@@ -1178,7 +1179,7 @@ def pdbgen(filename, hF, pN):
                 restype = 'THY'
             else:
                 print('...Error: No base sequence for scaffold strand...\n')
-        elif type == 2 and abtype == 'A' and natype == 'DNA': # Staple strand
+        elif type == 2 and abtype == 'A' and natype[type-1] == 'DNA': # Staple strand
             if baseseq == 'A':
                 refcrds = adna.Astap[:,3:6]
                 refatoms = adna.Astap[:,0]
@@ -1197,7 +1198,7 @@ def pdbgen(filename, hF, pN):
                 restype = 'THY'
             else:
                 print('...Error: No base sequence for staple strand...\n')
-        elif type == 1 and abtype == 'A' and natype == 'RNA': # Scaffold strand
+        elif type == 1 and abtype == 'A' and natype[type-1] == 'RNA': # Scaffold strand
             if baseseq == 'A':
                 refcrds = arna.Ascaf[:,3:6]
                 refatoms = arna.Ascaf[:,0]
@@ -1220,7 +1221,7 @@ def pdbgen(filename, hF, pN):
                 restype = 'URA'
             else:
                 print('...No base sequence for scaffold strand...\n')
-        elif type == 2 and abtype == 'A' and natype == 'RNA': # Staple strand
+        elif type == 2 and abtype == 'A' and natype[type-1] == 'RNA': # Staple strand
             if baseseq == 'A':
                 refcrds = arna.Astap[:,3:6]
                 refatoms = arna.Astap[:,0]
