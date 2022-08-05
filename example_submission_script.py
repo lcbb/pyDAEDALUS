@@ -17,10 +17,11 @@ multicall = xmlrpc.client.MultiCall(proxy)
 #	sequenceFile: Path to sequence file
 #
 
-ply_dir = "H:/PLY_Files" # directory containing input geometries
+ply_dir = "C:/pyDAEDALUSX/PLY_Files" # path to directory containing input geometries
 
 for geom in os.listdir(ply_dir):
-    ply = os.path.join(ply_dir, geom) # path to geometry file
+    ply = os.path.join(ply_dir, geom) # path to specific geometry file
+	name = geom # project name
     multicall.calc(name,"Aform",4,ply,"M13.txt");
 
 result = multicall()
