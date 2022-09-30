@@ -7,28 +7,19 @@ import numpy as np
 from Automated_Design.constants import VERMILLION, REDPURPLE, WHITE, BLU, ORANG
 from Automated_Design.util import intersect_lists
 
-#d = 3.4  # angstroms, distance between two nucleotides
-#IHD = 20.0  # angstroms, inter-helical distance
-#r = 10.0  # angstroms, radius of double helix
-#wDX = IHD + 2 * r  # angstroms, width of DX tile
 
-## parameters
-#if Aform: # A-form
-#    d = 2.6  # angstroms, distance between two nucleotides 2.6
-#    IHD = 23.0  # angstroms, inter-helical distance 23
-#    r = 11.5  # angstroms, radius of double helix 11.5
-#else: # B-form
-#    d = 3.4  # angstroms, distance between two nucleotides
-#    IHD = 20.0  # angstroms, inter-helical distance
-#    r = 10.0  # angstroms, radius of double helix
-#wDX = IHD + 2 * r  # angstroms, width of DX tile
+# parameters
+d = 2.6  # angstroms, distance between two nucleotides 2.6
+IHD = 23  # angstroms, inter-helical distance 23
+r = 11.5  # angstroms, radius of double helix 11.5
+wDX = IHD + 2 * r  # angstroms, width of DX tile
 
 
 # Running with defining a class rather than a dict to:
 # 1) Give you the dot-notation for subparts.  e.g., `.triad`
 # 2) Keep the option open for moving some of the later calculations
-#    into the DNAGeom class.
-class DNAGeom(object):
+#    into the DNAGenom class.
+class DNAGenom(object):
     def __init__(self, n_bp):
         self.dNode = np.zeros(shape=(n_bp, 3))
         self.triad = np.zeros(shape=(3, 3, n_bp))
@@ -70,7 +61,7 @@ def calc_buff(faces, num_vert, coordinates, d, wDX):
         V = number of vertices
     d : float
         distance between two nucleotides, in angstroms
-    wDX : float
+    wDX : int
         width of DX tile, in angstroms
 
     Returns
@@ -203,7 +194,7 @@ def tensor_product(a, b):
 
 class DnaInfo(object):
     def __init__(self, scaf_to_edge, scaf_seq, stap_list, stap_seq_list,
-                 coordinates, edges, edge_length_vec, faces, vert_to_face, Aform=False):
+                 coordinates, edges, edge_length_vec, faces, vert_to_face):
         """
         Generate file to sent to CanDo for rendering and finite element
         simulation.
@@ -268,17 +259,6 @@ class DnaInfo(object):
                 triad = 3 x 3 x n_bp matrix of spatial orientation
                 id_nt = n_bp x 2 matrix of nucleotides that compose base pair
         """
-        # parameters
-        if Aform: # A-form
-            d = 2.6  # angstroms, distance between two nucleotides 2.6
-            IHD = 23.0  # angstroms, inter-helical distance 23
-            r = 11.5  # angstroms, radius of double helix 11.5
-        else: # B-form
-            d = 3.4  # angstroms, distance between two nucleotides
-            IHD = 20.0  # angstroms, inter-helical distance
-            r = 10.0  # angstroms, radius of double helix
-        wDX = IHD + 2 * r  # angstroms, width of DX tile
-
         stap_seq_list = deepcopy(stap_seq_list)
         stap_list = deepcopy(stap_list)
 
@@ -299,7 +279,7 @@ class DnaInfo(object):
         '''
 
         # Initialize dnaGeom:
-        self.dnaGeom = DNAGeom(n_bp=n_bp)
+        self.dnaGeom = DNAGenom(n_bp=n_bp)
 
         # Note: preferred nucleotide always on scaffold strand
 
@@ -399,7 +379,7 @@ class DnaInfo(object):
                         nt_ID = scaf_part[bp_ID]  # nucleotide id
 
                         turnAngle = self.get_turn_angle_for_pos_scaf_nick_pos(
-                            num_nt, Aform)
+                            num_nt)
 
                         rot_matrix = self.get_rot_matrix(bp_ID, start_nt,
                                                          turnAngle, zX, zXz)
@@ -422,7 +402,7 @@ class DnaInfo(object):
                         nt_ID = scaf_part[bp_ID]  # nucleotide id
 
                         turnAngle = self.get_turn_angle_for_pos_scaf_nick_pos(
-                            num_nt, Aform)
+                            num_nt)
 
                         rot_matrix = self.get_rot_matrix(bp_ID, start_nt,
                                                          turnAngle, zX, zXz)
@@ -446,7 +426,7 @@ class DnaInfo(object):
                         nt_ID = scaf_part[bp_ID]  # nucleotide id
 
                         turnAngle = self.get_turn_angle_for_zero_scaf_nick_pos(
-                            num_nt, Aform)  # scalar
+                            num_nt)  # scalar
 
                         rot_matrix = self.get_rot_matrix(bp_ID, start_nt,
                                                          turnAngle, zX, zXz)
@@ -542,11 +522,8 @@ class DnaInfo(object):
                     stap_seq_list[stap_ID][stap_base].upper()
 
     @staticmethod
-    def get_turn_angle_for_zero_scaf_nick_pos(num_nt, Aform=False):
-        if Aform: # A-form
-            return 2 * np.pi * int(round(num_nt / 11.0)) / (num_nt + 1)
-        else: # B-form
-            return 2 * np.pi * int(round(num_nt / 10.5)) / (num_nt + 1)
+    def get_turn_angle_for_zero_scaf_nick_pos(num_nt):
+        return 2 * np.pi * int(round(num_nt / 11.0)) / (num_nt + 1)
 
     @staticmethod
     def get_rot_matrix(bp_ID, start_nt, turnAngle, zX, zXz):
@@ -556,11 +533,8 @@ class DnaInfo(object):
         return rot_matrix
 
     @staticmethod
-    def get_turn_angle_for_pos_scaf_nick_pos(num_nt, Aform=False):
-        if Aform: # A-form
-            return 2 * np.pi * (int(np.floor(num_nt / 11.0)) + 0.5) / (num_nt + 1)
-        else: # B-form
-            return 2 * np.pi * (int(np.floor(num_nt / 10.5)) + 0.5) / (num_nt + 1)
+    def get_turn_angle_for_pos_scaf_nick_pos(num_nt):
+        return 2 * np.pi * (int(np.floor(num_nt / 11.0)) + 0.5) / (num_nt + 1)
 
     def plot_3d_model(self, filename, scale=1.0):  # pragma: no cover
         """
@@ -692,15 +666,15 @@ class DnaInfo(object):
             triad = self.dnaGeom.triad[:, :, i]
             fid.write('{},{},{},{},{},{},{},{},{},{}\n'.format(
                 handle_1_indexing(i),
-                triad[0, 0],
-                triad[1, 0],
-                triad[2, 0],
+                -triad[0, 0],
+                -triad[1, 0],
+                -triad[2, 0],
                 triad[0, 1],
                 triad[1, 1],
                 triad[2, 1],
-                triad[0, 2],
-                triad[1, 2],
-                triad[2, 2]))
+                -triad[0, 2],
+                -triad[1, 2],
+                -triad[2, 2]))
         fid.write('\n')
 
         # dnaInfo.dnaGeom.id_nt

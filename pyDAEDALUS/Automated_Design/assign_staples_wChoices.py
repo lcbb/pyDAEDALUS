@@ -3,21 +3,32 @@ from math import floor
 from Automated_Design.util import find
 
 
+def generate_spanning_22_bp_staples(num_22_staps, scaf_bot_cut, scaf_top_cut):
+    staple_list = []
+    for i in range(num_22_staps):
+        a = (22 * i)
+        c = a-1 if a > 0 else None
+        b = 22 * (i + 1)
+        temp_stap = scaf_bot_cut[a:b] + scaf_top_cut[b-1:c:-1]
+        # Adjust nick to center on bottom strand (5' 11 22 11 3' split)
+        reordered_temp_stap = temp_stap[11:] + temp_stap[0:11]
+        staple_list.append(reordered_temp_stap)
+    return staple_list
+
 def generate_spanning_21_bp_staples(num_21_staps, scaf_bot_cut, scaf_top_cut):
     staple_list = []
     for i in range(num_21_staps):
         a = (21 * i)
-        a = a if a > 0 else None  # TODO: test when `a` doesn't equal 0
+        c = a-1 if a > 0 else None
         b = 21 * (i + 1)
-        temp_stap = scaf_bot_cut[a:b] + scaf_top_cut[b-1:a:-1]
+        temp_stap = scaf_bot_cut[a:b] + scaf_top_cut[b-1:c:-1]
         # Adjust nick to center on bottom strand (5' 10 21 11 3' split)
         reordered_temp_stap = temp_stap[11:] + temp_stap[0:11]
         staple_list.append(reordered_temp_stap)
     return staple_list
 
-
 def assign_staples_wChoices(edges, num_edges, edge_type_mat, scaf_to_edge,
-                            num_bases, num_vert, singleXOs):
+                            num_bases, num_vert, singleXOs, Aform=False):
     """
     Assign staples to edges following prescribed patterns
     Inputs: edges = Ex2 matrix where each row corresponds to one edge,
@@ -35,7 +46,7 @@ def assign_staples_wChoices(edges, num_edges, edge_type_mat, scaf_to_edge,
             num_vert = number of vertices, V
             singleXOs = 1 if using vertex staples with single crossovers,
                0 if not.
-Output: staples = cell array with E rows, each cell contains row vector.
+    Output: staples = cell array with E rows, each cell contains row vector.
         Some cells may be empty as fragments are combined into full staples.
         Columns 0-3 contain vertex staples, while 4+ contain edge staples.
     ##########################################################################
@@ -68,177 +79,333 @@ Output: staples = cell array with E rows, each cell contains row vector.
         if singleXOs:  # singleXOs on
 
             # TODO: remove staples 1 and 4.  change init'd stap_ID to 4.
-            staples[edge_ID][0] = scaf_bot[0:10]  # 5 bp -> 10
-            staples[edge_ID][1] = scaf_top[10::-1]  # 6 bp -> 11
-            staples[edge_ID][2] = scaf_top[-1:-1 - 10:-1]  # 5 bp -> 10
-            staples[edge_ID][3] = scaf_bot[-11:]  # 6 bp -> 11
+
+#
+# Tyson edits: changing vertex staples to new Hform
+#
+            if Aform: # A-form
+                staples[edge_ID][0] = scaf_bot[0:9]  # 5 bp -> 11
+                staples[edge_ID][1] = scaf_top[12::-1]  # 6 bp -> 11
+                ###possible bug in original code?
+                staples[edge_ID][2] = scaf_top[-1:(-1-9):-1]  # 5 bp -> 11
+                staples[edge_ID][3] = scaf_bot[-13:]  # 6 bp -> 11
+            else: # B-form
+                staples[edge_ID][0] = scaf_bot[0:10]  # 5 bp -> 10
+                staples[edge_ID][1] = scaf_top[10::-1]  # 6 bp -> 11
+                ###possible bug in original code?
+                staples[edge_ID][2] = scaf_top[-1:(-1-10):-1]  # 5 bp -> 11
+                staples[edge_ID][3] = scaf_bot[-11:]  # 6 bp -> 11
 
         else:  # singleXOs off, doubleXOs instead
             # TODO:
-            raise Exception("Section not tested")
-            staples[edge_ID][0] = scaf_bot[0:10] + scaf_top[11:5:-1]  # 10+6 bp
-            staples[edge_ID][1] = scaf_top[5::-1]  # 5 bp
-            staples[edge_ID][2] = scaf_top[-1:-1-10:-1] + \
-                scaf_bot[-1-11+1:-5]  # 10+6 bp
-            staples[edge_ID][3] = scaf_bot[-5:]  # 5 bp
+            # raise Exception("Section not tested")
+            if Aform: # A-form
+                staples[edge_ID][0] = scaf_bot[0:11] + scaf_top[10:4:-1]  # 11+6 bp
+                staples[edge_ID][1] = scaf_top[4::-1]  # 5 bp
+                staples[edge_ID][2] = scaf_top[-1:(-1-11):-1] + \
+                    scaf_bot[(-1-11+1):-5]  # 11+6 bp
+                staples[edge_ID][3] = scaf_bot[-5:]  # 5 bp
+            else: # B-form
+                staples[edge_ID][0] = scaf_bot[0:10] + scaf_top[10:4:-1]  # 10+6 bp
+                staples[edge_ID][1] = scaf_top[4::-1]  # 5 bp
+                staples[edge_ID][2] = scaf_top[-1:(-1-10):-1] + \
+                    scaf_bot[(-1-11+1):-5]  # 10+6 bp
+                staples[edge_ID][3] = scaf_bot[-5:]  # 5 bp
 
         # # Begin adding edge staples
         stap_ID = 4  # initialize staple ID
 
-        # # Clip off ends that bind to vertex staple
-        scaf_top_cut = scaf_top[11:-10]
-        scaf_bot_cut = scaf_bot[10:-11]
+        if Aform:
+            scaf_top_cut = scaf_top[13:-9]
+            scaf_bot_cut = scaf_bot[9:-13]
+        else:
+            scaf_top_cut = scaf_top[11:-10]
+            scaf_bot_cut = scaf_bot[10:-11]
 
-        len_cut = len(scaf_top_cut)  # length requiring edge staples
+
+        # # Clip off ends that bind to vertex staple
+        len_cut = len(scaf_top_cut)   # length requiring edge staples
+
         if len_cut > 0:  # if there are any other staples to be added
             if edge_type == 2:  # tree edge, no scaffold crossover
-                # number of 21x2-nt staples
-                num_21staps = int(floor(len_cut/21))
-                # remaining staple, 10x2 or 11x2
-                len_extra_stap = int(len_cut - 21*num_21staps)
+                # number of 22x2-nt staples and 21x2-nt staples
+                num_22staps = int(floor(len_cut/22)) # A-form
+                num_21staps = int(floor(len_cut/21)) # B-form
+                # remaining staple, 11x2 (A), or 10x2 or 11x2 (B)
+                if Aform: # A-form
+                    len_extra_stap = int(len_cut - 22*num_22staps)
+                else: # B-form
+                    len_extra_stap = int(len_cut - 21*num_21staps)
 
-                # # Add the staples that span 21 bp
-                bp_staples = generate_spanning_21_bp_staples(
-                    num_21staps, scaf_bot_cut, scaf_top_cut)
-                staples[edge_ID] += bp_staples
-                stap_ID += 1
+                # # Add the staples that span 22 bp
+                if Aform: # A-form
+                    bp_staples = generate_spanning_22_bp_staples(
+                            num_22staps, scaf_bot_cut, scaf_top_cut)
+                    staples[edge_ID] += bp_staples
+                    stap_ID += 1
+                else: # B-form
+                    bp_staples = generate_spanning_21_bp_staples(
+                            num_21staps, scaf_bot_cut, scaf_top_cut)
+                    staples[edge_ID] += bp_staples
+                    stap_ID += 1
 
                 # # Add the extra staple if necessary
                 # # abutting the higher index vertex
                 if len_extra_stap > 0:  # if an extra staple is required
-                    temp_stap = scaf_bot_cut[-1 - len_extra_stap + 1:] + \
-                                scaf_top_cut[-1:-1 - len_extra_stap:-1]
+                    temp_stap = scaf_bot_cut[(-1 - len_extra_stap + 1):] + \
+                                scaf_top_cut[-1:(-1 - len_extra_stap):-1]
                     staples[edge_ID].append(temp_stap)
                     stap_ID += 1
 
             else:  # nontree edge, 1 scaffold crossover
 
-                # number of 21x2-nt staples
-                num_21staps = int(floor(len_cut/21))
+                # number of 22x2-nt staples and 21x2-nt staples
+                num_22staps = int(floor(len_cut/22)) # A-form
+                num_21staps = int(floor(len_cut/21)) # B-form
 
                 # Going to match Table S1 to find what X and Y are.
                 # TODO: also done in enum_scaff_bases.  Extract both as func
                 # # Detect scaffold crossover location
-                # If scaffold crossover 5/6 away from center:
-                if len_cut == 21*num_21staps:
-                    if len_cut % 2 == 0:  # even
-                        cutoff = int(len_cut / 2 - 5)
-                    else:  # odd
-                        cutoff = int(len_cut / 2 - 5.5)
-                else:  # scaffold crossover 0/1 away from center
-                    if len_cut % 2 == 0:  # even
-                        cutoff = int(len_cut / 2)
-                    else:  # odd
-                        cutoff = int(len_cut / 2 - 0.5)
+                if Aform: # A-form
+                    # If scaffold crossover 5/6 away from center:
+                    if len_cut == 22*num_22staps:
+                        cutoffTop = int((len_cut/2.0)-8.0) # -5.5-2.5
+                        cutoffBot = int((len_cut/2.0)-3.0) # -5.5+2.5
+                    else:  # scaffold crossover 0/1 away from center
+                        cutoffTop = int((len_cut/2.0)-2.5) # 0-2.5
+                        cutoffBot = int((len_cut/2.0)+2.5) # 0+2.5
 
-                cutoff += 1  # cutoff is currently last number on left, but
-                # slicing notation takes everything less than given number.
+                    # # Split top scaffold strand in two
+                    scaf_top_cut_left = scaf_top_cut[:cutoffTop]
+                    scaf_top_cut_rght = scaf_top_cut[cutoffTop:]
 
-                # # Split top scaffold strand in two
-                scaf_top_cut_left = scaf_top_cut[:cutoff]
-                scaf_top_cut_rght = scaf_top_cut[cutoff:]
+                    # # Split bottom scaffold strand in two
+                    scaf_bot_cut_left = scaf_bot_cut[:cutoffBot]
+                    scaf_bot_cut_rght = scaf_bot_cut[cutoffBot:]
 
-                # # Split bottom scaffold strand in two
-                scaf_bot_cut_left = scaf_bot_cut[:cutoff]
-                scaf_bot_cut_rght = scaf_bot_cut[cutoff:]
+                    # # Check if 15/16 or 16/16 scaffold crossover staple
+                    len_left = len(scaf_top_cut_left)  # Basically X
+                    len_rght = len(scaf_top_cut_rght)  # basically Y
 
-                # # Check if 15/16 or 16/16 scaffold crossover staple
-                len_left = len(scaf_top_cut_left)  # Basically X
-                len_rght = len(scaf_top_cut_rght)  # basically Y
+                    rem_left = len_left % 22
+                    rem_rght = len_rght % 22
 
-                rem_left = len_left % 21
-                rem_rght = len_rght % 21
+                    # scs = scaffold crossover staple
+                    if rem_left == 16:
+                        left_SCS = min(16, len_left)
+                    elif rem_left== 3:
+                        left_SCS = min(14, len_left)
+                    elif rem_left==17:
+                        left_SCS = min(14)
+                    else:  # 5/26, 6/27, 16
+                        left_SCS = min(14, len_left)
 
-                # scs = scaffold crossover staple
-                if rem_left == 15:
-                    left_SCS = min(15, len_left)
-                else:  # 5/26, 6/27, 16
-                    left_SCS = min(16, len_left)
+                    if rem_rght == 16:
+                        rght_SCS = min(16, len_rght)
+                    elif rem_rght == 8:
+                        rght_SCS = min(19, len_rght)
+                    else:  # 5/26, 6/27, 16
+                        rght_SCS = min(19, len_rght)
 
-                if rem_rght == 15:
-                    rght_SCS = min(15, len_rght)
-                else:  # 5/26, 6/27, 16
-                    rght_SCS = min(16, len_rght)
+                    # Define new regions
+                    # Region with staples that cross scaffold crossovers
+                    scaf_top_SCS = scaf_top_cut_left[-left_SCS:] + \
+                        scaf_top_cut_rght[:rght_SCS]
+                    scaf_bot_SCS = scaf_bot_cut_left[-left_SCS-5:] + \
+                        scaf_bot_cut_rght[:rght_SCS-5]
 
-                # Define new regions
-                # Region with staples that cross scaffold crossovers
-                scaf_top_SCS = scaf_top_cut_left[-left_SCS:] + \
-                    scaf_top_cut_rght[:rght_SCS]
-                scaf_bot_SCS = scaf_bot_cut_left[-left_SCS:] + \
-                    scaf_bot_cut_rght[:rght_SCS]
+                    # Regions to the left and right of the scaf crossover staples
+                    scaf_top_cut_left_noSCS = scaf_top_cut_left[:-left_SCS]
+                    scaf_top_cut_rght_noSCS = scaf_top_cut_rght[rght_SCS:]
+                    len_left_noSCS = len(scaf_top_cut_left_noSCS)
+                    len_rght_noSCS = len(scaf_top_cut_rght_noSCS)
 
-                # Regions to the left and right of the scaf crossover staples
-                scaf_top_cut_left_noSCS = scaf_top_cut_left[:-left_SCS]
-                scaf_top_cut_rght_noSCS = scaf_top_cut_rght[rght_SCS:]
-                len_left_noSCS = len(scaf_top_cut_left_noSCS)
-                len_rght_noSCS = len(scaf_top_cut_rght_noSCS)
+                    scaf_bot_cut_left_noSCS = scaf_bot_cut_left[:-left_SCS-5]
+                    scaf_bot_cut_rght_noSCS = scaf_bot_cut_rght[rght_SCS-5:]
 
-                scaf_bot_cut_left_noSCS = scaf_bot_cut_left[:-left_SCS]
-                scaf_bot_cut_rght_noSCS = scaf_bot_cut_rght[rght_SCS:]
+                    if len_cut <= 11:
+                        # # if len_cut <= 11, make single-crossover edge staple
+                        staples[edge_ID].append(scaf_bot_SCS)
+                        stap_ID += 1
+                        staples[edge_ID].append(scaf_top_SCS[-1::-1])
+                        stap_ID += 1
+                    else:
+                        # # Do SCStaples, nick 8 bp away from 3'
+                        staples[edge_ID].append(
+                            scaf_bot_SCS[-8:] + scaf_top_SCS[-1:8 - 1:-1])
+                        stap_ID += 1
+                        staples[edge_ID].append(
+                            scaf_top_SCS[8-1::-1] + scaf_bot_SCS[:-8])
+                        stap_ID += 1
 
-                if len_cut <= 11:
-                    # # if len_cut <= 11, make single-crossover edge staple
-                    staples[edge_ID].append(scaf_bot_SCS)
-                    stap_ID += 1
-                    staples[edge_ID].append(scaf_top_SCS[-1::-1])
-                    stap_ID += 1
-                else:
-                    # # Do SCStaples, nick 8 bp away from 3'
-                    staples[edge_ID].append(
-                        scaf_bot_SCS[-8:] + scaf_top_SCS[-1:8 - 1:-1])
-                    stap_ID += 1
-                    staples[edge_ID].append(
-                        scaf_top_SCS[8-1::-1] + scaf_bot_SCS[:-8])
-                    stap_ID += 1
+                    # total length 44 or less, merge staples
+                    if len_cut <= 22:
+                        staples[edge_ID][-2] = staples[edge_ID][-2]\
+                            + staples[edge_ID][-1]
+                        # TODO: bug: ***
+                        staples[edge_ID].pop()  # remove last element
+                        stap_ID = stap_ID - 1
 
-                # total length 42 or less, merge staples
-                if len_cut <= 21:
-                    staples[edge_ID][-2] = staples[edge_ID][-2]\
-                        + staples[edge_ID][-1]
-                    staples[edge_ID][-1].pop()  # remove last element
+                    # # Do LEFT of SCS
+                    num_22staps = int(floor(len_left_noSCS/22))
+                    len_extra_stap = len_left_noSCS - 22*num_22staps
 
-                # # Do LEFT of SCS
-                num_21staps = int(floor(len_left_noSCS/21))
-                len_extra_stap = len_left_noSCS - 21*num_21staps
+                    # # Add the extra staple if necessary, should go closest to
+                    # vertex:
+                    if len_extra_stap > 0:  # if an extra staple is required
+                        temp_stap = scaf_top_cut_left_noSCS[len_extra_stap-1::-1] +\
+                            scaf_bot_cut_left_noSCS[:len_extra_stap]
+                        staples[edge_ID].append(temp_stap)
 
-                # # Add the extra staple if necessary, should go closest to
-                # vertex:
-                if len_extra_stap > 0:  # if an extra staple is required
-                    temp_stap = scaf_top_cut_left_noSCS[len_extra_stap::-1] +\
-                        scaf_bot_cut_left_noSCS[:len_extra_stap]
-                    staples[edge_ID].append(temp_stap)
+                        # # Cut out this region
+                        scaf_top_cut_left_noSCS = scaf_top_cut_left_noSCS[
+                                                  len_extra_stap:]
+                        scaf_bot_cut_left_noSCS = scaf_bot_cut_left_noSCS[
+                                                  len_extra_stap:]
 
-                    # # Cut out this region
-                    scaf_top_cut_left_noSCS = scaf_top_cut_left_noSCS[
-                                              len_extra_stap:]
-                    scaf_bot_cut_left_noSCS = scaf_bot_cut_left_noSCS[
-                                              len_extra_stap:]
+                    # # Add the staples that span 22 bp
+                    staples[edge_ID] += generate_spanning_22_bp_staples(
+                        num_22staps, scaf_bot_cut_left_noSCS,
+                        scaf_top_cut_left_noSCS)
 
-                # # Add the staples that span 21 bp
-                staples[edge_ID] += generate_spanning_21_bp_staples(
-                    num_21staps, scaf_bot_cut_left_noSCS,
-                    scaf_top_cut_left_noSCS)
+                    # # Do RIGHT of SCS
+                    num_22staps = int(floor(len_rght_noSCS/22))
+                    len_extra_stap = len_rght_noSCS - 22*num_22staps
 
-                # # Do RIGHT of SCS
-                num_21staps = int(floor(len_rght_noSCS/21))
-                len_extra_stap = len_rght_noSCS - 21*num_21staps
+                    # # Add the staples that span 22 bp
+                    staples[edge_ID] += generate_spanning_22_bp_staples(
+                        num_22staps, scaf_bot_cut_rght_noSCS,
+                        scaf_top_cut_rght_noSCS)
 
-                # # Add the staples that span 21 bp
-                staples[edge_ID] += generate_spanning_21_bp_staples(
-                    num_21staps, scaf_bot_cut_rght_noSCS,
-                    scaf_top_cut_rght_noSCS)
+                    # # Add the extra staple if necessary, should go closest to
+                    # vertex
+                    if len_extra_stap > 0:  # if an extra staple is required
+                        temp_stap = scaf_bot_cut_rght_noSCS[-len_extra_stap:] + \
+                            scaf_top_cut_rght_noSCS[-1:-(len_extra_stap+1):-1]
+                        staples[edge_ID].append(temp_stap)
 
-                # # Add the extra staple if necessary, should go closest to
-                # vertex
-                if len_extra_stap > 0:  # if an extra staple is required
-                    temp_stap = scaf_bot_cut_rght_noSCS[len_extra_stap:] + \
-                        scaf_top_cut_rght_noSCS[-1:len_extra_stap:-1]
-                    staples[edge_ID].append(temp_stap)
+                else: # B-form
+                    # If scaffold crossover 5/6 away from center:
+                    if len_cut == 21*num_21staps:
+                        if len_cut % 2 == 0:  # even
+                            cutoff = int(len_cut / 2.0 - 5.0)
+                        else:  # odd
+                            cutoff = int(len_cut / 2.0 - 5.5)
+                    else:  # scaffold crossover 0/1 away from center
+                        if len_cut % 2 == 0:  # even
+                            cutoff = int(len_cut / 2.0)
+                        else:  # odd
+                            cutoff = int(len_cut / 2.0 - 0.5)
+
+                    # # Split top scaffold strand in two
+                    scaf_top_cut_left = scaf_top_cut[:cutoff]
+                    scaf_top_cut_rght = scaf_top_cut[cutoff:]
+
+                    # # Split bottom scaffold strand in two
+                    scaf_bot_cut_left = scaf_bot_cut[:cutoff]
+                    scaf_bot_cut_rght = scaf_bot_cut[cutoff:]
+
+                    # # Check if 15/16 or 16/16 scaffold crossover staple
+                    len_left = len(scaf_top_cut_left)  # Basically X
+                    len_rght = len(scaf_top_cut_rght)  # basically Y
+
+                    rem_left = len_left % 21
+                    rem_rght = len_rght % 21
+
+                    # scs = scaffold crossover staple
+                    if rem_left == 15:
+                        left_SCS = min(15, len_left)
+                    else:  # 5/26, 6/27, 16
+                        left_SCS = min(16, len_left)
+
+                    if rem_rght == 15:
+                        rght_SCS = min(15, len_rght)
+                    else:  # 5/26, 6/27, 16
+                        rght_SCS = min(16, len_rght)
+
+                    # Define new regions
+                    # Region with staples that cross scaffold crossovers
+                    scaf_top_SCS = scaf_top_cut_left[-left_SCS:] + \
+                        scaf_top_cut_rght[:rght_SCS]
+                    scaf_bot_SCS = scaf_bot_cut_left[-left_SCS:] + \
+                        scaf_bot_cut_rght[:rght_SCS]
+
+                    # Regions to the left and right of the scaf crossover staples
+                    scaf_top_cut_left_noSCS = scaf_top_cut_left[:-left_SCS]
+                    scaf_top_cut_rght_noSCS = scaf_top_cut_rght[rght_SCS:]
+                    len_left_noSCS = len(scaf_top_cut_left_noSCS)
+                    len_rght_noSCS = len(scaf_top_cut_rght_noSCS)
+
+                    scaf_bot_cut_left_noSCS = scaf_bot_cut_left[:-left_SCS]
+                    scaf_bot_cut_rght_noSCS = scaf_bot_cut_rght[rght_SCS:]
+
+                    if len_cut <= 11:
+                        # # if len_cut <= 11, make single-crossover edge staple
+                        staples[edge_ID].append(scaf_bot_SCS)
+                        stap_ID += 1
+                        staples[edge_ID].append(scaf_top_SCS[-1::-1])
+                        stap_ID += 1
+                    else:
+                        # # Do SCStaples, nick 8 bp away from 3'
+                        staples[edge_ID].append(
+                            scaf_bot_SCS[-8:] + scaf_top_SCS[-1:8 - 1:-1])
+                        stap_ID += 1
+                        staples[edge_ID].append(
+                            scaf_top_SCS[8-1::-1] + scaf_bot_SCS[:-8])
+                        stap_ID += 1
+
+                    # total length 42 or less, merge staples
+                    if len_cut <= 21:
+                        staples[edge_ID][-2] = staples[edge_ID][-2] \
+                            + staples[edge_ID][-1]
+                        # TODO: bug: ***
+                        staples[edge_ID].pop()  # remove last element
+                        stap_ID = stap_ID - 1
+
+                    # # Do LEFT of SCS
+                    num_21staps = int(floor(len_left_noSCS/21))
+                    len_extra_stap = len_left_noSCS - 21*num_21staps
+
+                    # # Add the extra staple if necessary, should go closest to
+                    # vertex:
+                    if len_extra_stap > 0:  # if an extra staple is required
+                        temp_stap = scaf_top_cut_left_noSCS[len_extra_stap-1::-1] +\
+                            scaf_bot_cut_left_noSCS[:len_extra_stap]
+                        staples[edge_ID].append(temp_stap)
+
+                        # # Cut out this region
+                        scaf_top_cut_left_noSCS = scaf_top_cut_left_noSCS[
+                                                  len_extra_stap:]
+                        scaf_bot_cut_left_noSCS = scaf_bot_cut_left_noSCS[
+                                                  len_extra_stap:]
+
+                    # # Add the staples that span 21 bp
+                    staples[edge_ID] += generate_spanning_21_bp_staples(
+                        num_21staps, scaf_bot_cut_left_noSCS,
+                        scaf_top_cut_left_noSCS)
+
+                    # # Do RIGHT of SCS
+                    num_21staps = int(floor(len_rght_noSCS/21))
+                    len_extra_stap = len_rght_noSCS - 21*num_21staps
+
+                    # # Add the staples that span 21 bp
+                    staples[edge_ID] += generate_spanning_21_bp_staples(
+                        num_21staps, scaf_bot_cut_rght_noSCS,
+                        scaf_top_cut_rght_noSCS)
+
+                    # # Add the extra staple if necessary, should go closest to
+                    # vertex
+                    if len_extra_stap > 0:  # if an extra staple is required
+                        temp_stap = scaf_bot_cut_rght_noSCS[-len_extra_stap:] + \
+                            scaf_top_cut_rght_noSCS[-1:-(len_extra_stap+1):-1]
+                        staples[edge_ID].append(temp_stap)
+
 
     # # Add polyTs after all preliminary staples generated
     len_polyT = 5
 
-    # # Join 11 and 10 staples with polyT to make 11+5+10 = 26 nt fragments
+    # # A-form: Join 11 and 11 staples with polyT to make 11+5+11 = 27 nt fragments
+    # # B-form: Join 11 and 10 staples with polyT to make 11+5+10 = 26 nt fragments
     for edge_ID in range(len(staples)):
         for elev_Vstap_ID in [1, 3]:  # len 11 staples
             this_eleven_Vstap = staples[edge_ID][elev_Vstap_ID]

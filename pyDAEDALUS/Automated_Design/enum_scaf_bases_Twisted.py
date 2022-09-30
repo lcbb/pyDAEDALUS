@@ -1,7 +1,7 @@
 import math
 
 
-def enum_scaf_bases_DX(route_real, route_vals, edge_length_mat_full, Aform=False):
+def enum_scaf_bases_Twisted(route_real, route_vals, edge_length_mat_full, Aform=False):
     """
     Enumerates scaffold bases for N-arm DX tile-based cages
     Inputs: route_real = row vector of vertices listed in visitation order
@@ -66,7 +66,7 @@ def enum_scaf_bases_DX(route_real, route_vals, edge_length_mat_full, Aform=False
             edge_type_vec = edge_type_vec + ([route_vals[route_ID]] * len_edge)
 
         elif route_val == -1:  # half non-tree edge
-            if Aform: # H-form
+            if Aform: # A-form
                 # # Is it an even or odd multiple of 11? (Is the length even/odd?)
                 quotient = round(len_edge / 11)
                 quot_is_odd = quotient % 2  # 1 if odd, 0 if even multiple
@@ -78,10 +78,10 @@ def enum_scaf_bases_DX(route_real, route_vals, edge_length_mat_full, Aform=False
                     # if returning half-strand, 3' end, 1 shorter
                     if edge_before == edge_fin:
                         route_val = -3  # -3 = returning half-strand
-                        len_half = math.ceil(len_edge_adjusted / 2.0) # changed
+                        len_half = math.ceil(len_edge_adjusted / 2.0)-2.0 # changed
                     else:  # outgoing half-strand, 5' end, 1 longer
                         route_val = -5  # -5 = outgoing half-strand
-                        len_half = math.floor(len_edge_adjusted / 2.0) # changed
+                        len_half = math.floor(len_edge_adjusted / 2.0)+2.0 # changed
 
                 else:  # quotient is even, scaffold 3/8 bp from middle
                         # len is even, outgoing + returning = len_edge +/-11
@@ -90,9 +90,9 @@ def enum_scaf_bases_DX(route_real, route_vals, edge_length_mat_full, Aform=False
                         route_val = -3  # -3 = returning half-strand
 
                         if edge_bgn > edge_fin:  # shorter half
-                            len_edge_adjusted = len_edge - 10
+                            len_edge_adjusted = len_edge - 16
                         else:  # longer half
-                            len_edge_adjusted = len_edge + 10
+                            len_edge_adjusted = len_edge + 6
 
                         len_half = math.floor(len_edge_adjusted / 2.0) # changed
 
@@ -100,9 +100,9 @@ def enum_scaf_bases_DX(route_real, route_vals, edge_length_mat_full, Aform=False
                         route_val = -5  # -5 = outgoing half-strand
 
                         if edge_bgn < edge_fin:  # shorter half
-                            len_edge_adjusted = len_edge - 10
+                            len_edge_adjusted = len_edge - 6
                         else:  # longer half
-                            len_edge_adjusted = len_edge + 10
+                            len_edge_adjusted = len_edge + 16
 
                         len_half = math.ceil(len_edge_adjusted / 2.0)
 

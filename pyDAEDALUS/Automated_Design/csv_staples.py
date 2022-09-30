@@ -28,7 +28,7 @@ def csv_staples(full_file_name, named_stap_seq_list,
     num_stap = len(named_stap_seq_list)
 
     for stap_ID in range(num_stap):
-        fid.write("{},{}\r\n".format(
+        fid.write("{},{}\n".format(
             named_stap_seq_list[stap_ID][0], named_stap_seq_list[stap_ID][1]))
 
     fid.close()

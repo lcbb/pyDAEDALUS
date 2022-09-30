@@ -1,7 +1,7 @@
 import math
 
 
-def enum_scaf_bases_DX(route_real, route_vals, edge_length_mat_full, Aform=False):
+def enum_scaf_bases_Hybrid(route_real, route_vals, edge_length_mat_full, Aform=False):
     """
     Enumerates scaffold bases for N-arm DX tile-based cages
     Inputs: route_real = row vector of vertices listed in visitation order

@@ -18,7 +18,7 @@ def extract_file_reader_and_shape_name_from_input_filename(input_filename):
     return f, shape_name
 
 
-def ply_to_input(input_filename, results_foldername=None, min_len_nt=31, Aform=False):
+def ply_to_input(input_filename, results_foldername=None, min_len_nt=33):
     """
 
     Converts PLY file into design variables for DX_cage_design input.
@@ -39,8 +39,7 @@ def ply_to_input(input_filename, results_foldername=None, min_len_nt=31, Aform=F
         False, '', ...) or leave at default value to not create or save plots.
     min_len_nt : int, optional
         The number of nucleotides long the smallest edge will have. Each edge
-        must be a multiple of 11 bp, min 33 bp (A-form) or 10.5 bp, min 31 bp
-        (B-form).
+        must be a multiple of 11 bp, min 33 bp.
 
     Returns
     -------
@@ -170,41 +169,27 @@ def ply_to_input(input_filename, results_foldername=None, min_len_nt=31, Aform=F
 
     edge_length_PLY = get_edge_lengths(edges, coordinates)
 
-    def get_scaled_and_rounded_edge_lengths(edge_lengths, min_len_nt, Aform):
+    def get_scaled_and_rounded_edge_lengths(edge_lengths, min_len_nt):
         min_edge_PLY = min(edge_lengths)
         scale = float(min_len_nt)/min_edge_PLY
         scale_edge_length_PLY = np.rint(scale * np.array(edge_lengths))
-        if Aform: # A-form
-            rounded = np.rint(scale_edge_length_PLY / 11.0)
-        else: # B-form
-            rounded = np.rint(scale_edge_length_PLY / 10.5)
+        rounded = np.rint(scale_edge_length_PLY / 11.0)
 
         rounded_edge_length_PLY = []
         for edge_ID in range(len(edge_lengths)):
-            if Aform: # A-form
-                final_length = rounded[edge_ID]*11.0
-            else: # B-form
-                rounded_times_ten_point_five = rounded[edge_ID]*10.5
-                remainder = rounded[edge_ID] % 2
-                if remainder == 0:
-                    final_length = rounded_times_ten_point_five
-                elif scale_edge_length_PLY[edge_ID] > rounded_times_ten_point_five:
-                    final_length = rounded_times_ten_point_five + 0.5
-                else:
-                    final_length = rounded_times_ten_point_five - 0.5
-                    
+            final_length = rounded[edge_ID]*11.0
             rounded_edge_length_PLY.append(int(final_length))
         return scale_edge_length_PLY, rounded_edge_length_PLY
 
     scale_edge_length_PLY, rounded_edge_length_PLY = \
-        get_scaled_and_rounded_edge_lengths(edge_length_PLY, min_len_nt, Aform)
+        get_scaled_and_rounded_edge_lengths(edge_length_PLY, min_len_nt)
     edge_length_vec = rounded_edge_length_PLY
 
     # Other parameters
     structure_name = shape_name + '_' + str(min_len_nt)
     staple_name = structure_name
 
-    if min_len_nt < 42:
+    if min_len_nt < 44:
         singleXOs = 0
     else:
         singleXOs = 1
@@ -213,8 +198,7 @@ def ply_to_input(input_filename, results_foldername=None, min_len_nt=31, Aform=F
         plot_edge_length_distributions(structure_name,
                                        scale_edge_length_PLY,
                                        rounded_edge_length_PLY,
-                                       results_foldername,
-									   Aform)
+                                       results_foldername)
 
     coordinates = np.array(coordinates)
     # faces = np.array(faces)
@@ -228,8 +212,7 @@ def ply_to_input(input_filename, results_foldername=None, min_len_nt=31, Aform=F
 def plot_edge_length_distributions(shape_name,
                                    scale_edge_length_PLY,
                                    rounded_edge_length_PLY,
-                                   results_foldername,
-								   Aform):  # pragma: no cover
+                                   results_foldername):  # pragma: no cover
     min_len_nt = min(rounded_edge_length_PLY)
     max_len_nt = max(rounded_edge_length_PLY)
     bins_for_hist = range(min_len_nt, max_len_nt + 3, 1)
@@ -275,10 +258,7 @@ def plot_edge_length_distributions(shape_name,
     plt.xlim((min_len_nt - width_multiplier,
               max_len_nt + 1.5 * width_multiplier))
     plt.ylim((0, max(max(max(y31), max(y32)) + 1, 1)))
-    if Aform: # A-form
-        plt.title('Edges rounded to nearest 11 bp')
-    else: # B-form
-        plt.title('Edges rounded to nearest 10.5 bp')
+    plt.title('Edges rounded to nearest 11 bp')
     plt.xlabel('Edge length (bp)')
     plt.ylabel('Number of edges')
     # plt.xticks(bins_for_hist)
@@ -287,10 +267,5 @@ def plot_edge_length_distributions(shape_name,
     base_filename = path.join(results_foldername, shape_name_with_len)
     fig_31.savefig(base_filename + 'min_edge_length_dist.png',
                    bbox_inches='tight')
-    if Aform: # A-form
-        fig_32.savefig(base_filename + 'edges_rounded_to_11.png',
+    fig_32.savefig(base_filename + 'edges_rounded_to_11.png',
                    bbox_inches='tight')
-    else: # B-form
-        fig_32.savefig(base_filename + 'edges_rounded_to_10_5.png',
-                   bbox_inches='tight')
-            

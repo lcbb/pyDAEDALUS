@@ -114,23 +114,17 @@ def set_routing_direction(edge_type_mat_allNodes, num_vert, pseudo_vert,
         dereferenced_path = dereference_pseudonodes_in_path(path, pseudo_vert)
         route_real = dereferenced_path
 
-        # TODO: Review that this code is really no longer needed given how I'm
-        # picking start node / generating the paths.
-
-        # Does this differ from previous 'magic' number that picks first vert?
-        # # # For consistency, start routing at a tree edge (route_vals = 2)
-        # # # with Vertex 1 upstream (route_real = 1)
-        # start_route = (i for i in range(len(route_real)) \
-        #     if route_real[i] == 1 and route_vals[i] == 2)
-        # start_route = intersect(find(route_real == 1), find(route_vals == 2))
-        # start_route = start_route(1) # in case there are multiple choices
-        #
-        # # # Shift route_real and route_vals to start at start_route
-        # route_real = [route_real[start_route:end], route_real[0:start_route]]
-        # route_vals = [route_vals(start_route:end), \
-        #     route_vals(1:start_route-1)]
-
         if check_direction(route_real, vert_to_face, faces):
+        # For consistency, start routing at a tree edge (route_vals = 2)
+            start_route_list=[]
+            for i in range(len(route_real)):
+                if route_real[i] == 0 and route_vals[i] == 2:
+                    start_route_list.append(i)
+            start_route = start_route_list[0] # in case there are multiple choices
+        #
+        # Shift route_real and route_vals to start at start_route
+            route_real = route_real[start_route:] + route_real[:start_route]
+            route_vals = route_vals[start_route:] + route_vals[:start_route]
             return [route_real, route_vals]
 
     raise Exception("one of the two above should have returned")

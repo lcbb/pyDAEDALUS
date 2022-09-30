@@ -2,7 +2,7 @@ from datetime import datetime
 
 
 def seqtoText(scaf_to_edge, edges, dnaInfo, file_name, scaf_name, singleXOs,
-              full_file_name):  # pragma: no cover
+              full_file_name, Aform=False):  # pragma: no cover
     """
     Generate text file to visualize each edge's sequences and nick/crossover
     information.  The result can be physically printed and used to visualize
@@ -41,24 +41,24 @@ def seqtoText(scaf_to_edge, edges, dnaInfo, file_name, scaf_name, singleXOs,
 
     num_edges = len(edges)
 
-    fid.write('Structure: {}\r\n'.format(file_name))
-    fid.write('Scaffold: {}\r\n'.format(scaf_name))
+    fid.write('Structure: {}\n'.format(file_name))
+    fid.write('Scaffold: {}\n'.format(scaf_name))
 
     if singleXOs > 0:
-        fid.write('Vertex staples: Single crossovers\r\n')
+        fid.write('Vertex staples: Single crossovers\n')
     else:
-        fid.write('Vertex staples: Double crossovers\r\n')
+        fid.write('Vertex staples: Double crossovers\n')
 
-    fid.write('Produced: \r\n'.format(str(datetime.now())))
+    fid.write('Produced: \n'.format(str(datetime.now())))
     fid.write(
-        'Key:    outer strands = scaffold (sequence and index shown)\r\n')
-    fid.write('        inner strands = staples\r\n')
-    fid.write('                    | = nucleotide\r\n')
-    fid.write('                    . = 5'' end\r\n')
-    fid.write('               v or ^ = 3'' end\r\n')
-    fid.write('   +>>+   or   +<<+   = staple crossover\r\n')
-    fid.write(' >> >> >> or << << << = scaffold crossover\r\n')
-    fid.write('Not shown: polyT loops in staple strands between edges\r\n\r\n')
+        'Key:    outer strands = scaffold (sequence and index shown)\n')
+    fid.write('        inner strands = staples\n')
+    fid.write('                    | = nucleotide\n')
+    fid.write('                    . = 5'' end\n')
+    fid.write('               v or ^ = 3'' end\n')
+    fid.write('   +>>+   or   +<<+   = staple crossover\n')
+    fid.write(' >> >> >> or << << << = scaffold crossover\n')
+    fid.write('Not shown: polyT loops in staple strands between edges\n\n')
 
     for edge_ID in range(num_edges):
 
@@ -68,16 +68,21 @@ def seqtoText(scaf_to_edge, edges, dnaInfo, file_name, scaf_name, singleXOs,
         scaf_right = scaf_to_edge[edge_ID][0]
         scaf_left = scaf_to_edge[edge_ID][1]
 
-        fid.write('Vertex {} (top) to {} (bottom), Edge {}\r\n\r\n'.format(
+        fid.write('Vertex {} (top) to {} (bottom), Edge {}\n\n'.format(
             edge_bgn, edge_fin, edge_ID))
-        fid.write("         3'5' 3'5' \r\n")
-        fid.write('              | | {} {}\r\n'.format(
-            dnaInfo.dnaTop[scaf_right[0]].seq, scaf_right[0]
-        ))
+        fid.write("         3'5' 3'5' \n")
+        if Aform: # A-form
+			# Invert scaf_left
+            scaf_right = scaf_right[0:]
+            scaf_left = scaf_left[-1::-1]
+        else: # B-form
+            fid.write('              | | {} {}\n'.format(
+				dnaInfo.dnaTop[scaf_right[0]].seq, scaf_right[0]
+			))
 
-        # Cut off first of scaf_right and invert scaf_left
-        scaf_right = scaf_right[1:-1]
-        scaf_left = scaf_left[-1::-1]
+			# Cut off first of scaf_right and invert scaf_left
+            scaf_right = scaf_right[1:]
+            scaf_left = scaf_left[-1::-1]
 
         for nt_ID in range(len(scaf_right)):
             # Left nucleotides
@@ -142,14 +147,16 @@ def seqtoText(scaf_to_edge, edges, dnaInfo, file_name, scaf_name, singleXOs,
             middle = ''.join(middle)
 
             # Left scaffold nucleotide
-            fid.write('{:>6} {} {} {} {:<6}\r\n'.format(
+            fid.write('{:>6} {} {} {} {:<6}\n'.format(
                 scaf_left_ID, dnaInfo.dnaTop[scaf_left_ID].seq,
                 middle,
                 dnaInfo.dnaTop[scaf_right_ID].seq, scaf_right_ID
             ))  # TODO: to give an exact match, `{:<6}` -> `{}`
 
-        fid.write('{:>6} {} | |\r\n'.format(
-            scaf_left[-1], dnaInfo.dnaTop[scaf_left[-1]].seq))
-        fid.write("         5'3' 5'3' \r\n\r\n\r\n")
+        if not Aform:
+            fid.write('{:>6} {} | |\n'.format(
+                scaf_left[-1], dnaInfo.dnaTop[scaf_left[-1]].seq))
+
+        fid.write("         5'3' 5'3' \n\n\r\n")
 
     fid.close()

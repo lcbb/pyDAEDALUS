@@ -17,7 +17,7 @@ def get_scaf_nick_pos(edges, route_real, edge_length_vec):
     first_edge = intersect_lists(from_nodes, to_nodes)[0]
 
     first_edge_length = edge_length_vec[first_edge]
-    if first_edge_length < 42:  # == 31
+    if first_edge_length < 44:  # == 33
         scaf_nick_pos = 16
     else:
         scaf_nick_pos = 19

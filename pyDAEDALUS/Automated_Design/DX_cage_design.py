@@ -7,24 +7,26 @@ from Automated_Design.adj_scaf_nick_pos import adj_scaf_nick_pos, \
     get_scaf_nick_pos
 from Automated_Design.assign_scaf_to_edge import assign_scaf_to_edge
 from Automated_Design.assign_staples_wChoices import assign_staples_wChoices
-from Automated_Design.constants import SCAF_SEQ
+from Automated_Design.constants import M13_SCAF_SEQ
 from Automated_Design.csv_staples import csv_staples
 from Automated_Design.dna_info import DnaInfo
 from Automated_Design.enum_scaf_bases_DX import enum_scaf_bases_DX
+from Automated_Design.enum_scaf_bases_Hybrid import enum_scaf_bases_Hybrid
+from Automated_Design.enum_scaf_bases_Twisted import enum_scaf_bases_Twisted
 from Automated_Design.gen_stap_seq import gen_stap_seq
 from Automated_Design.seq_to_text import seqtoText
 from Automated_Design.set_routing_direction import set_routing_direction
 from Automated_Design.split_edge import split_edge
 from Automated_Design.split_vert import split_vert
 from Automated_Design.util import generate_graph
-from designate_edge_type import designate_edge_type
+from Automated_Design.designate_edge_type import designate_edge_type
 from gen_schlegel import gen_schlegel
 from gen_vert_to_face import gen_vert_to_face
 
 
 def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
-                   staple_name, singleXOs, scaf_seq, scaf_name,
-                   results_foldername, print_to_console=True):
+                   staple_name, singleXOs, scaf_seq, scaf_name, Aform,
+                   results_foldername, twist, print_to_console=True):
     """
     Creates scaffold routing and staple placement of a DX-based DNA origami
     nano cage.
@@ -75,20 +77,20 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     if not scaf_seq:  # if a scaffold sequence was not provided
         if len_scaf_used <= 7249:  # default to using M13 sequence
             # Set scaffold sequence as full M13 scaffold, 7249 nucleotides
-            scaf_seq = SCAF_SEQ  # from NEB
+            scaf_seq = M13_SCAF_SEQ  # from NEB
             scaf_name = 'full_M13'  # scaffold name
         else:  # generate a random scaffold sequence
             scaf_seq = ''
             for i in range(2 * sum(edge_length_vec)):
                 roll = np.random.uniform()
                 if roll < 0.25:
-                    chosen_letter = 'a'
+                    chosen_letter = 'A'
                 elif roll < 0.50:
-                    chosen_letter = 't'
+                    chosen_letter = 'T'
                 elif roll < 0.75:
-                    chosen_letter = 'g'
+                    chosen_letter = 'G'
                 else:
-                    chosen_letter = 'c'
+                    chosen_letter = 'C'
                 scaf_seq += chosen_letter
 
             scaf_name = 'randomscaf'  # scaffold name
@@ -141,10 +143,19 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
 
     # 6. Enumerate scaffold bases ############################################
     edge_length_mat_full = full_graph
-    # TODO: Did I save the ege lengths onto this one, too?  If not, need to
+    # TODO: Did I save the edge lengths onto this one, too?  If not, need to
     # propogate edge lengths to this point
-    [edge_bgn_vec, edge_fin_vec, edge_type_vec] = enum_scaf_bases_DX(
-        route_real, route_vals, edge_length_mat_full)
+    #[edge_bgn_vec, edge_fin_vec, edge_type_vec] = enum_scaf_bases_DX(
+    #    route_real, route_vals, edge_length_mat_full)
+    if (twist==2):
+        [edge_bgn_vec, edge_fin_vec, edge_type_vec] = enum_scaf_bases_Hybrid(
+            route_real, route_vals, edge_length_mat_full, Aform)
+    elif (twist==3):
+        [edge_bgn_vec, edge_fin_vec, edge_type_vec] = enum_scaf_bases_Twisted(
+            route_real, route_vals, edge_length_mat_full, Aform)
+    else:
+        [edge_bgn_vec, edge_fin_vec, edge_type_vec] = enum_scaf_bases_DX(
+            route_real, route_vals, edge_length_mat_full, Aform)
 
     num_bases = len(edge_type_vec)
 
@@ -160,9 +171,12 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     scaf_to_edge = scaf_to_edge_adj
 
     # 9. Add staples #########################################################
+    #staples = assign_staples_wChoices(edges, num_edges, edge_type_mat,
+    #                                  scaf_to_edge, num_bases, num_vert,
+    #                                  singleXOs)
     staples = assign_staples_wChoices(edges, num_edges, edge_type_mat,
                                       scaf_to_edge, num_bases, num_vert,
-                                      singleXOs)
+                                      singleXOs, Aform)
 
     # 10. Assign sequence to staples #########################################
     if not scaf_seq:  # if a scaffold sequence has been input
@@ -190,7 +204,8 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     # Leaving this within above scaf_seq, since it relies on 10's output
     # 11. Port to CanDo, save information ####################################
     dnaInfo = DnaInfo(scaf_to_edge, scaf_seq, stap_list, stap_seq_list,
-                      coordinates, edges, edge_length_vec, faces, vert_to_face)
+                      coordinates, edges, edge_length_vec, faces, vert_to_face,
+                      Aform)
 
     # 11.5 Save DnaInfo
     if singleXOs > 0:
@@ -210,7 +225,7 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     pickled_dna_info_filename = 'dnaInfo_' + full_file_name + '.pickle'
     full_pickled_dna_info_filename = path.join(results_foldername,
                                                pickled_dna_info_filename)
-    pickle.dump(dnaInfo, open(full_pickled_dna_info_filename, 'w'))
+    pickle.dump(dnaInfo, open(full_pickled_dna_info_filename, 'wb'))
 
     route_info_dump = {'scaf_to_edge': scaf_to_edge,
                        'scaf_seq': scaf_seq,
@@ -224,7 +239,7 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     route_info_dump_filename = 'routeInfo_' + full_file_name + '.pickle'
     full_route_info_filename = path.join(results_foldername,
                                          route_info_dump_filename)
-    pickle.dump(route_info_dump, open(full_route_info_filename, 'w'))
+    pickle.dump(route_info_dump, open(full_route_info_filename, 'wb'))
 
     # as cando file
     cando_filename = full_file_name + '.cndo'
@@ -243,6 +258,6 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     seq_filename = path.join(results_foldername,
                              'seq_{}.txt'.format(full_file_name))
     seqtoText(scaf_to_edge, edges, dnaInfo, file_name, scaf_name,
-              singleXOs, seq_filename)
+              singleXOs, seq_filename, Aform)
 
     return full_file_name
