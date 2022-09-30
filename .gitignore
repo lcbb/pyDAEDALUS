@@ -1,9 +1,0 @@
-*.pyc
-*.cndo
-*.pickle
-.idea
-.cache
-Drawings
-tests/.cache/
-Results/*
-!Results/README.md
