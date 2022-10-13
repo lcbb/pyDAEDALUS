@@ -1,0 +1,20 @@
+*** To start the backend python process ***
+
+If needed, install anaconda2
+	(https://www.anaconda.com/distribution/#download-section)
+
+Use the anaconda2 python2 program to start a backend instance:
+	python2 DAEDserve.py
+
+Optionally compile to a binary (note: use the pip that is part of the anaconda2 package):
+	pip install pyinstaller
+Mac:	pyinstaller -Fc  --hiddenimport _sysconfigdata DAEDserve.py
+Win:	pyinstaller -Fc DAEDserve.py
+
+The executable is built in the dist folder, where it could just be double-clicked to execute
+
+The server can be tested using "python2 testServer.py" in a separate command window.
+
+*** To use the GUI ***
+
+Navigate to either the pyDAEDALUSX windows or Darwin (mac) folder and double click the pyDAEDALUSX application.
