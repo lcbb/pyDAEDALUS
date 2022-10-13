@@ -1,4 +1,4 @@
-# pyDAEDALUSX
+# pyDAEDALUS
 The purpose of this software is to design nucleic acid-scaffolded wireframe origami with double duplex edges. With a PLY file as geometry input and with or without a TXT file as the scaffold sequence input, the algorithm calculates scaffold routing along the edges of the geometry and outputs the staple sequences required to fold the scaffold nucleic acid into the target geometry.
 
 There are two ways to submit jobs to the algorithm:
@@ -10,14 +10,14 @@ Both require the program to be started as a server in the background.
 
 ## Installation
 
-**pyDAEDALUSX download**
+**pyDAEDALUS download**
 Installation time is negligible, as no installation is necessary beyond downloading the required files. Simply clone the GitHub repository or download and unzip the files into your preferred installation location. 
 
-The pyDAEDALUSX repository contains these instructions, an example batch submission script, a "PLY_Files" subfolder with example geometry file inputs, and a "pyDAEDALUSX" subfolder containing the program files. 
+The pyDAEDALUS repository contains these instructions, an example batch submission script, a "PLY_Files" subfolder with example geometry file inputs, and a "pyDAEDALUS" subfolder containing the program files. 
 
 A GUI application for Windows users is available upon request.
 
- **System requirements:** To run pyDAEDALUSX, you minimally need to have Python 2 installed. We recommend setting up a **virtual environment with Python v2.7** in Anaconda (instructions for doing so can be found [here](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)).
+ **System requirements:** To run pyDAEDALUS, you minimally need to have Python 2 installed. We recommend setting up a **virtual environment with Python v2.7** in Anaconda (instructions for doing so can be found [here](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)).
 Briefly, in terminal or Anaconda Prompt (recommended for Windows users), type:
 
     conda create –name python2 python=2.7
@@ -47,28 +47,28 @@ Use conda to install the required packages in the active python2 virtual environ
 
     conda install network==1.11 click mpmath mock tqdm flake8
 
-   > We have tested pyDAEDALUSX on Windows 10 and Windows 11 desktops and laptops, and a MacOS 10.15 (Catalina) laptop.
+   > We have tested pyDAEDALUS on Windows 10 and Windows 11 desktops and laptops, and a MacOS 10.15 (Catalina) laptop.
 
 ## Running the program
-To operate pyDAEDALUSX, you must first start the backend python process, and then submit design jobs either through the GUI or through a python script.
+To operate pyDAEDALUS, you must first start the backend python process, and then submit design jobs either through the GUI or through a python script.
 
-### Start the backend server for pyDAEDALUSX
-In terminal or Anaconda Prompt, with your virtual environment activated and operating Python v2.7 as described above, navigate to the pyDAEDALUSX repository folder, wherever you installed it. For example:
+### Start the backend server for pyDAEDALUS
+In terminal or Anaconda Prompt, with your virtual environment activated and operating Python v2.7 as described above, navigate to the pyDAEDALUS repository folder, wherever you installed it. For example:
 
-    cd C:/users/username/pyDAEDALUSX
+    cd C:/users/username/pyDAEDALUS
     
- Start the backend process with Python by calling the "DAEDserve.py" script in the pyDAEDALUSX subfolder:
+ Start the backend process with Python by calling the "DAEDserve.py" script in the pyDAEDALUS subfolder:
 
-    python pyDAEDALUSX/DAEDserve.py
+    python pyDAEDALUS/DAEDserve.py
   
-  >Note: output folders for each design will be created in the working directory from which you enter the above command. If you want these folders to be output elsewhere, navigate to the desired output directory first, and then specify the full pathname to ./pyDAEDALUSX/pyDAEDALUSX/DAEDserve.py when you start the backend process with Python.
+  >Note: output folders for each design will be created in the working directory from which you enter the above command. If you want these folders to be output elsewhere, navigate to the desired output directory first, and then specify the full pathname to ./pyDAEDALUS/pyDAEDALUS/DAEDserve.py when you start the backend process with Python.
 
 Leave this running in the background (you can minimize the command prompt window) while you submit design jobs using one of the options below.
   
 ### Submit design jobs
 
 #### Inputs
-There are several required inputs and one optional input to generate a 3D nucleic acid-scaffolded DX wireframe origami design with pyDAEDALUSX:
+There are several required inputs and one optional input to generate a 3D nucleic acid-scaffolded DX wireframe origami design with pyDAEDALUS:
 
  - Project name (a name for your design)
 	 *This will be the name of the output folder created.*
