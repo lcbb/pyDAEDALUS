@@ -118,7 +118,9 @@ An example batch job submission script, "example_submission_script.py" is includ
 
 #### Option 3: (Windows only) Graphical User Interface
 
-If you have a Windows OS, we can send you a folder containing a GUI upon request.
+If you have a Windows OS, you can download a graphical user interface (GUI) at:
+https://www.dropbox.com/scl/fo/3d67tdqlxu1751rzec5b3/h?rlkey=zbvattczidviiiyzmx64mbkau&dl=0
+
 To use the GUI, run within the shared "pyDAEDALUSX-win32-x64" folder, run the "pyDAEDALUSX.exe" file. A GUI window should appear. Provide the inputs (described above) in the appropriate locations. The "Select PLY" and "Select Sequence" buttons will open a File Explorer for you to select the appropriate file. Do not select a sequence file if you wish to use the program default scaffold sequence.
 
 Click the "submit" button to submit the job to your backend server and generate the design. At the bottom of the GUI window, the word "Processing.." will show until the job is complete, at which time it will display "Fail!" (*see troubleshooting section below*) or "Success!" 
