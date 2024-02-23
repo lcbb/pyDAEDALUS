@@ -20,8 +20,8 @@ from Automated_Design.split_edge import split_edge
 from Automated_Design.split_vert import split_vert
 from Automated_Design.util import generate_graph
 from Automated_Design.designate_edge_type import designate_edge_type
-from gen_schlegel import gen_schlegel
-from gen_vert_to_face import gen_vert_to_face
+from .gen_schlegel import gen_schlegel
+from .gen_vert_to_face import gen_vert_to_face
 
 
 def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
@@ -104,7 +104,7 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     file_name_without_containing_folder = path.split(file_name)[1]
     shape_name = file_name_without_containing_folder
     full_graph = generate_graph(num_vert, edges, edge_length_vec)
-    full_graph.name = file_name_without_containing_folder
+    full_graph.name = shape_name
 
     # Identify presence of every vertex in every face
     vert_to_face = gen_vert_to_face(num_vert, faces)
@@ -113,54 +113,51 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     # Designate edges as type 1 or 2:
     # Type 1: Non-spanning tree, i.e. 1 scaffold crossover in DX cage
     # Type 2: Spanning tree edges, i.e. 0 scaffold crossovers in DX cage
-    edge_type_mat = designate_edge_type(full_graph)
-    # graph_with_spanning_tree_marked = edge_type_mat   # TODO: this rename
+    graph_with_spanning_tree = designate_edge_type(full_graph)
 
     schlegel_filename = file_name_without_containing_folder + '_schlegel.png'
     full_schlegel_filename = path.join(results_foldername, schlegel_filename)
 
     gen_schlegel(edges, coordinates, faces,
                  schlegel_filename=full_schlegel_filename,
-                 edge_type_graph=edge_type_mat)
+                 edge_type_graph=graph_with_spanning_tree)
 
-    edge_type_mat = edge_type_mat.to_directed()
+    graph_with_spanning_tree = graph_with_spanning_tree.to_directed()
     # MST in networkx requires an undirected graph?
     # Later code requires directed?
 
     # 3. Add nodes to edges ##################################################
     # Add two nodes to each nontree edge to implement scaffold crossovers
-    edge_type_mat_wHalfs, pseudo_vert = split_edge(edge_type_mat)
-    # graph_with_edges_split = edge_type_mat_wHalfs  # TODO: this rename
+    graph_with_edges_split, pseudo_vert = split_edge(graph_with_spanning_tree)
 
     # 4. Add nodes to vertices ###############################################
     # # Split each vertex into N nodes, where N is degree of vertex
-    edge_type_mat_allNodes, pseudo_vert = split_vert(
-        edge_type_mat_wHalfs, pseudo_vert, num_vert, vert_to_face)
-
+    graph_with_spanning_tree_allNodes, pseudo_vert = split_vert(
+        graph_with_edges_split, pseudo_vert, num_vert, vert_to_face)
+    
     # 5. Set direction of routing ############################################
     [route_real, route_vals] = set_routing_direction(
-        edge_type_mat_allNodes, num_vert, pseudo_vert, faces, vert_to_face)
+        graph_with_spanning_tree_allNodes, num_vert, pseudo_vert, faces, vert_to_face)
 
     # 6. Enumerate scaffold bases ############################################
-    edge_length_mat_full = full_graph
     # TODO: Did I save the edge lengths onto this one, too?  If not, need to
     # propogate edge lengths to this point
     #[edge_bgn_vec, edge_fin_vec, edge_type_vec] = enum_scaf_bases_DX(
     #    route_real, route_vals, edge_length_mat_full)
     if (twist==2):
         [edge_bgn_vec, edge_fin_vec, edge_type_vec] = enum_scaf_bases_Hybrid(
-            route_real, route_vals, edge_length_mat_full, Aform)
+            route_real, route_vals, full_graph, Aform)
     elif (twist==3):
         [edge_bgn_vec, edge_fin_vec, edge_type_vec] = enum_scaf_bases_Twisted(
-            route_real, route_vals, edge_length_mat_full, Aform)
+            route_real, route_vals, full_graph, Aform)
     else:
         [edge_bgn_vec, edge_fin_vec, edge_type_vec] = enum_scaf_bases_DX(
-            route_real, route_vals, edge_length_mat_full, Aform)
+            route_real, route_vals, full_graph, Aform)
 
     num_bases = len(edge_type_vec)
 
     # 7. Assign enumerated scaffold bases to edges ###########################
-    scaf_to_edge = assign_scaf_to_edge(edges, num_edges, edge_type_mat,
+    scaf_to_edge = assign_scaf_to_edge(edges, num_edges, graph_with_spanning_tree,
                                        edge_bgn_vec, edge_fin_vec,
                                        edge_type_vec)
 
@@ -171,10 +168,10 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
     scaf_to_edge = scaf_to_edge_adj
 
     # 9. Add staples #########################################################
-    #staples = assign_staples_wChoices(edges, num_edges, edge_type_mat,
+    #staples = assign_staples_wChoices(edges, num_edges, graph_with_spanning_tree,
     #                                  scaf_to_edge, num_bases, num_vert,
     #                                  singleXOs)
-    staples = assign_staples_wChoices(edges, num_edges, edge_type_mat,
+    staples = assign_staples_wChoices(edges, num_edges, graph_with_spanning_tree,
                                       scaf_to_edge, num_bases, num_vert,
                                       singleXOs, Aform)
 
@@ -195,8 +192,8 @@ def DX_cage_design(coordinates, edges, faces, edge_length_vec, file_name,
         for i in range(len(stap_seq)):
             for j in range(len(stap_seq[i])):
                 if stap_seq[i][j]:
-                    print("{}, {} : {}".format(
-                        i, j, stap_seq[i][j]))
+                    print(("{}, {} : {}".format(
+                        i, j, stap_seq[i][j])))
         print('')
     if print_to_console:
         display_named_stap_seq_list(stap_seq)

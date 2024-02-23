@@ -1,17 +1,16 @@
 import numpy as np
 from networkx.algorithms.simple_paths import all_simple_paths
-
+import networkx as nx
 
 def pick_longest_path(paths):
     return max(list(paths), key=len)
 
 
 def dereference_pseudonodes_in_path(path_with_pseudonodes, pseudo_vert):
-    path_with_only_real_nodes = []
-    for node in path_with_pseudonodes:
-        dereferenced = pseudo_vert[node]
-        path_with_only_real_nodes.append(dereferenced)
-    return path_with_only_real_nodes
+    
+    path_of_real_nodes = [pseudo_vert[node] for node in path_with_pseudonodes]
+
+    return path_of_real_nodes
 
 
 def check_direction(route_real, vert_to_face, faces):
@@ -53,14 +52,14 @@ def check_direction(route_real, vert_to_face, faces):
         return True
 
 
-def set_routing_direction(edge_type_mat_allNodes, num_vert, pseudo_vert,
+def set_routing_direction(graph_with_spanning_tree_allNodes, num_vert, pseudo_vert,
                           faces, vert_to_face):
     """
     Sets routing direction for traversing scaffold route path
 
     Parameters
     ----------
-    edge_type_mat_allNodes : networkx.classes.digraph.DiGraph
+    graph_with_spanning_tree_allNodes : networkx.classes.digraph.DiGraph
         Network representation including link types.  Link types have the
         following possible values:
             -1 is half of a non-spanning tree edge (one side of scaffold
@@ -94,37 +93,47 @@ def set_routing_direction(edge_type_mat_allNodes, num_vert, pseudo_vert,
     # graph network
     start_node = 2*num_vert+2  # this node is a pseudo-node at Vertex 1
 
-    next_nodes = edge_type_mat_allNodes.neighbors(start_node)  # you'll have 2
+    next_nodes = graph_with_spanning_tree_allNodes.neighbors(start_node)  # you'll have 2
     # TODO: Convert to generator, since you only need to make the second
     # path if the first is the wrong direction?
     for next_node in next_nodes:
+        
+        # Make sure a path exists
+        if not nx.has_path(graph_with_spanning_tree_allNodes, start_node, next_node):
+            raise Exception('No viable path between vertices.')
+            
         paths = all_simple_paths(
-            edge_type_mat_allNodes, start_node, next_node)
+            graph_with_spanning_tree_allNodes, start_node, next_node)
 
         # you'll have one 1-length path because they're neighbors.  You want
         # the other path that includes all the other nodes:
         path = pick_longest_path(paths)
 
-        route_real = path
-        temp_route_real = route_real + [route_real[0]]
-        route_vals = [edge_type_mat_allNodes
+        temp_route_real = path + [path[0]]
+        route_vals = [graph_with_spanning_tree_allNodes
                       [temp_route_real[i]][temp_route_real[i+1]]['type']
-                      for i in range(len(route_real))]
-
-        dereferenced_path = dereference_pseudonodes_in_path(path, pseudo_vert)
-        route_real = dereferenced_path
+                      for i in range(len(path))]
+        
+        # list the route in terms of real vertices instead of pseudonodes
+        route_real = dereference_pseudonodes_in_path(path, pseudo_vert)
 
         if check_direction(route_real, vert_to_face, faces):
         # For consistency, start routing at a tree edge (route_vals = 2)
-            start_route_list=[]
-            for i in range(len(route_real)):
-                if route_real[i] == 0 and route_vals[i] == 2:
-                    start_route_list.append(i)
-            start_route = start_route_list[0] # in case there are multiple choices
-        #
+            # start_route_list=[]
+            # for i in range(len(route_real)):
+            #     if route_real[i] == 0 and route_vals[i] == 2:
+            #         start_route_list.append(i)
+            # if start_route_list == []: #happens if above conditions are never met
+            #     start_route = 0
+            # else: 
+            #     start_route = start_route_list[0] # in case there are multiple choices
+            start_route_loc = min(idx for idx, v in enumerate(route_real)
+                               if route_vals[idx] == 2)
+        
+        
         # Shift route_real and route_vals to start at start_route
-            route_real = route_real[start_route:] + route_real[:start_route]
-            route_vals = route_vals[start_route:] + route_vals[:start_route]
+            route_real = route_real[start_route_loc:] + route_real[:start_route_loc]
+            route_vals = route_vals[start_route_loc:] + route_vals[:start_route_loc]
             return [route_real, route_vals]
 
     raise Exception("one of the two above should have returned")

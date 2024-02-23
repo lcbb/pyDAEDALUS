@@ -1,5 +1,4 @@
-from networkx.algorithms.mst import prim_mst
-
+from networkx.algorithms import tree
 
 def designate_edge_type(full_graph):
     """
@@ -8,20 +7,16 @@ def designate_edge_type(full_graph):
         1 is non-spanning tree edge: DX edge with 1 scaffold crossover
         2 is spanning tree edge: DX edge with 0 scaffold crossovers
     """
-    tree = prim_mst(full_graph)
-
-    # networkx undirected networks already implicitly can be considered a
-    # symmetrical matrix
-    full_tree = tree
-
-    tree_edges = full_tree.edges()
+    mst = tree.minimum_spanning_tree(full_graph, algorithm="prim")
+    edgelist = mst.edges
+    
     for edge in full_graph.edges():
-        if edge in tree_edges:
-            type = 2
+        if edge in edgelist:
+            edgetype = 2
         else:
-            type = 1
+            edgetype = 1
         i = edge[0]
         j = edge[1]
-        full_graph[i][j]['type'] = type
-
+        full_graph[i][j]['type'] = edgetype
+    
     return full_graph

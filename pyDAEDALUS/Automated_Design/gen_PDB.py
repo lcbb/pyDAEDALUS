@@ -1,7 +1,9 @@
 from numpy import *
 import numpy as np
+from numpy import math
+
 import os
-from PDB_loader import *
+from .PDB_loader import *
 
 '''
 Contents
@@ -1311,7 +1313,7 @@ def pdbgen(filename, hF, pN):
             fpdb.write('TER\n')
             
             # Multi-model PDB ends model here
-            fmm.write('\TER\nENDMDL\n')
+            fmm.write('TER\nENDMDL\n')
 
             # Chain segment PDB end chain
             fseg.write('TER\n')

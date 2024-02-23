@@ -91,7 +91,7 @@ def ply_to_input(input_filename, results_foldername=None, min_len_nt=33):
         for i in range(number_of_vertices):
             line = filestream.readline()
             line_as_list = line.split()
-            coords_on_this_line = map(float, line_as_list)
+            coords_on_this_line = list(map(float, line_as_list))
             coordinates_as_list.append(coords_on_this_line)
 
         return coordinates_as_list
@@ -103,7 +103,7 @@ def ply_to_input(input_filename, results_foldername=None, min_len_nt=33):
         faces_as_list = []
         for face_id in range(number_of_faces):
             line = filestream.readline()
-            line_as_list_of_ints = map(int, line.strip().split())
+            line_as_list_of_ints = list(map(int, line.strip().split()))
             number_of_vertices = line_as_list_of_ints[0]
             vertices = line_as_list_of_ints[1:]
 
@@ -215,7 +215,7 @@ def plot_edge_length_distributions(shape_name,
                                    results_foldername):  # pragma: no cover
     min_len_nt = min(rounded_edge_length_PLY)
     max_len_nt = max(rounded_edge_length_PLY)
-    bins_for_hist = range(min_len_nt, max_len_nt + 3, 1)
+    bins_for_hist = list(range(min_len_nt, max_len_nt + 3, 1))
     bins_for_plotting = [x - 0.25 for x in bins_for_hist[:-1]]
 
     # Everything pertaining to `width_multiplier` is to help with the shapes
