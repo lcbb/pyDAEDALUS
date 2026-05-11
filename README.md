@@ -8,6 +8,11 @@ There are two ways to submit jobs to the algorithm:
 
 Both require the program to be started as a server in the background.
 
+## Release notes
+Release 2.0.0 updates the program from Python 2 to Python 3. The staple sequences generated for a given scaffold and geometry specifications will not be identical between the two versions, but are equivalent in terms of folding the structure. The difference lies in alternate scaffold routings chosen:
+
+This requires an updated networkx version, with slightly different language/usage, for calculating the spanning tree to route the scaffold. When multiple minimum spanning trees are found, networkx=3.0.0 outputs the list in a different default order than networkx==1.11. pyDAEDALUS chooses the first instance in the list for equivalent minimum spanning tress, and so with this release a different scaffold routing may be chosen and thus different staple sequences generated. This should introduce no issues for assembling the structures on the bench.
+
 ## Installation
 
 **pyDAEDALUS download**
@@ -17,25 +22,25 @@ The pyDAEDALUS repository contains these instructions, an example batch submissi
 
 A GUI application for Windows users is available upon request.
 
- **System requirements:** To run pyDAEDALUS, you minimally need to have Python 2 installed. We recommend setting up a **virtual environment with Python v2.7** in Anaconda (instructions for doing so can be found [here](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)).
+ **System requirements:** To run pyDAEDALUS, you minimally need to have Python 3 installed. We recommend setting up a **virtual environment** in Anaconda (instructions for doing so can be found [here](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)).
 Briefly, in terminal or Anaconda Prompt (recommended for Windows users), type:
 
-    conda create –name python2 python=2.7
+    conda create –name pydaed python=3.11
 
-to create the environment, named "python2" in this example.
+to create the environment, named "pydaed" in this example.
 To activate the environment:
 
-    conda activate python2
+    conda activate pydaed
    
 Your command prompt prefix should then look like this:
 
-       (python2) $
+       (pydaed) $
 
 Several Python packages are required:
 
- - networkx==1.11 
  - numpy>=1.11.1
  - matplotlib>=1.5.1
+ - networkx>=3.0.0
  - scipy>=0.18.0
  - click>=6.6
  - mpmath>=0.19
@@ -43,9 +48,9 @@ Several Python packages are required:
  - tqdm>=4.9.0
  - flake8>=3.2.0
 
-Use conda to install the required packages in the active python2 virtual environment, e.g.:
+Use conda to install the required packages in the active virtual environment, e.g.:
 
-    conda install network==1.11 click mpmath mock tqdm flake8
+    conda install network click mpmath mock tqdm flake8 --name pydaed
 
    > We have tested pyDAEDALUS on Windows 10 and Windows 11 desktops and laptops, and a MacOS 10.15 (Catalina) laptop.
 
@@ -99,7 +104,7 @@ Then, within Python, import the xmlrpc.client package and define the server para
     >>> proxy = xmlrpc.client.ServerProxy("http://localhost:4242/")
     >>> multicall = xmlrpc.client.MultiCall(proxy)
 
-Then use the specify the inputs in the order listed above in `multicall.calc()`, and submit the design job to the backend server by running `multicall()`. For example:
+Then specify the inputs in the order listed above in `multicall.calc()`, and submit the design job to the backend server by running `multicall()`. For example:
 
     >>> multicall.calc('TestProject','Aform', 4, 'PLY_Files/01_tetrahedron.ply', 'M13.txt')
     >>> result = multicall()
