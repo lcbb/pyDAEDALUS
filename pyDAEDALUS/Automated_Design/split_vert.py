@@ -1,13 +1,13 @@
 from Automated_Design.arrange_neighbors import arrange_neighbors
 
 
-def split_vert(edge_type_mat_wHalfs, pseudo_vert, num_vert, vert_to_face):
+def split_vert(graph_with_edges_split, pseudo_vert, num_vert, vert_to_face):
     """
     Splits vertices into N nodes, where N is the degree of the vertex.
 
     Parameters
     ----------
-    edge_type_mat_wHalfs : networkx.classes.digraph.DiGraph
+    graph_with_edges_split : networkx.classes.digraph.DiGraph
         VxV sparse matrix where
             -1 is half of a non-spanning tree edge (one side of scaffold
             crossover)
@@ -23,7 +23,7 @@ def split_vert(edge_type_mat_wHalfs, pseudo_vert, num_vert, vert_to_face):
 
     Returns
     -------
-    edge_type_mat_allNodes
+    graph_with_spanning_tree_allNodes
         sparse matrix where
             -1 is half of a non-spanning tree edge (one side of scaffold
             crossover)
@@ -32,19 +32,19 @@ def split_vert(edge_type_mat_wHalfs, pseudo_vert, num_vert, vert_to_face):
         updated to include new pseudo-vertices
     """
 
-    # # Initialize edge_type_mat_allNodes. It will be augmented from _wHalfs
-    edge_type_mat_allNodes = edge_type_mat_wHalfs.copy()
+    # # Initialize graph_with_spanning_tree_allNodes. It will be augmented from _wHalfs
+    graph_with_spanning_tree_allNodes = graph_with_edges_split.copy()
 
     # # Initialize face_storage matrix for pseudo nodes added in this function
     face_assign = [None] * len(pseudo_vert)
 
     for vert_ID in range(num_vert):  # for each real vertex
-        neighbors = edge_type_mat_allNodes.in_edges(vert_ID, data=True)
+        neighbors = graph_with_spanning_tree_allNodes.in_edges(vert_ID, data=True)
 
         # # arrange_neighbors identifies which neighboring vertices share faces
         # # and adds nodes at the vertex to route the scaffold around the
         # # vertex vert_ID accordingly
-        edge_type_mat_allNodes, pseudo_vert, face_assign = arrange_neighbors(
-            edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors,
+        graph_with_spanning_tree_allNodes, pseudo_vert, face_assign = arrange_neighbors(
+            graph_with_spanning_tree_allNodes, pseudo_vert, vert_ID, neighbors,
             vert_to_face, face_assign)
-    return edge_type_mat_allNodes, pseudo_vert
+    return graph_with_spanning_tree_allNodes, pseudo_vert

@@ -48,7 +48,7 @@ def gen_stap_seq(staples, scaf_seq, staple_name, scaf_name,
         staps_for_this_edge = []
         for stap_ID in range(len(staples[edge_ID])):
             stap = staples[edge_ID][stap_ID]  # obtain staple index information
-            seq = u''  # initialize string
+            seq = ''  # initialize string
             for nt_ID in stap:
                 # # because A binds to T, and G binds to C...
                 if (nt_ID is None) or (scaf_seq[nt_ID] == 'A'):

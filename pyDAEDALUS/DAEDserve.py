@@ -1,5 +1,5 @@
-from SimpleXMLRPCServer import SimpleXMLRPCServer
-import xmlrpclib
+from xmlrpc.server import SimpleXMLRPCServer
+import xmlrpc.client
 import shutil
 import sys
 from math import floor
@@ -56,8 +56,9 @@ def calc(pName, helicalForm, helicalTurns, plyfile, seqfile):
         twist, print_to_console=False)
     pdbout = pdbgen(full_file_name, hForm, str(pName))
     return "Finished!"
-#
-server = SimpleXMLRPCServer(("localhost", 4242))
-server.register_multicall_functions()
-server.register_function(calc, "calc")
-server.serve_forever()
+
+if __name__ == '__main__':
+    server = SimpleXMLRPCServer(("localhost", 4242))
+    server.register_multicall_functions()
+    server.register_function(calc, "calc")
+    server.serve_forever()

@@ -1,10 +1,10 @@
-def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors,
+def arrange_neighbors(graph_with_spanning_tree_allNodes, pseudo_vert, vert_ID, neighbors,
                       vert_to_face, face_assign):
     """
     Identifies which neighboring vertices share faces (which neighbors are
     adjacent and adds N nodes at the vertex to route the scaffold around the
     vertex vert_ID accordingly, where N is the degree of the vertex vert_ID.
-    Inputs: edge_type_mat_wHalfs = VxV sparse matrix where
+    Inputs: graph_with_edges_split = VxV sparse matrix where
      -1 is half of a non-spanning tree edge (one side of scaffold crossover)
       2 is spanning tree edge: DX edge with 0 scaffold crossovers
             pseudo_vert = row vector where value j at index i indicate that
@@ -15,7 +15,7 @@ def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors,
             vert_to_face = Vx1 cell array, each row has a row vector listing
                 the face IDs the particular vertex belongs to
             face_assign = vector that stores face_ID of pseudo-vertices
-    Outputs: edge_type_mat_allNodes = VxV sparse matrix where
+    Outputs: graph_with_spanning_tree_allNodes = VxV sparse matrix where
      -1 is half of a non-spanning tree edge (one side of scaffold crossover)
       2 is spanning tree edge: DX edge with 0 scaffold crossovers
            pseudo_vert = updated to include new pseudo-vertices
@@ -30,14 +30,14 @@ def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors,
     ##########################################################################
     """
 
-    n_rows, dontcare, n_vals = zip(*neighbors)  # n for neighbors
+    n_rows, dontcare, n_vals = list(zip(*neighbors))  # n for neighbors
 
     # # Identify degree of vertex vert_ID, number of vertices connected to
     # # central vertex. This includes pseudo-vertices, so degree may be > N
     degree = len(n_rows)
 
     # # Identify neighboring pairs and add a new node between each pair
-    list_a = range(degree - 1)
+    list_a = list(range(degree - 1))
     for row_ID1 in list_a:
 
         # # Find neighbor 1 info
@@ -45,7 +45,7 @@ def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors,
         val_1 = n_vals[row_ID1]  # extract edge type connecting to neighbor
         face_1 = face_assign[neighbor_1]  # designated face, if assigned
 
-        list_b = range(row_ID1 + 1, degree)
+        list_b = list(range(row_ID1 + 1, degree))
         for row_ID2 in list_b:
 
             # # Find neighbor info
@@ -83,28 +83,26 @@ def arrange_neighbors(edge_type_mat_allNodes, pseudo_vert, vert_ID, neighbors,
 
                         # # Create a new node and store in pseudo_vert
                         new_node_id = len(pseudo_vert)  # create a new node
-                        edge_type_mat_allNodes.add_node(new_node_id)
+                        graph_with_spanning_tree_allNodes.add_node(new_node_id)
                         pseudo_vert.append(vert_ID)  # store in pseudo_vert
 
-                        # Incorporate new node into edge_type_mat_allNodes
-                        edge_type_mat_allNodes.add_edge(
-                            neighbor_1, new_node_id, attr_dict=val_1)
-                        edge_type_mat_allNodes.add_edge(
-                            new_node_id, neighbor_1, attr_dict=val_1)
-                        edge_type_mat_allNodes.add_edge(
-                            new_node_id, neighbor_2, attr_dict=val_2)
-                        edge_type_mat_allNodes.add_edge(
-                            neighbor_2, new_node_id, attr_dict=val_2)
-
+                        # Incorporate new node into graph_with_spanning_tree_allNodes
+                        graph_with_spanning_tree_allNodes.add_edges_from([
+                            (neighbor_1, new_node_id, val_1),
+                            (new_node_id, neighbor_1, val_1),
+                            (new_node_id, neighbor_2, val_2),
+                            (neighbor_2, new_node_id, val_2)
+                            ])
+                        
                         # # Store in face_assign
                         face_assign.append(face_3)
 
-    # Remove/disconnect vert_ID from edge_type_mat_allNodes, the real vertex
+    # Remove/disconnect vert_ID from graph_with_spanning_tree_allNodes, the real vertex
     # is no longer needed to route, having been replaced by pseudo-vertices
-    edge_type_mat_allNodes.remove_edges_from(
-        edge_type_mat_allNodes.in_edges(vert_ID))
-    edge_type_mat_allNodes.remove_edges_from(
-        edge_type_mat_allNodes.out_edges(vert_ID))
+    graph_with_spanning_tree_allNodes.remove_edges_from(list(
+        graph_with_spanning_tree_allNodes.in_edges(vert_ID)))
+    graph_with_spanning_tree_allNodes.remove_edges_from(list(
+        graph_with_spanning_tree_allNodes.out_edges(vert_ID)))
 
     # TODO: replace pseudo_vert with a property on the node `original_id`?
-    return edge_type_mat_allNodes, pseudo_vert, face_assign
+    return graph_with_spanning_tree_allNodes, pseudo_vert, face_assign

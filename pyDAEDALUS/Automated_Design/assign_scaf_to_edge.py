@@ -1,7 +1,7 @@
 from Automated_Design.util import intersect_lists, find
 
 
-def assign_scaf_to_edge(edges, num_edges, edge_type_mat, edge_bgn_vec,
+def assign_scaf_to_edge(edges, num_edges, graph_with_spanning_tree, edge_bgn_vec,
                         edge_fin_vec, edge_type_vec):
     """
     # Assign enumerated scaffold bases to edges. Create vectors for each duplex
@@ -9,11 +9,9 @@ def assign_scaf_to_edge(edges, num_edges, edge_type_mat, edge_bgn_vec,
     # Inputs: edges = Ex2 matrix where each row corresponds to one edge,
     #           denoting the vertices being connected. 1st column > 2nd column
     #         num_edges = number of edges, E
-    #         edge_length_mat_full = VxV sparse matrix of edge lengths
+    #         graph_with_spanning_tree = VxV sparse matrix of edge types
     #         edge_bgn_vec = row vector of scaff nt IDs at which edge begins
     #         edge_fin_vec = row vector of scaff nt IDs at which edge finishes
-    #         edge_type_vec = row vector of edge types, corresponding to
-    #                          edge_length_mat_full
     #   2 is spanning tree edge: DX edge with 0 scaffold crossovers
     #  -3 is half of a non-spanning tree edge, connecting to vertex at 3' end
     #  -5 is half of a non-spanning tree edge, connecting to vertex at 5' end
@@ -32,20 +30,20 @@ def assign_scaf_to_edge(edges, num_edges, edge_type_mat, edge_bgn_vec,
     """
 
     scaf_to_edge = []
-    for edge_ID in range(num_edges):  # TODO: convert to `for edge in edges:`
+    for edge in edges:
         # first column low to high, second column high to low
         row = [None, None]
         for high_to_low in [1, 2]:  # for each duplex direction on edge
             col = 2 - high_to_low
 
             if high_to_low == 1:  # high to low 5' to 3'
-                edge_bgn = edges[edge_ID][0]
-                edge_fin = edges[edge_ID][1]
+                edge_bgn = edge[0]
+                edge_fin = edge[1]
             else:  # low_to_high 5' to 3'
-                edge_bgn = edges[edge_ID][1]
-                edge_fin = edges[edge_ID][0]
+                edge_bgn = edge[1]
+                edge_fin = edge[0]
 
-            edge_type = edge_type_mat[edge_bgn][edge_fin]['type']
+            edge_type = graph_with_spanning_tree[edge_bgn][edge_fin]['type']
             if edge_type == 2:  # tree edge  # TODO: extract into constant
                 bases = intersect_lists(find(edge_bgn_vec, edge_bgn),
                                         find(edge_fin_vec, edge_fin))

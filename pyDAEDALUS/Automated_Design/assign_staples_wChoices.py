@@ -27,14 +27,14 @@ def generate_spanning_21_bp_staples(num_21_staps, scaf_bot_cut, scaf_top_cut):
         staple_list.append(reordered_temp_stap)
     return staple_list
 
-def assign_staples_wChoices(edges, num_edges, edge_type_mat, scaf_to_edge,
+def assign_staples_wChoices(edges, num_edges, graph_with_spanning_tree, scaf_to_edge,
                             num_bases, num_vert, singleXOs, Aform=False):
     """
     Assign staples to edges following prescribed patterns
     Inputs: edges = Ex2 matrix where each row corresponds to one edge,
               denoting the vertices being connected. 1st column > 2nd column
             num_edges = number of edges, E
-            edge_type_mat = VxV sparse matrix (V = number of vertices) where
+            graph_with_spanning_tree = VxV sparse matrix (V = number of vertices) where
       1 is non-spanning tree edge: DX edge with 1 scaffold crossover
       2 is spanning tree edge: DX edge with 0 scaffold crossovers
             scaf_to_edge = Ex2 cell array, where each row corresponds to one
@@ -67,7 +67,7 @@ def assign_staples_wChoices(edges, num_edges, edge_type_mat, scaf_to_edge,
         scaf_1 = scaf_to_edge[edge_ID][0]  # low to high 5' to 3'
         scaf_2 = scaf_to_edge[edge_ID][1]  # high to low 5' to 3'
 
-        edge_type = edge_type_mat[edge_bgn][edge_fin]['type']
+        edge_type = graph_with_spanning_tree[edge_bgn][edge_fin]['type']
 
         scaf_top = scaf_1  # low to high 5' to 3'
         scaf_bot = scaf_2[-1::-1]  # low to high 3' to 5'
@@ -78,11 +78,6 @@ def assign_staples_wChoices(edges, num_edges, edge_type_mat, scaf_to_edge,
         # breakpoint of staple be at crossover.
         if singleXOs:  # singleXOs on
 
-            # TODO: remove staples 1 and 4.  change init'd stap_ID to 4.
-
-#
-# Tyson edits: changing vertex staples to new Hform
-#
             if Aform: # A-form
                 staples[edge_ID][0] = scaf_bot[0:9]  # 5 bp -> 11
                 staples[edge_ID][1] = scaf_top[12::-1]  # 6 bp -> 11
@@ -196,7 +191,7 @@ def assign_staples_wChoices(edges, num_edges, edge_type_mat, scaf_to_edge,
                     elif rem_left== 3:
                         left_SCS = min(14, len_left)
                     elif rem_left==17:
-                        left_SCS = min(14)
+                        left_SCS = min(14, len_left)
                     else:  # 5/26, 6/27, 16
                         left_SCS = min(14, len_left)
 
@@ -434,12 +429,12 @@ def assign_staples_wChoices(edges, num_edges, edge_type_mat, scaf_to_edge,
     # Group vertex staple fragments int 52 nt (4 domains)
     # and 78 nt (6 domains) staples:
     for vert_ID in range(num_vert):
-        neighbors = edge_type_mat.neighbors(vert_ID)
+        neighbors = graph_with_spanning_tree.adj[vert_ID]
         degree = len(neighbors)  # degree of vertex
         # num of 26x2 = 52 nt staples, has 4 domains
-        num_four_dom_Vstap = -degree % 3
+        num_four_dom_Vstap = int(-degree % 3)
         # num of 26x3 = 78 nt staples, has 6 domains
-        num_six_dom_Vstap = (degree - 2*num_four_dom_Vstap)/3
+        num_six_dom_Vstap = int((degree - 2*num_four_dom_Vstap)/3)
 
         # # Identify starting position of routing
         # identify all neighbor ids that are greater than vert_ID:

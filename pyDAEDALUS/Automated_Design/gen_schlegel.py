@@ -38,7 +38,7 @@ def create_2d_mapping(edges, coordinates, faces):
                 for row, col in zip(find_vert_row, find_vert_col):
                     find_vert_col_nbr = 1 - col
                     neighbors.append(edges[row, find_vert_col_nbr])
-                neighbors = np.array(neighbors, dtype=np.int)
+                neighbors = np.array(neighbors, dtype=int)
 
                 # # Get neighbor coords
                 nbr_coord = xycoord[neighbors, :]
@@ -81,7 +81,7 @@ def plot_schlegel(edges, edge_type_graph, xycoord,
         # None, default to coloring edges the same as if all edges weren't a
         # part of the spanning tree.
         if edge_type_graph is not None \
-                and (edge_type_graph.edge[edge_bgn][edge_fin]['type'] == 1):
+                and (edge_type_graph.edges[edge_bgn,edge_fin]['type'] == 1):
             plt.plot(x_vec, y_vec, linestyle='-', color=SKYBLUE, linewidth=5)
         else:  # if this is a non-tree edge:
             plt.plot(x_vec, y_vec, linestyle='-', color=REDPURPLE, linewidth=8)
